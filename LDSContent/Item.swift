@@ -24,19 +24,19 @@ import Foundation
 
 public struct Item: Equatable {
     
-    var id: Int
-    var itemExternalID: String
-    var languageID: Int
-    var sourceID: Int
-    var platformID: Int
-    var uri: String
-    var title: String
-    var itemCoverRenditions: [ImageRendition]
-    var itemCategoryID: Int
-    var latestVersion: Int
-    var obsolete: Bool
+    public var id: Int
+    public var itemExternalID: String
+    public var languageID: Int
+    public var sourceID: Int
+    public var platformID: Int
+    public var uri: String
+    public var title: String
+    public var itemCoverRenditions: [ImageRendition]
+    public var itemCategoryID: Int
+    public var latestVersion: Int
+    public var obsolete: Bool
     
-    init(id: Int, itemExternalID: String, languageID: Int, sourceID: Int, platformID: Int, uri: String, title: String, itemCoverRenditions: [ImageRendition], itemCategoryID: Int, latestVersion: Int, obsolete: Bool) {
+    public init(id: Int, itemExternalID: String, languageID: Int, sourceID: Int, platformID: Int, uri: String, title: String, itemCoverRenditions: [ImageRendition], itemCategoryID: Int, latestVersion: Int, obsolete: Bool) {
         self.id = id
         self.itemExternalID = itemExternalID
         self.languageID = languageID

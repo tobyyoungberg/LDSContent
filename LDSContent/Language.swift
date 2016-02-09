@@ -22,18 +22,26 @@
 
 import Foundation
 
-public struct ImageRendition: Equatable {
+public struct Language {
     
-    public var size: CGSize
-    public var url: NSURL
+    public var id: Int
+    public var ldsLanguageCode: String
+    public var iso639_3Code: String
+    public var bcp47Code: String
+    public var rootLibraryCollectionID: Int
+    public var rootLibraryCollectionExternalID: String
     
-    public init(size: CGSize, url: NSURL) {
-        self.size = size
-        self.url = url
+    public init(id: Int, ldsLanguageCode: String, iso639_3Code: String, bcp47Code: String, rootLibraryCollectionID: Int, rootLibraryCollectionExternalID: String) {
+        self.id = id
+        self.ldsLanguageCode = ldsLanguageCode
+        self.iso639_3Code = iso639_3Code
+        self.bcp47Code = bcp47Code
+        self.rootLibraryCollectionID = rootLibraryCollectionID
+        self.rootLibraryCollectionExternalID = rootLibraryCollectionExternalID
     }
     
 }
 
-public func == (lhs: ImageRendition, rhs: ImageRendition) -> Bool {
-    return lhs.size == rhs.size && lhs.url == rhs.url
+public func == (lhs: Language, rhs: Language) -> Bool {
+    return lhs.id == rhs.id
 }

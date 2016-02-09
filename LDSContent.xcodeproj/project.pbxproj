@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7CE3011EF7C35F3D53247E75 /* Pods_LDSContent_LDSContentTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D75CE91D7DD83C1652836147 /* Pods_LDSContent_LDSContentTests.framework */; };
 		A8CA513CEB94BF565578434E /* Pods_LDSContentTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EBF7D305EF122484D5284AB /* Pods_LDSContentTests.framework */; };
 		AA7595EB520EE39398A793E4 /* Pods_LDSContent.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 59EE076D6520345EE9FB40CC /* Pods_LDSContent.framework */; };
 		D9D3AEEA1C6A982200E2681A /* LDSContent.h in Headers */ = {isa = PBXBuildFile; fileRef = D9D3AEE91C6A982200E2681A /* LDSContent.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -15,6 +14,7 @@
 		D9D3AEFA1C6A9A2400E2681A /* LDSContent.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9D3AEE61C6A982200E2681A /* LDSContent.framework */; };
 		D9D3AF011C6AA41C00E2681A /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9D3AF001C6AA41C00E2681A /* Item.swift */; };
 		D9D3AF031C6AAD5D00E2681A /* ImageRendition.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9D3AF021C6AAD5D00E2681A /* ImageRendition.swift */; };
+		D9D3AF051C6AB07F00E2681A /* Language.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9D3AF041C6AB07F00E2681A /* Language.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,7 +33,6 @@
 		59EE076D6520345EE9FB40CC /* Pods_LDSContent.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LDSContent.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9EBF7D305EF122484D5284AB /* Pods_LDSContentTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LDSContentTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A852E08924FFA467F542C194 /* Pods-LDSContent.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LDSContent.release.xcconfig"; path = "Pods/Target Support Files/Pods-LDSContent/Pods-LDSContent.release.xcconfig"; sourceTree = "<group>"; };
-		D75CE91D7DD83C1652836147 /* Pods_LDSContent_LDSContentTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LDSContent_LDSContentTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D9D3AEE61C6A982200E2681A /* LDSContent.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = LDSContent.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D9D3AEE91C6A982200E2681A /* LDSContent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LDSContent.h; sourceTree = "<group>"; };
 		D9D3AEEB1C6A982200E2681A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -42,6 +41,7 @@
 		D9D3AEF91C6A9A2400E2681A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D9D3AF001C6AA41C00E2681A /* Item.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
 		D9D3AF021C6AAD5D00E2681A /* ImageRendition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageRendition.swift; sourceTree = "<group>"; };
+		D9D3AF041C6AB07F00E2681A /* Language.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Language.swift; sourceTree = "<group>"; };
 		F8C0FCA5D7FE1C890C3FDCD0 /* Pods-LDSContentTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LDSContentTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-LDSContentTests/Pods-LDSContentTests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -59,7 +59,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				D9D3AEFA1C6A9A2400E2681A /* LDSContent.framework in Frameworks */,
-				7CE3011EF7C35F3D53247E75 /* Pods_LDSContent_LDSContentTests.framework in Frameworks */,
 				A8CA513CEB94BF565578434E /* Pods_LDSContentTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -82,7 +81,6 @@
 			isa = PBXGroup;
 			children = (
 				59EE076D6520345EE9FB40CC /* Pods_LDSContent.framework */,
-				D75CE91D7DD83C1652836147 /* Pods_LDSContent_LDSContentTests.framework */,
 				9EBF7D305EF122484D5284AB /* Pods_LDSContentTests.framework */,
 			);
 			name = Frameworks;
@@ -113,6 +111,7 @@
 			children = (
 				D9D3AF001C6AA41C00E2681A /* Item.swift */,
 				D9D3AF021C6AAD5D00E2681A /* ImageRendition.swift */,
+				D9D3AF041C6AB07F00E2681A /* Language.swift */,
 				D9D3AEE91C6A982200E2681A /* LDSContent.h */,
 				D9D3AEEB1C6A982200E2681A /* Info.plist */,
 			);
@@ -319,6 +318,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D9D3AF051C6AB07F00E2681A /* Language.swift in Sources */,
 				D9D3AF031C6AAD5D00E2681A /* ImageRendition.swift in Sources */,
 				D9D3AF011C6AA41C00E2681A /* Item.swift in Sources */,
 			);
