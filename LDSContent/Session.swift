@@ -21,9 +21,26 @@
 //
 
 import Foundation
+import PSOperations
 
-public enum SourceType: Int {
-    case Default = 1
-    case Secure = 2
-    case Foreign = 3
+public class Session {
+    
+    public init() {}
+    
+    lazy var urlSession: NSURLSession = {
+        return NSURLSession(configuration: NSURLSessionConfiguration.ephemeralSessionConfiguration(), delegate: nil, delegateQueue: nil)
+    }()
+    
+    let operationQueue = OperationQueue()
+    
+    public func fetchCatalogVersion(completion completion: (FetchCatalogVersionResult) -> Void) {
+        let operation = FetchCatalogVersionOperation(session: self, completion: completion)
+        operationQueue.addOperation(operation)
+    }
+    
+    public func downloadCatalog(destinationURL destinationURL: NSURL, catalogVersion: Int? = nil, completion: (DownloadCatalogResult) -> Void) {
+        let operation = DownloadCatalogOperation(session: self, destinationURL: destinationURL, catalogVersion: catalogVersion, completion: completion)
+        operationQueue.addOperation(operation)
+    }
+    
 }

@@ -22,10 +22,14 @@
 
 import Foundation
 
-public struct Source {
+public struct Source: Equatable {
     
-    var id: Int
-    var name: String
-    var type: SourceType
+    public var id: Int
+    public var name: String
+    public var type: SourceType
 
+}
+
+public func == (lhs: Source, rhs: Source) -> Bool {
+    return lhs.id == rhs.id && lhs.name == rhs.name && lhs.type == rhs.type
 }

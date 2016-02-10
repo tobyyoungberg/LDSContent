@@ -15,4 +15,5 @@ Pod::Spec.new do |s|
   s.dependency 'PSOperations'
   s.dependency 'SQLite.swift', '~> 0.9.2'
   s.dependency 'Swiftification'
+  s.dependency 'SSZipArchive'
 end

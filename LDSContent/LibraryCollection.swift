@@ -26,8 +26,8 @@ public struct LibraryCollection {
     
     public var id: Int
     public var externalID: String
-    public var librarySectionID: Int
-    public var librarySectionExternalID: String
+    public var librarySectionID: Int?
+    public var librarySectionExternalID: String?
     public var position: Int
     public var title: String
     public var coverRenditions: [ImageRendition]

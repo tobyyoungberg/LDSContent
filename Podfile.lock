@@ -1,16 +1,19 @@
 PODS:
   - PSOperations (2.1.0)
   - SQLite.swift (0.9.2)
+  - SSZipArchive (1.1)
   - Swiftification (5.0.0)
 
 DEPENDENCIES:
   - PSOperations
   - SQLite.swift (~> 0.9.2)
+  - SSZipArchive
   - Swiftification
 
 SPEC CHECKSUMS:
   PSOperations: ced5d50e2ce4ec28dcdb2ff121c04f56b479fa7b
   SQLite.swift: 5dca22dbf6634fdb9c3270fae9491830804e9b2d
+  SSZipArchive: de3d215ab73f87db627f81f2ce24f1731e3886c3
   Swiftification: cf7c49e2689beb8aefbb9b00ba655dc7b9b1d06e
 
 COCOAPODS: 0.39.0

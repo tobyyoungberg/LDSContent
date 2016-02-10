@@ -22,8 +22,17 @@
 
 import Foundation
 
-public enum SourceType: Int {
-    case Default = 1
-    case Secure = 2
-    case Foreign = 3
+public struct Error {
+    
+    public static let Domain = "com.crosswaterbridge.LDSContent"
+    
+    public enum Code: Int {
+        case Unknown = -1000
+    }
+    
+    static func errorWithCode(code: Error.Code, failureReason: String) -> NSError {
+        let userInfo = [NSLocalizedFailureReasonErrorKey: failureReason]
+        return NSError(domain: Error.Domain, code: code.rawValue, userInfo: userInfo)
+    }
+    
 }

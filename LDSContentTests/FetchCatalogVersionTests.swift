@@ -20,10 +20,25 @@
 // THE SOFTWARE.
 //
 
-import Foundation
+import XCTest
+import LDSContent
 
-public enum SourceType: Int {
-    case Default = 1
-    case Secure = 2
-    case Foreign = 3
+class FetchCatalogVersionTests: XCTestCase {
+    
+    func testFetchCatalogVersion() {
+        let session = Session()
+        
+        let expectation = expectationWithDescription("Fetch catalog version")
+        session.fetchCatalogVersion { result in
+            switch result {
+            case let .Success(catalogVersion):
+                XCTAssertGreaterThan(catalogVersion, 0)
+            case let .Error(errors):
+                XCTFail("Failed with errors \(errors)")
+            }
+            expectation.fulfill()
+        }
+        waitForExpectationsWithTimeout(30, handler: nil)
+    }
+    
 }
