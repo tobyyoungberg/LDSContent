@@ -21,9 +21,26 @@
 //
 
 import Foundation
+import SQLite
 
 public enum SourceType: Int {
     case Default = 1
     case Secure = 2
     case Foreign = 3
+}
+
+extension SourceType: Value {
+    
+    public static var declaredDatatype: String {
+        return Int.declaredDatatype
+    }
+    
+    public static func fromDatatypeValue(rawValue: Int) -> SourceType? {
+        return SourceType(rawValue: rawValue)
+    }
+    
+    public var datatypeValue: Int {
+        return rawValue
+    }
+    
 }
