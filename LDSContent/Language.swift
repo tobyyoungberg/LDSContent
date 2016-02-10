@@ -22,17 +22,17 @@
 
 import Foundation
 
-public struct Language {
+public struct Language: Equatable {
     
     public var id: Int
     public var ldsLanguageCode: String
     public var iso639_3Code: String
-    public var bcp47Code: String
+    public var bcp47Code: String?
     public var rootLibraryCollectionID: Int
     public var rootLibraryCollectionExternalID: String
     
 }
 
 public func == (lhs: Language, rhs: Language) -> Bool {
-    return lhs.id == rhs.id
+    return lhs.id == rhs.id && lhs.ldsLanguageCode == rhs.ldsLanguageCode && lhs.iso639_3Code == rhs.iso639_3Code && lhs.bcp47Code == rhs.bcp47Code && lhs.rootLibraryCollectionID == rhs.rootLibraryCollectionID && lhs.rootLibraryCollectionExternalID == rhs.rootLibraryCollectionExternalID
 }

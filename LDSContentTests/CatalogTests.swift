@@ -82,6 +82,20 @@ class CatalogTests: XCTestCase {
         XCTAssertEqual(item4!.uri, "/scriptures/bofm")
     }
     
+    func testLanguages() {
+        let languages = catalog.languages()
+        XCTAssertGreaterThan(languages.count, 20)
+        
+        let language = languages.first!
+        
+        XCTAssertEqual(catalog.languageWithID(language.id)!, language)
+        XCTAssertEqual(catalog.languageWithISO639_3Code(language.iso639_3Code)!, language)
+        XCTAssertEqual(catalog.languageWithBCP47Code(language.bcp47Code!)!, language)
+        XCTAssertEqual(catalog.languageWithLDSLanguageCode(language.ldsLanguageCode)!, language)
+        XCTAssertEqual(catalog.languageWithRootLibraryCollectionID(language.rootLibraryCollectionID)!, language)
+        XCTAssertEqual(catalog.languageWithRootLibraryCollectionExternalID(language.rootLibraryCollectionExternalID)!, language)
+    }
+    
     func testItemTitles() {
         let items = catalog.itemsWithTitlesThatContainString("Mormon", languageID: 1, limit: 10)
         XCTAssertTrue(items.contains { $0.title == "Book of Mormon" })
@@ -103,6 +117,13 @@ class CatalogTests: XCTestCase {
         
         let items7 = catalog.itemsWithTitlesThatContainString("!Mormon", languageID: 1, limit: 10)
         XCTAssertEqual(items7.count, 0)
+    }
+    
+    func testLanguageNames() {
+        XCTAssertEqual(catalog.nameForLanguageWithID(1, inLanguageWithID: 1), "English")
+        XCTAssertEqual(catalog.nameForLanguageWithID(3, inLanguageWithID: 1), "Spanish")
+        XCTAssertEqual(catalog.nameForLanguageWithID(1, inLanguageWithID: 3), "Inglés")
+        XCTAssertEqual(catalog.nameForLanguageWithID(3, inLanguageWithID: 3), "Español")
     }
     
     func testLibraryCollections() {

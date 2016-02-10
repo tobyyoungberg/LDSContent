@@ -262,6 +262,76 @@ extension Catalog {
 
 }
 
+private class LanguageTable {
+    
+    static let table = Table("language")
+    static let id = Expression<Int>("_id")
+    static let ldsLanguageCode = Expression<String>("lds_language_code")
+    static let iso639_3Code = Expression<String>("iso639_3")
+    static let bcp47Code = Expression<String?>("bcp47")
+    static let rootLibraryCollectionID = Expression<Int>("root_library_collection_id")
+    static let rootLibraryCollectionExternalID = Expression<String>("root_library_collection_external_id")
+    
+    static func fromRow(row: Row) -> Language {
+        return Language(id: row[id], ldsLanguageCode: row[ldsLanguageCode], iso639_3Code: row[iso639_3Code], bcp47Code: row[bcp47Code], rootLibraryCollectionID: row[rootLibraryCollectionID], rootLibraryCollectionExternalID: row[rootLibraryCollectionExternalID])
+    }
+    
+}
+
+extension Catalog {
+    
+    func languages() -> [Language] {
+        do {
+            return try db.prepare(LanguageTable.table).map { LanguageTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
+    func languageWithID(id: Int) -> Language? {
+        return db.pluck(LanguageTable.table.filter(LanguageTable.id == id)).map { LanguageTable.fromRow($0) }
+    }
+    
+    func languageWithISO639_3Code(iso639_3Code: String) -> Language? {
+        return db.pluck(LanguageTable.table.filter(LanguageTable.iso639_3Code == iso639_3Code)).map { LanguageTable.fromRow($0) }
+    }
+    
+    func languageWithBCP47Code(bcp47Code: String) -> Language? {
+        return db.pluck(LanguageTable.table.filter(LanguageTable.bcp47Code == bcp47Code)).map { LanguageTable.fromRow($0) }
+    }
+    
+    func languageWithLDSLanguageCode(ldsLanguageCode: String) -> Language? {
+        return db.pluck(LanguageTable.table.filter(LanguageTable.ldsLanguageCode == ldsLanguageCode)).map { LanguageTable.fromRow($0) }
+    }
+    
+    func languageWithRootLibraryCollectionID(rootLibraryCollectionID: Int) -> Language? {
+        return db.pluck(LanguageTable.table.filter(LanguageTable.rootLibraryCollectionID == rootLibraryCollectionID)).map { LanguageTable.fromRow($0) }
+    }
+    
+    func languageWithRootLibraryCollectionExternalID(rootLibraryCollectionExternalID: String) -> Language? {
+        return db.pluck(LanguageTable.table.filter(LanguageTable.rootLibraryCollectionExternalID == rootLibraryCollectionExternalID)).map { LanguageTable.fromRow($0) }
+    }
+    
+}
+
+private class LanguageNameTable {
+    
+    static let table = Table("language_name")
+    static let id = Expression<Int>("_id")
+    static let languageID = Expression<Int>("language_id")
+    static let localizationLanguageID = Expression<Int>("localization_language_id")
+    static let name = Expression<String>("name")
+    
+}
+
+extension Catalog {
+
+    func nameForLanguageWithID(languageID: Int, inLanguageWithID localizationLanguageID: Int) -> String {
+        return db.scalar(LanguageNameTable.table.select(LanguageNameTable.name).filter(LanguageNameTable.languageID == languageID && LanguageNameTable.localizationLanguageID == localizationLanguageID))
+    }
+    
+}
+
 private class LibraryItemTable {
     
     static let table = Table("library_item")
