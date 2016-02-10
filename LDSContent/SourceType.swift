@@ -22,32 +22,8 @@
 
 import Foundation
 
-public struct Item: Equatable {
-    
-    public var id: Int
-    public var externalID: String
-    public var languageID: Int
-    public var sourceID: Int
-    public var platformID: Int
-    public var uri: String
-    public var title: String
-    public var itemCoverRenditions: [ImageRendition]
-    public var itemCategoryID: Int
-    public var latestVersion: Int
-    public var obsolete: Bool
-    
-}
-
-public func == (lhs: Item, rhs: Item) -> Bool {
-    return lhs.id == rhs.id &&
-        lhs.externalID == rhs.externalID &&
-        lhs.languageID == rhs.languageID &&
-        lhs.sourceID == rhs.sourceID &&
-        lhs.platformID == rhs.platformID &&
-        lhs.uri == rhs.uri &&
-        lhs.title == rhs.title &&
-        lhs.itemCoverRenditions == rhs.itemCoverRenditions &&
-        lhs.itemCategoryID == rhs.itemCategoryID &&
-        lhs.latestVersion == rhs.latestVersion &&
-        lhs.obsolete == rhs.obsolete
+public enum SourceType: Int {
+    case Default = 1
+    case Secure = 2
+    case Foreign = 3
 }
