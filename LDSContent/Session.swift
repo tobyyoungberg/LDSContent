@@ -23,12 +23,10 @@
 import Foundation
 import PSOperations
 
-public class Session {
-    
-    public init() {}
+public class Session: NSObject {
     
     lazy var urlSession: NSURLSession = {
-        return NSURLSession(configuration: NSURLSessionConfiguration.ephemeralSessionConfiguration(), delegate: nil, delegateQueue: nil)
+        return NSURLSession(configuration: NSURLSessionConfiguration.ephemeralSessionConfiguration(), delegate: self, delegateQueue: nil)
     }()
     
     let operationQueue = OperationQueue()
@@ -41,6 +39,14 @@ public class Session {
     public func downloadCatalog(destinationURL destinationURL: NSURL, catalogVersion: Int? = nil, completion: (DownloadCatalogResult) -> Void) {
         let operation = DownloadCatalogOperation(session: self, destinationURL: destinationURL, catalogVersion: catalogVersion, completion: completion)
         operationQueue.addOperation(operation)
+    }
+    
+}
+
+extension Session: NSURLSessionDelegate {
+    
+    public func URLSession(session: NSURLSession, didReceiveChallenge challenge: NSURLAuthenticationChallenge, completionHandler: (NSURLSessionAuthChallengeDisposition, NSURLCredential?) -> Void) {
+        completionHandler(.UseCredential, NSURLCredential(forTrust: challenge.protectionSpace.serverTrust!))
     }
     
 }
