@@ -61,25 +61,35 @@ class CatalogTests: XCTestCase {
         let items2 = catalog.itemsWithIDsIn(expectedItems.map { $0.id })
         XCTAssertEqual(items2, expectedItems)
         
-        let items3 = catalog.itemsWithExternalIDsIn(expectedItems.map { $0.externalID })
-        XCTAssertEqual(items3, expectedItems)
-        
-        let items4 = catalog.itemsWithURIsIn(["/scriptures/bofm", "/scriptures/dc-testament"], languageID: 1)
-        XCTAssertEqual(items4.count, 2)
+        let items3 = catalog.itemsWithURIsIn(["/scriptures/bofm", "/scriptures/dc-testament"], languageID: 1)
+        XCTAssertEqual(items3.count, 2)
         
         let expectedItem = items.first!
         
         let item = catalog.itemWithID(expectedItem.id)
         XCTAssertEqual(item, expectedItem)
         
-        let item2 = catalog.itemWithExternalID(expectedItem.externalID)
+        let item2 = catalog.itemWithURI(expectedItem.uri, languageID: expectedItem.languageID)
         XCTAssertEqual(item2, expectedItem)
         
-        let item3 = catalog.itemWithURI(expectedItem.uri, languageID: expectedItem.languageID)
-        XCTAssertEqual(item3, expectedItem)
+        let item3 = catalog.itemThatContainsURI("/scriptures/bofm/1-ne/1", languageID: 1)
+        XCTAssertEqual(item3!.uri, "/scriptures/bofm")
+    }
+    
+    @available(*, deprecated=1.0.0)
+    func testDeprecatedItems() {
+        let items = catalog.items()
+        XCTAssertGreaterThan(items.count, 1000)
         
-        let item4 = catalog.itemThatContainsURI("/scriptures/bofm/1-ne/1", languageID: 1)
-        XCTAssertEqual(item4!.uri, "/scriptures/bofm")
+        let expectedItems = Array(items[0..<20])
+        
+        let items3 = catalog.itemsWithExternalIDsIn(expectedItems.map { $0.externalID })
+        XCTAssertEqual(items3, expectedItems)
+        
+        let expectedItem = items.first!
+        
+        let item2 = catalog.itemWithExternalID(expectedItem.externalID)
+        XCTAssertEqual(item2, expectedItem)
     }
     
     func testLanguages() {
@@ -93,6 +103,15 @@ class CatalogTests: XCTestCase {
         XCTAssertEqual(catalog.languageWithBCP47Code(language.bcp47Code!)!, language)
         XCTAssertEqual(catalog.languageWithLDSLanguageCode(language.ldsLanguageCode)!, language)
         XCTAssertEqual(catalog.languageWithRootLibraryCollectionID(language.rootLibraryCollectionID)!, language)
+    }
+    
+    @available(*, deprecated=1.0.0)
+    func testDeprecatedLanguages() {
+        let languages = catalog.languages()
+        XCTAssertGreaterThan(languages.count, 20)
+        
+        let language = languages.first!
+        
         XCTAssertEqual(catalog.languageWithRootLibraryCollectionExternalID(language.rootLibraryCollectionExternalID)!, language)
     }
     
@@ -143,16 +162,27 @@ class CatalogTests: XCTestCase {
         let libraryCollection = catalog.libraryCollectionWithID(scripturesLibraryCollection.id)!
         XCTAssertEqual(libraryCollection, scripturesLibraryCollection)
         
-        let libraryCollection2 = catalog.libraryCollectionWithExternalID(scripturesLibraryCollection.externalID)!
-        XCTAssertEqual(libraryCollection2, scripturesLibraryCollection)
-        
         let librarySection = catalog.librarySectionsForLibraryCollectionWithID(rootLibraryCollection.id).first!
         
         let libraryCollections3 = catalog.libraryCollectionsForLibrarySectionWithID(librarySection.id)
         XCTAssertGreaterThan(libraryCollections3.count, 0)
+    }
+    
+    @available(*, deprecated=1.0.0)
+    func testDeprecatedLibraryCollections() {
+        let libraryCollections = catalog.libraryCollections()
+        XCTAssertGreaterThan(libraryCollections.count, 0)
         
-        let libraryCollections4 = catalog.libraryCollectionsForLibrarySectionWithExternalID(librarySection.externalID)
-        XCTAssertEqual(libraryCollections3, libraryCollections4)
+        let scripturesLibraryCollection = libraryCollections.find { $0.type == .Scriptures }!
+        
+        let libraryCollection = catalog.libraryCollectionWithExternalID(scripturesLibraryCollection.externalID)!
+        XCTAssertEqual(libraryCollection, scripturesLibraryCollection)
+        
+        let rootLibraryCollection = libraryCollections.first!
+        let librarySection = catalog.librarySectionsForLibraryCollectionWithID(rootLibraryCollection.id).first!
+        
+        let libraryCollections3 = catalog.libraryCollectionsForLibrarySectionWithExternalID(librarySection.externalID)
+        XCTAssertGreaterThan(libraryCollections3.count, 0)
     }
     
     func testLibrarySections() {
@@ -161,16 +191,23 @@ class CatalogTests: XCTestCase {
         let librarySections = catalog.librarySectionsForLibraryCollectionWithID(scripturesLibraryCollection.id)
         XCTAssertGreaterThan(librarySections.count, 0)
         
-        let librarySections2 = catalog.librarySectionsForLibraryCollectionWithExternalID(scripturesLibraryCollection.externalID)
-        XCTAssertEqual(librarySections2, librarySections)
-        
         let librarySection = librarySections.first!
         
         let librarySection2 = catalog.librarySectionWithID(librarySection.id)
         XCTAssertEqual(librarySection2, librarySection)
+    }
+    
+    @available(*, deprecated=1.0.0)
+    func testDeprecatedLibrarySections() {
+        let scripturesLibraryCollection = catalog.libraryCollections().find { $0.type == .Scriptures }!
         
-        let librarySection3 = catalog.librarySectionWithExternalID(librarySection.externalID)
-        XCTAssertEqual(librarySection3, librarySection2)
+        let librarySections = catalog.librarySectionsForLibraryCollectionWithExternalID(scripturesLibraryCollection.externalID)
+        XCTAssertGreaterThan(librarySections.count, 0)
+        
+        let librarySection = librarySections.first!
+        
+        let librarySection2 = catalog.librarySectionWithExternalID(librarySection.externalID)
+        XCTAssertEqual(librarySection2, librarySection)
     }
     
     func testLibraryItems() {
@@ -180,37 +217,44 @@ class CatalogTests: XCTestCase {
         let libraryItems = catalog.libraryItemsForLibrarySectionWithID(scripturesLibrarySection.id)
         XCTAssertGreaterThan(libraryItems.count, 0)
         
-        let libraryItems2 = catalog.libraryItemsForLibrarySectionWithExternalID(scripturesLibrarySection.externalID)
-        XCTAssertEqual(libraryItems2, libraryItems)
-        
-        let libraryItems3 = catalog.libraryItemsForLibraryCollectionWithID(scripturesLibraryCollection.id)
-        XCTAssertGreaterThan(libraryItems3.count, 0)
-        
-        let libraryItems4 = catalog.libraryItemsForLibraryCollectionWithExternalID(scripturesLibraryCollection.externalID)
-        XCTAssertEqual(libraryItems4, libraryItems3)
+        let libraryItems2 = catalog.libraryItemsForLibraryCollectionWithID(scripturesLibraryCollection.id)
+        XCTAssertGreaterThan(libraryItems2.count, 0)
         
         let libraryItem = libraryItems.first!
         
-        let libraryItems5 = catalog.libraryItemsWithItemID(libraryItem.itemID)
-        XCTAssertTrue(libraryItems5.contains(libraryItem))
-        
-        let libraryItems6 = catalog.libraryItemsWithItemExternalID(libraryItem.itemExternalID)
-        XCTAssertTrue(libraryItems6.contains(libraryItem))
-        
-        let libraryItems7 = catalog.libraryItemsWithItemExternalIDs(libraryItems.map { $0.itemExternalID })
-        XCTAssertTrue(Set(libraryItems7).isStrictSupersetOf(libraryItems))
+        let libraryItems3 = catalog.libraryItemsWithItemID(libraryItem.itemID)
+        XCTAssertTrue(libraryItems3.contains(libraryItem))
         
         let libraryItem2 = catalog.libraryItemWithItemID(libraryItem.itemID, inLibraryCollectionWithID: scripturesLibraryCollection.id)
         XCTAssertEqual(libraryItem2, libraryItem)
         
-        let libraryItem3 = catalog.libraryItemWithItemExternalID(libraryItem.itemExternalID, inLibraryCollectionWithExternalID: scripturesLibraryCollection.externalID)
+        let libraryItem3 = catalog.libraryItemWithID(libraryItem.id)
         XCTAssertEqual(libraryItem3, libraryItem)
+    }
+    
+    @available(*, deprecated=1.0.0)
+    func testDeprecatedLibraryItems() {
+        let scripturesLibraryCollection = catalog.libraryCollections().find { $0.type == .Scriptures }!
+        let scripturesLibrarySection = catalog.librarySectionsForLibraryCollectionWithID(scripturesLibraryCollection.id).first!
         
-        let libraryItem4 = catalog.libraryItemWithID(libraryItem.id)
-        XCTAssertEqual(libraryItem4, libraryItem)
+        let libraryItems = catalog.libraryItemsForLibrarySectionWithID(scripturesLibrarySection.id)
         
-        let libraryItem5 = catalog.libraryItemWithExternalID(libraryItem.externalID)
-        XCTAssertEqual(libraryItem5, libraryItem)
+        let libraryItems2 = catalog.libraryItemsForLibrarySectionWithExternalID(scripturesLibrarySection.externalID)
+        XCTAssertEqual(libraryItems2, libraryItems)
+        
+        let libraryItems3 = catalog.libraryItemsForLibraryCollectionWithExternalID(scripturesLibraryCollection.externalID)
+        XCTAssertGreaterThan(libraryItems3.count, 0)
+        
+        let libraryItem = libraryItems.first!
+        
+        let libraryItems4 = catalog.libraryItemsWithItemExternalID(libraryItem.itemExternalID)
+        XCTAssertTrue(libraryItems4.contains(libraryItem))
+        
+        let libraryItem2 = catalog.libraryItemWithItemExternalID(libraryItem.itemExternalID, inLibraryCollectionWithExternalID: scripturesLibraryCollection.externalID)
+        XCTAssertEqual(libraryItem2, libraryItem)
+        
+        let libraryItem3 = catalog.libraryItemWithExternalID(libraryItem.externalID)
+        XCTAssertEqual(libraryItem3, libraryItem)
     }
     
     func testLibraryNodes() {
@@ -219,6 +263,12 @@ class CatalogTests: XCTestCase {
         
         let libraryNodes = catalog.libraryNodesForLibrarySectionWithID(scripturesLibrarySection.id)
         XCTAssertGreaterThan(libraryNodes.count, 0)
+    }
+    
+    @available(*, deprecated=1.0.0)
+    func testDeprecatedLibraryNodes() {
+        let scripturesLibraryCollection = catalog.libraryCollections().find { $0.type == .Scriptures }!
+        let scripturesLibrarySection = catalog.librarySectionsForLibraryCollectionWithID(scripturesLibraryCollection.id).first!
         
         let libraryNodes2 = catalog.libraryNodesForLibrarySectionWithExternalID(scripturesLibrarySection.externalID)
         XCTAssertGreaterThan(libraryNodes2.count, 0)

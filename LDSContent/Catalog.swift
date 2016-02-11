@@ -221,6 +221,7 @@ extension Catalog {
         }
     }
     
+    @available(*, deprecated=1.0.0, message="Use `itemsWithIDsIn(_:)` instead")
     public func itemsWithExternalIDsIn(externalIDs: [String]) -> [Item] {
         do {
             return try db.prepare(ItemTable.table.filter(externalIDs.contains(ItemTable.externalID) && [1, 2].contains(ItemTable.platformID))).map { ItemTable.fromRow($0) }
@@ -233,6 +234,7 @@ extension Catalog {
         return db.pluck(ItemTable.table.filter(ItemTable.id == id && [1, 2].contains(ItemTable.platformID))).map { ItemTable.fromRow($0) }
     }
     
+    @available(*, deprecated=1.0.0, message="Use `itemWithID(_:)` instead")
     public func itemWithExternalID(externalID: String) -> Item? {
         return db.pluck(ItemTable.table.filter(ItemTable.externalID == externalID && [1, 2].contains(ItemTable.platformID))).map { ItemTable.fromRow($0) }
     }
@@ -308,6 +310,7 @@ extension Catalog {
         return db.pluck(LanguageTable.table.filter(LanguageTable.rootLibraryCollectionID == rootLibraryCollectionID)).map { LanguageTable.fromRow($0) }
     }
     
+    @available(*, deprecated=1.0.0, message="Use `languageWithRootLibraryCollectionID(_:)` instead")
     public func languageWithRootLibraryCollectionExternalID(rootLibraryCollectionExternalID: String) -> Language? {
         return db.pluck(LanguageTable.table.filter(LanguageTable.rootLibraryCollectionExternalID == rootLibraryCollectionExternalID)).map { LanguageTable.fromRow($0) }
     }
@@ -359,6 +362,7 @@ extension Catalog {
         }
     }
     
+    @available(*, deprecated=1.0.0, message="Use `librarySectionsForLibraryCollectionWithID(_:)` instead")
     public func librarySectionsForLibraryCollectionWithExternalID(externalID: String) -> [LibrarySection] {
         do {
             return try db.prepare(LibrarySectionTable.table.filter(LibrarySectionTable.libraryCollectionExternalID == externalID).order(LibrarySectionTable.position)).map { LibrarySectionTable.fromRow($0) }
@@ -371,6 +375,7 @@ extension Catalog {
         return db.pluck(LibrarySectionTable.table.filter(LibrarySectionTable.id == id)).map { LibrarySectionTable.fromRow($0) }
     }
     
+    @available(*, deprecated=1.0.0, message="Use `librarySectionWithID(_:)` instead")
     public func librarySectionWithExternalID(externalID: String) -> LibrarySection? {
         return db.pluck(LibrarySectionTable.table.filter(LibrarySectionTable.externalID == externalID)).map { LibrarySectionTable.fromRow($0) }
     }
@@ -417,6 +422,7 @@ extension Catalog {
         }
     }
     
+    @available(*, deprecated=1.0.0, message="Use `libraryCollectionsForLibrarySectionWithID(_:)` instead")
     public func libraryCollectionsForLibrarySectionWithExternalID(librarySectionExternalID: String) -> [LibraryCollection] {
         do {
             return try db.prepare(LibraryCollectionTable.table.filter(LibraryCollectionTable.librarySectionExternalID == librarySectionExternalID).order(LibraryCollectionTable.position)).map { LibraryCollectionTable.fromRow($0) }
@@ -437,6 +443,7 @@ extension Catalog {
         return db.pluck(LibraryCollectionTable.table.filter(LibraryCollectionTable.id == id)).map { LibraryCollectionTable.fromRow($0) }
     }
     
+    @available(*, deprecated=1.0.0, message="Use `libraryCollectionWithID(_:)` instead")
     public func libraryCollectionWithExternalID(externalID: String) -> LibraryCollection? {
         return db.pluck(LibraryCollectionTable.table.filter(LibraryCollectionTable.externalID == externalID)).map { LibraryCollectionTable.fromRow($0) }
     }
@@ -468,14 +475,6 @@ private class LibraryItemTable {
 
 extension Catalog {
     
-    public func libraryItemsWithItemExternalIDs(itemExternalIDs: [String]) -> [LibraryItem] {
-        do {
-            return try db.prepare(LibraryItemTable.table.filter(itemExternalIDs.contains(LibraryItemTable.itemExternalID)).order(LibraryItemTable.position)).map { LibraryItemTable.fromRow($0) }
-        } catch {
-            return []
-        }
-    }
-    
     public func libraryItemsForLibrarySectionWithID(librarySectionID: Int) -> [LibraryItem] {
         do {
             return try db.prepare(LibraryItemTable.table.filter(LibraryItemTable.librarySectionID == librarySectionID).order(LibraryItemTable.position)).map { LibraryItemTable.fromRow($0) }
@@ -484,6 +483,7 @@ extension Catalog {
         }
     }
     
+    @available(*, deprecated=1.0.0, message="Use `libraryItemsForLibrarySectionWithID(_:)` instead")
     func libraryItemsForLibrarySectionWithExternalID(librarySectionExternalID: String) -> [LibraryItem] {
         do {
             return try db.prepare(LibraryItemTable.table.join(ItemTable.table, on: ItemTable.table[ItemTable.id] == LibraryItemTable.itemID).filter(LibraryItemTable.librarySectionExternalID == librarySectionExternalID && [1, 2].contains(ItemTable.platformID)).order(LibraryItemTable.position)).map { LibraryItemTable.fromNamespacedRow($0) }
@@ -500,6 +500,7 @@ extension Catalog {
         }
     }
     
+    @available(*, deprecated=1.0.0, message="Use `libraryItemsForLibraryCollectionWithID(_:)` instead")
     public func libraryItemsForLibraryCollectionWithExternalID(libraryCollectionExternalID: String) -> [LibraryItem] {
         do {
             return try db.prepare(LibraryItemTable.table.join(LibrarySectionTable.table, on: LibrarySectionTable.table[LibrarySectionTable.id] == LibraryItemTable.librarySectionID).filter(LibrarySectionTable.libraryCollectionExternalID == libraryCollectionExternalID).order(LibraryItemTable.position)).map { LibraryItemTable.fromNamespacedRow($0) }
@@ -516,6 +517,7 @@ extension Catalog {
         }
     }
     
+    @available(*, deprecated=1.0.0, message="Use `libraryItemsWithItemID(_:)` instead")
     public func libraryItemsWithItemExternalID(itemExternalID: String) -> [LibraryItem] {
         do {
             return try db.prepare(LibraryItemTable.table.filter(LibraryItemTable.itemExternalID == itemExternalID)).map { LibraryItemTable.fromRow($0) }
@@ -528,6 +530,7 @@ extension Catalog {
         return db.pluck(LibraryItemTable.table.join(LibrarySectionTable.table, on: LibrarySectionTable.table[LibrarySectionTable.id] == LibraryItemTable.librarySectionID).filter(LibraryItemTable.itemID == itemID && LibrarySectionTable.libraryCollectionID == libraryCollectionID).order(LibraryItemTable.position)).map { LibraryItemTable.fromNamespacedRow($0) }
     }
     
+    @available(*, deprecated=1.0.0, message="Use `libraryItemWithItemID(_:inLibraryCollectionWithID:)` instead")
     public func libraryItemWithItemExternalID(itemExternalID: String, inLibraryCollectionWithExternalID libraryCollectionExternalID: String) -> LibraryItem? {
         return db.pluck(LibraryItemTable.table.join(LibrarySectionTable.table, on: LibrarySectionTable.table[LibrarySectionTable.id] == LibraryItemTable.librarySectionID).filter(LibraryItemTable.itemExternalID == itemExternalID && LibrarySectionTable.libraryCollectionExternalID == libraryCollectionExternalID).order(LibraryItemTable.position)).map { LibraryItemTable.fromNamespacedRow($0) }
     }
@@ -536,6 +539,7 @@ extension Catalog {
         return db.pluck(LibraryItemTable.table.filter(LibraryItemTable.id == id)).map { LibraryItemTable.fromRow($0) }
     }
     
+    @available(*, deprecated=1.0.0, message="Use `libraryItemWithID(_:)` instead")
     public func libraryItemWithExternalID(externalID: String) -> LibraryItem? {
         return db.pluck(LibraryItemTable.table.filter(LibraryItemTable.externalID == externalID)).map { LibraryItemTable.fromRow($0) }
     }
@@ -551,6 +555,7 @@ extension Catalog {
         return libraryNodes.sort { $0.position < $1.position }
     }
     
+    @available(*, deprecated=1.0.0, message="Use `libraryNodesForLibrarySectionWithID(_:)` instead")
     public func libraryNodesForLibrarySectionWithExternalID(librarySectionExternalID: String) -> [LibraryNode] {
         var libraryNodes = [LibraryNode]()
         libraryNodes += libraryCollectionsForLibrarySectionWithExternalID(librarySectionExternalID).map { $0 as LibraryNode }
