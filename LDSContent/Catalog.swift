@@ -280,7 +280,7 @@ private class LanguageTable {
 
 extension Catalog {
     
-    func languages() -> [Language] {
+    public func languages() -> [Language] {
         do {
             return try db.prepare(LanguageTable.table).map { LanguageTable.fromRow($0) }
         } catch {
@@ -288,27 +288,27 @@ extension Catalog {
         }
     }
     
-    func languageWithID(id: Int) -> Language? {
+    public func languageWithID(id: Int) -> Language? {
         return db.pluck(LanguageTable.table.filter(LanguageTable.id == id)).map { LanguageTable.fromRow($0) }
     }
     
-    func languageWithISO639_3Code(iso639_3Code: String) -> Language? {
+    public func languageWithISO639_3Code(iso639_3Code: String) -> Language? {
         return db.pluck(LanguageTable.table.filter(LanguageTable.iso639_3Code == iso639_3Code)).map { LanguageTable.fromRow($0) }
     }
     
-    func languageWithBCP47Code(bcp47Code: String) -> Language? {
+    public func languageWithBCP47Code(bcp47Code: String) -> Language? {
         return db.pluck(LanguageTable.table.filter(LanguageTable.bcp47Code == bcp47Code)).map { LanguageTable.fromRow($0) }
     }
     
-    func languageWithLDSLanguageCode(ldsLanguageCode: String) -> Language? {
+    public func languageWithLDSLanguageCode(ldsLanguageCode: String) -> Language? {
         return db.pluck(LanguageTable.table.filter(LanguageTable.ldsLanguageCode == ldsLanguageCode)).map { LanguageTable.fromRow($0) }
     }
     
-    func languageWithRootLibraryCollectionID(rootLibraryCollectionID: Int) -> Language? {
+    public func languageWithRootLibraryCollectionID(rootLibraryCollectionID: Int) -> Language? {
         return db.pluck(LanguageTable.table.filter(LanguageTable.rootLibraryCollectionID == rootLibraryCollectionID)).map { LanguageTable.fromRow($0) }
     }
     
-    func languageWithRootLibraryCollectionExternalID(rootLibraryCollectionExternalID: String) -> Language? {
+    public func languageWithRootLibraryCollectionExternalID(rootLibraryCollectionExternalID: String) -> Language? {
         return db.pluck(LanguageTable.table.filter(LanguageTable.rootLibraryCollectionExternalID == rootLibraryCollectionExternalID)).map { LanguageTable.fromRow($0) }
     }
     
@@ -326,7 +326,7 @@ private class LanguageNameTable {
 
 extension Catalog {
 
-    func nameForLanguageWithID(languageID: Int, inLanguageWithID localizationLanguageID: Int) -> String {
+    public func nameForLanguageWithID(languageID: Int, inLanguageWithID localizationLanguageID: Int) -> String {
         return db.scalar(LanguageNameTable.table.select(LanguageNameTable.name).filter(LanguageNameTable.languageID == languageID && LanguageNameTable.localizationLanguageID == localizationLanguageID))
     }
     

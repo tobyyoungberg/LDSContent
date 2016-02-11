@@ -1,16 +1,19 @@
 PODS:
+  - GMCMultiImage (1.0.6)
   - PSOperations (2.1.0)
   - SQLite.swift (0.9.2)
   - SSZipArchive (1.1)
   - Swiftification (5.0.0)
 
 DEPENDENCIES:
+  - GMCMultiImage
   - PSOperations
   - SQLite.swift (~> 0.9.2)
   - SSZipArchive
   - Swiftification
 
 SPEC CHECKSUMS:
+  GMCMultiImage: f7dd7e2e39faaec1197e6ba44864c98c0ed3906a
   PSOperations: ced5d50e2ce4ec28dcdb2ff121c04f56b479fa7b
   SQLite.swift: 5dca22dbf6634fdb9c3270fae9491830804e9b2d
   SSZipArchive: de3d215ab73f87db627f81f2ce24f1731e3886c3
