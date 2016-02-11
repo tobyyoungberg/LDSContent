@@ -22,17 +22,22 @@
 
 import UIKit
 import LDSContent
+import Swiftification
 
-class LanguagesViewController: UIViewController {
+class LibraryCollectionViewController: UIViewController {
     
-    var catalog: Catalog?
+    let catalog: Catalog
+    let libraryCollection: LibraryCollection
     
-    init() {
+    init(catalog: Catalog, libraryCollection: LibraryCollection) {
+        self.catalog = catalog
+        self.libraryCollection = libraryCollection
+        
         super.init(nibName: nil, bundle: nil)
         
         automaticallyAdjustsScrollViewInsets = false
         
-        title = "Languages"
+        title = libraryCollection.title
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -54,7 +59,7 @@ class LanguagesViewController: UIViewController {
         
         automaticallyAdjustsScrollViewInsets = true
         
-        tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: LanguagesViewController.CellIdentifier)
+        tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: LibraryCollectionViewController.CellIdentifier)
         tableView.estimatedRowHeight = 44
         
         view.addSubview(tableView)
@@ -67,6 +72,7 @@ class LanguagesViewController: UIViewController {
         view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[tableView]|", options: [], metrics: nil, views: views))
         
         reloadData()
+        tableView.reloadData()
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -83,52 +89,12 @@ class LanguagesViewController: UIViewController {
         tableView.flashScrollIndicators()
     }
     
-    var languages = [Language]()
-    var uiLanguage: Language?
+    var sections = [(librarySection: LibrarySection, libraryNodes: [LibraryNode])]()
     
     func reloadData() {
-        let tempDirectoryURL = NSURL(fileURLWithPath: NSTemporaryDirectory()).URLByAppendingPathComponent(NSProcessInfo.processInfo().globallyUniqueString)
-        do {
-            try NSFileManager.defaultManager().createDirectoryAtURL(tempDirectoryURL, withIntermediateDirectories: true, attributes: nil)
-        } catch {
-            NSLog("Failed to create temp directory with error %@", "\(error)")
-            return
-        }
-        
-        let destinationURL = tempDirectoryURL.URLByAppendingPathComponent("Catalog.sqlite")
-        
-        let session = Session()
-        
-        session.downloadCatalog(destinationURL: destinationURL) { result in
-            switch result {
-            case .Success:
-                guard let path = destinationURL.path else {
-                    NSLog("Failed to get temp directory path")
-                    break
-                }
-                
-                if let catalog = Catalog(path: path) {
-                    dispatch_async(dispatch_get_main_queue()) {
-                        if let uiLanguage = catalog.languageWithISO639_3Code("eng") {
-                            self.catalog = catalog
-                            
-                            let languages = catalog.languages()
-                            
-                            let nameByLanguageID = [Int: String](languages.map { language in
-                                return (language.id, catalog.nameForLanguageWithID(language.id, inLanguageWithID: uiLanguage.id))
-                            })
-                            
-                            self.languages = languages.sort { nameByLanguageID[$0.id] < nameByLanguageID[$1.id] }
-                            
-                            self.uiLanguage = uiLanguage
-                            
-                            self.tableView.reloadData()
-                        }
-                    }
-                }
-            case let .Error(errors: errors):
-                NSLog("Failed to download catalog with errors %@", errors)
-            }
+        let librarySections = catalog.librarySectionsForLibraryCollectionWithID(libraryCollection.id)
+        sections = librarySections.map { librarySection in
+            return (librarySection: librarySection, libraryNodes: catalog.libraryNodesForLibrarySectionWithID(librarySection.id))
         }
     }
     
@@ -136,24 +102,31 @@ class LanguagesViewController: UIViewController {
 
 // MARK: - UITableViewDataSource
 
-extension LanguagesViewController: UITableViewDataSource {
+extension LibraryCollectionViewController: UITableViewDataSource {
     
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return 1
+        return sections.count
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return languages.count
+        return sections[section].libraryNodes.count
+    }
+    
+    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return sections[section].librarySection.title
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier(LanguagesViewController.CellIdentifier, forIndexPath: indexPath)
+        let cell = tableView.dequeueReusableCellWithIdentifier(LibraryCollectionViewController.CellIdentifier, forIndexPath: indexPath)
         
-        let language = languages[indexPath.row]
-        if let catalog = catalog, uiLanguage = uiLanguage {
-            cell.textLabel?.text = catalog.nameForLanguageWithID(language.id, inLanguageWithID: uiLanguage.id)
+        let libraryNode = sections[indexPath.section].libraryNodes[indexPath.row]
+        cell.textLabel?.text = libraryNode.title
+        
+        if libraryNode is LibraryCollection {
+            cell.accessoryType = .DisclosureIndicator
+        } else {
+            cell.accessoryType = .None
         }
-        cell.accessoryType = .DisclosureIndicator
         
         return cell
     }
@@ -162,12 +135,12 @@ extension LanguagesViewController: UITableViewDataSource {
 
 // MARK: - UITableViewDelegate
 
-extension LanguagesViewController: UITableViewDelegate {
+extension LibraryCollectionViewController: UITableViewDelegate {
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        let language = languages[indexPath.row]
-        if let catalog = catalog, rootLibraryCollection = catalog.libraryCollectionWithID(language.rootLibraryCollectionID) {
-            let viewController = LibraryCollectionViewController(catalog: catalog, libraryCollection: rootLibraryCollection)
+        let libraryNode = sections[indexPath.section].libraryNodes[indexPath.row]
+        if let libraryCollection = libraryNode as? LibraryCollection {
+            let viewController = LibraryCollectionViewController(catalog: catalog, libraryCollection: libraryCollection)
             
             navigationController?.pushViewController(viewController, animated: true)
         } else {

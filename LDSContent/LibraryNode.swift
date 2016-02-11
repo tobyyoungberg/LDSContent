@@ -23,7 +23,10 @@
 import Foundation
 
 public protocol LibraryNode {
-
+    
+    var title: String { get }
     var position: Int { get }
+    var librarySectionID: Int? { get }
+    var librarySectionExternalID: String? { get }
     
 }
