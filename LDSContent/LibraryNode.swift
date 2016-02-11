@@ -22,26 +22,8 @@
 
 import Foundation
 
-public struct LibraryCollection: LibraryNode, Equatable {
+public protocol LibraryNode {
+
+    var position: Int { get }
     
-    public var id: Int
-    public var externalID: String
-    public var librarySectionID: Int?
-    public var librarySectionExternalID: String?
-    public var position: Int
-    public var title: String
-    public var coverRenditions: [ImageRendition]
-    public var type: LibraryCollectionType
-
-}
-
-public func == (lhs: LibraryCollection, rhs: LibraryCollection) -> Bool {
-    return lhs.id == rhs.id &&
-        lhs.externalID == rhs.externalID &&
-        lhs.librarySectionID == rhs.librarySectionID &&
-        lhs.librarySectionExternalID == rhs.librarySectionExternalID &&
-        lhs.position == rhs.position &&
-        lhs.title == rhs.title &&
-        lhs.coverRenditions == rhs.coverRenditions &&
-        lhs.type == rhs.type
 }

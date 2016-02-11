@@ -19,6 +19,7 @@
 		D93CAA301C6BB17200C21A46 /* CatalogVersionCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = D93CAA2F1C6BB17200C21A46 /* CatalogVersionCondition.swift */; };
 		D93CAA341C6BB52C00C21A46 /* CatalogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D93CAA331C6BB52C00C21A46 /* CatalogTests.swift */; };
 		D93CAA361C6BDC3E00C21A46 /* String+SQL.swift in Sources */ = {isa = PBXBuildFile; fileRef = D93CAA351C6BDC3E00C21A46 /* String+SQL.swift */; };
+		D9BBF3301C6C040E00F7D9E6 /* LibraryNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9BBF32F1C6C040E00F7D9E6 /* LibraryNode.swift */; };
 		D9D3AEEA1C6A982200E2681A /* LDSContent.h in Headers */ = {isa = PBXBuildFile; fileRef = D9D3AEE91C6A982200E2681A /* LDSContent.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D9D3AEF81C6A9A2400E2681A /* FetchCatalogVersionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9D3AEF71C6A9A2400E2681A /* FetchCatalogVersionTests.swift */; };
 		D9D3AEFA1C6A9A2400E2681A /* LDSContent.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9D3AEE61C6A982200E2681A /* LDSContent.framework */; };
@@ -62,6 +63,7 @@
 		D93CAA2F1C6BB17200C21A46 /* CatalogVersionCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CatalogVersionCondition.swift; sourceTree = "<group>"; };
 		D93CAA331C6BB52C00C21A46 /* CatalogTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CatalogTests.swift; sourceTree = "<group>"; };
 		D93CAA351C6BDC3E00C21A46 /* String+SQL.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+SQL.swift"; sourceTree = "<group>"; };
+		D9BBF32F1C6C040E00F7D9E6 /* LibraryNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibraryNode.swift; sourceTree = "<group>"; };
 		D9D3AEE61C6A982200E2681A /* LDSContent.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = LDSContent.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D9D3AEE91C6A982200E2681A /* LDSContent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LDSContent.h; sourceTree = "<group>"; };
 		D9D3AEEB1C6A982200E2681A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -193,6 +195,7 @@
 				D9D3AF0E1C6AB32F00E2681A /* LibraryCollectionType.swift */,
 				D9D3AF121C6AB6EB00E2681A /* LibraryItem.swift */,
 				D9D3AF101C6AB56A00E2681A /* LibrarySection.swift */,
+				D9BBF32F1C6C040E00F7D9E6 /* LibraryNode.swift */,
 				D9D3AF061C6AB1A500E2681A /* Source.swift */,
 				D9D3AF081C6AB1E000E2681A /* SourceType.swift */,
 				D9D3AF141C6AB74E00E2681A /* Stopword.swift */,
@@ -411,6 +414,7 @@
 				D93CAA221C6B7A5C00C21A46 /* Error.swift in Sources */,
 				D93CAA2C1C6BA06400C21A46 /* DownloadCatalogResult.swift in Sources */,
 				D9D3AF011C6AA41C00E2681A /* Item.swift in Sources */,
+				D9BBF3301C6C040E00F7D9E6 /* LibraryNode.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

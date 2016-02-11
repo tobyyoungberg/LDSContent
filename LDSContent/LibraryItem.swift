@@ -22,7 +22,7 @@
 
 import Foundation
 
-public struct LibraryItem {
+public struct LibraryItem: LibraryNode, Equatable, Hashable {
     
     public var id: Int
     public var externalID: String
@@ -34,4 +34,20 @@ public struct LibraryItem {
     public var itemID: Int
     public var itemExternalID: String
     
+    public var hashValue: Int {
+        return id
+    }
+    
+}
+
+public func == (lhs: LibraryItem, rhs: LibraryItem) -> Bool {
+    return lhs.id == rhs.id &&
+        lhs.externalID == rhs.externalID &&
+        lhs.librarySectionID == rhs.librarySectionID &&
+        lhs.librarySectionExternalID == rhs.librarySectionExternalID &&
+        lhs.position == rhs.position &&
+        lhs.title == rhs.title &&
+        lhs.obsolete == rhs.obsolete &&
+        lhs.itemID == rhs.itemID &&
+        lhs.itemExternalID == rhs.itemExternalID
 }

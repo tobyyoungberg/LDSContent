@@ -332,25 +332,6 @@ extension Catalog {
     
 }
 
-private class LibraryItemTable {
-    
-    static let table = Table("library_item")
-    static let id = Expression<Int>("_id")
-    static let externalID = Expression<String>("external_id")
-    static let librarySectionID = Expression<Int>("library_section_id")
-    static let librarySectionExternalID = Expression<String>("library_section_external_id")
-    static let position = Expression<Int>("position")
-    static let title = Expression<String>("title")
-    static let obsolete = Expression<Bool>("is_obsolete")
-    static let itemID = Expression<Int>("item_id")
-    static let itemExternalID = Expression<String>("item_external_id")
-    
-    static func fromRow(row: Row) -> LibraryItem {
-        return LibraryItem(id: row[id], externalID: row[externalID], librarySectionID: row[librarySectionID], librarySectionExternalID: row[librarySectionExternalID], position: row[position], title: row[title], obsolete: row[obsolete], itemID: row[itemID], itemExternalID: row[itemExternalID])
-    }
-    
-}
-
 private class LibrarySectionTable {
     
     static let table = Table("library_section")
@@ -359,11 +340,39 @@ private class LibrarySectionTable {
     static let libraryCollectionID = Expression<Int>("library_collection_id")
     static let libraryCollectionExternalID = Expression<String>("library_collection_external_id")
     static let position = Expression<Int>("position")
-    static let title = Expression<String>("title")
-    static let indexTitle = Expression<String>("index_title")
+    static let title = Expression<String?>("title")
+    static let indexTitle = Expression<String?>("index_title")
     
     static func fromRow(row: Row) -> LibrarySection {
         return LibrarySection(id: row[id], externalID: row[externalID], libraryCollectionID: row[libraryCollectionID], libraryCollectionExternalID: row[libraryCollectionExternalID], position: row[position], title: row[title], indexTitle: row[indexTitle])
+    }
+    
+}
+
+extension Catalog {
+    
+    public func librarySectionsForLibraryCollectionWithID(id: Int) -> [LibrarySection] {
+        do {
+            return try db.prepare(LibrarySectionTable.table.filter(LibrarySectionTable.libraryCollectionID == id).order(LibrarySectionTable.position)).map { LibrarySectionTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
+    public func librarySectionsForLibraryCollectionWithExternalID(externalID: String) -> [LibrarySection] {
+        do {
+            return try db.prepare(LibrarySectionTable.table.filter(LibrarySectionTable.libraryCollectionExternalID == externalID).order(LibrarySectionTable.position)).map { LibrarySectionTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
+    public func librarySectionWithID(id: Int) -> LibrarySection? {
+        return db.pluck(LibrarySectionTable.table.filter(LibrarySectionTable.id == id)).map { LibrarySectionTable.fromRow($0) }
+    }
+    
+    public func librarySectionWithExternalID(externalID: String) -> LibrarySection? {
+        return db.pluck(LibrarySectionTable.table.filter(LibrarySectionTable.externalID == externalID)).map { LibrarySectionTable.fromRow($0) }
     }
     
 }
@@ -384,6 +393,10 @@ private class LibraryCollectionTable {
         return LibraryCollection(id: row[id], externalID: row[externalID], librarySectionID: row[librarySectionID], librarySectionExternalID: row[librarySectionExternalID], position: row[position], title: row[title], coverRenditions: (row[coverRenditions] ?? "").toImageRenditions() ?? [], type: LibraryCollectionType(rawValue: row[typeID]) ?? .Default)
     }
     
+    static func fromNamespacedRow(row: Row) -> LibraryCollection {
+        return LibraryCollection(id: row[LibraryCollectionTable.table[id]], externalID: row[LibraryCollectionTable.table[externalID]], librarySectionID: row[LibraryCollectionTable.table[librarySectionID]], librarySectionExternalID: row[LibraryCollectionTable.table[librarySectionExternalID]], position: row[LibraryCollectionTable.table[position]], title: row[LibraryCollectionTable.table[title]], coverRenditions: (row[LibraryCollectionTable.table[coverRenditions]] ?? "").toImageRenditions() ?? [], type: LibraryCollectionType(rawValue: row[LibraryCollectionTable.table[typeID]]) ?? .Default)
+    }
+    
 }
 
 extension Catalog {
@@ -395,5 +408,179 @@ extension Catalog {
             return []
         }
     }
+    
+    public func libraryCollectionsForLibrarySectionWithID(librarySectionID: Int) -> [LibraryCollection] {
+        do {
+            return try db.prepare(LibraryCollectionTable.table.filter(LibraryCollectionTable.librarySectionID == librarySectionID).order(LibraryCollectionTable.position)).map { LibraryCollectionTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
+    public func libraryCollectionsForLibrarySectionWithExternalID(librarySectionExternalID: String) -> [LibraryCollection] {
+        do {
+            return try db.prepare(LibraryCollectionTable.table.filter(LibraryCollectionTable.librarySectionExternalID == librarySectionExternalID).order(LibraryCollectionTable.position)).map { LibraryCollectionTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
+    public func libraryCollectionsForLibraryCollectionWithID(id: Int) -> [LibraryCollection] {
+        do {
+            return try db.prepare(LibraryCollectionTable.table.join(LibrarySectionTable.table, on: LibraryCollectionTable.librarySectionID == LibrarySectionTable.table[LibrarySectionTable.id]).filter(LibrarySectionTable.libraryCollectionID == id).order(LibraryCollectionTable.table[LibraryCollectionTable.position])).map { LibraryCollectionTable.fromNamespacedRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
+    public func libraryCollectionWithID(id: Int) -> LibraryCollection? {
+        return db.pluck(LibraryCollectionTable.table.filter(LibraryCollectionTable.id == id)).map { LibraryCollectionTable.fromRow($0) }
+    }
+    
+    public func libraryCollectionWithExternalID(externalID: String) -> LibraryCollection? {
+        return db.pluck(LibraryCollectionTable.table.filter(LibraryCollectionTable.externalID == externalID)).map { LibraryCollectionTable.fromRow($0) }
+    }
 
+}
+
+private class LibraryItemTable {
+    
+    static let table = Table("library_item")
+    static let id = Expression<Int>("_id")
+    static let externalID = Expression<String>("external_id")
+    static let librarySectionID = Expression<Int>("library_section_id")
+    static let librarySectionExternalID = Expression<String>("library_section_external_id")
+    static let position = Expression<Int>("position")
+    static let title = Expression<String>("title")
+    static let obsolete = Expression<Bool>("is_obsolete")
+    static let itemID = Expression<Int>("item_id")
+    static let itemExternalID = Expression<String>("item_external_id")
+    
+    static func fromRow(row: Row) -> LibraryItem {
+        return LibraryItem(id: row[id], externalID: row[externalID], librarySectionID: row[librarySectionID], librarySectionExternalID: row[librarySectionExternalID], position: row[position], title: row[title], obsolete: row[obsolete], itemID: row[itemID], itemExternalID: row[itemExternalID])
+    }
+    
+    static func fromNamespacedRow(row: Row) -> LibraryItem {
+        return LibraryItem(id: row[LibraryItemTable.table[id]], externalID: row[LibraryItemTable.table[externalID]], librarySectionID: row[LibraryItemTable.table[librarySectionID]], librarySectionExternalID: row[LibraryItemTable.table[librarySectionExternalID]], position: row[LibraryItemTable.table[position]], title: row[LibraryItemTable.table[title]], obsolete: row[LibraryItemTable.table[obsolete]], itemID: row[LibraryItemTable.table[itemID]], itemExternalID: row[LibraryItemTable.table[itemExternalID]])
+    }
+    
+}
+
+extension Catalog {
+    
+    public func libraryItemsWithItemExternalIDs(itemExternalIDs: [String]) -> [LibraryItem] {
+        do {
+            return try db.prepare(LibraryItemTable.table.filter(itemExternalIDs.contains(LibraryItemTable.itemExternalID)).order(LibraryItemTable.position)).map { LibraryItemTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
+    public func libraryItemsForLibrarySectionWithID(librarySectionID: Int) -> [LibraryItem] {
+        do {
+            return try db.prepare(LibraryItemTable.table.filter(LibraryItemTable.librarySectionID == librarySectionID).order(LibraryItemTable.position)).map { LibraryItemTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
+    func libraryItemsForLibrarySectionWithExternalID(librarySectionExternalID: String) -> [LibraryItem] {
+        do {
+            return try db.prepare(LibraryItemTable.table.join(ItemTable.table, on: ItemTable.table[ItemTable.id] == LibraryItemTable.itemID).filter(LibraryItemTable.librarySectionExternalID == librarySectionExternalID && [1, 2].contains(ItemTable.platformID)).order(LibraryItemTable.position)).map { LibraryItemTable.fromNamespacedRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
+    public func libraryItemsForLibraryCollectionWithID(libraryCollectionID: Int) -> [LibraryItem] {
+        do {
+            return try db.prepare(LibraryItemTable.table.join(LibrarySectionTable.table, on: LibrarySectionTable.table[LibrarySectionTable.id] == LibraryItemTable.librarySectionID).filter(LibrarySectionTable.libraryCollectionID == libraryCollectionID).order(LibraryItemTable.position)).map { LibraryItemTable.fromNamespacedRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
+    public func libraryItemsForLibraryCollectionWithExternalID(libraryCollectionExternalID: String) -> [LibraryItem] {
+        do {
+            return try db.prepare(LibraryItemTable.table.join(LibrarySectionTable.table, on: LibrarySectionTable.table[LibrarySectionTable.id] == LibraryItemTable.librarySectionID).filter(LibrarySectionTable.libraryCollectionExternalID == libraryCollectionExternalID).order(LibraryItemTable.position)).map { LibraryItemTable.fromNamespacedRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
+    public func libraryItemsWithItemID(itemID: Int) -> [LibraryItem] {
+        do {
+            return try db.prepare(LibraryItemTable.table.filter(LibraryItemTable.itemID == itemID)).map { LibraryItemTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
+    public func libraryItemsWithItemExternalID(itemExternalID: String) -> [LibraryItem] {
+        do {
+            return try db.prepare(LibraryItemTable.table.filter(LibraryItemTable.itemExternalID == itemExternalID)).map { LibraryItemTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
+    public func libraryItemWithItemID(itemID: Int, inLibraryCollectionWithID libraryCollectionID: Int) -> LibraryItem? {
+        return db.pluck(LibraryItemTable.table.join(LibrarySectionTable.table, on: LibrarySectionTable.table[LibrarySectionTable.id] == LibraryItemTable.librarySectionID).filter(LibraryItemTable.itemID == itemID && LibrarySectionTable.libraryCollectionID == libraryCollectionID).order(LibraryItemTable.position)).map { LibraryItemTable.fromNamespacedRow($0) }
+    }
+    
+    public func libraryItemWithItemExternalID(itemExternalID: String, inLibraryCollectionWithExternalID libraryCollectionExternalID: String) -> LibraryItem? {
+        return db.pluck(LibraryItemTable.table.join(LibrarySectionTable.table, on: LibrarySectionTable.table[LibrarySectionTable.id] == LibraryItemTable.librarySectionID).filter(LibraryItemTable.itemExternalID == itemExternalID && LibrarySectionTable.libraryCollectionExternalID == libraryCollectionExternalID).order(LibraryItemTable.position)).map { LibraryItemTable.fromNamespacedRow($0) }
+    }
+    
+    public func libraryItemWithID(id: Int) -> LibraryItem? {
+        return db.pluck(LibraryItemTable.table.filter(LibraryItemTable.id == id)).map { LibraryItemTable.fromRow($0) }
+    }
+    
+    public func libraryItemWithExternalID(externalID: String) -> LibraryItem? {
+        return db.pluck(LibraryItemTable.table.filter(LibraryItemTable.externalID == externalID)).map { LibraryItemTable.fromRow($0) }
+    }
+    
+}
+
+extension Catalog {
+    
+    public func libraryNodesForLibrarySectionWithID(librarySectionID: Int) -> [LibraryNode] {
+        var libraryNodes = [LibraryNode]()
+        libraryNodes += libraryCollectionsForLibrarySectionWithID(librarySectionID).map { $0 as LibraryNode }
+        libraryNodes += libraryItemsForLibrarySectionWithID(librarySectionID).map { $0 as LibraryNode }
+        return libraryNodes.sort { $0.position < $1.position }
+    }
+    
+    public func libraryNodesForLibrarySectionWithExternalID(librarySectionExternalID: String) -> [LibraryNode] {
+        var libraryNodes = [LibraryNode]()
+        libraryNodes += libraryCollectionsForLibrarySectionWithExternalID(librarySectionExternalID).map { $0 as LibraryNode }
+        libraryNodes += libraryItemsForLibrarySectionWithExternalID(librarySectionExternalID).map { $0 as LibraryNode }
+        return libraryNodes.sort { $0.position < $1.position }
+    }
+    
+}
+
+private class StopwordTable {
+    
+    static let table = Table("stopword")
+    static let id = Expression<Int>("_id")
+    static let languageID = Expression<Int>("language_id")
+    static let word = Expression<String>("word")
+    
+    static func fromRow(row: Row) -> Stopword {
+        return Stopword(id: row[id], languageID: row[languageID], word: row[word])
+    }
+    
+}
+
+extension Catalog {
+    
+    public func stopwordsWithLanguageID(languageID: Int) -> [Stopword] {
+        do {
+            return try db.prepare(StopwordTable.table.filter(StopwordTable.languageID == languageID)).map { StopwordTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
 }

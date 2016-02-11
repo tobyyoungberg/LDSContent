@@ -22,14 +22,24 @@
 
 import Foundation
 
-public struct LibrarySection {
+public struct LibrarySection: Equatable {
     
     public var id: Int
     public var externalID: String
     public var libraryCollectionID: Int
     public var libraryCollectionExternalID: String
     public var position: Int
-    public var title: String
-    public var indexTitle: String
+    public var title: String?
+    public var indexTitle: String?
 
+}
+
+public func == (lhs: LibrarySection, rhs: LibrarySection) -> Bool {
+    return lhs.id == rhs.id &&
+        lhs.externalID == rhs.externalID &&
+        lhs.libraryCollectionID == rhs.libraryCollectionID &&
+        lhs.libraryCollectionExternalID == rhs.libraryCollectionExternalID &&
+        lhs.position == rhs.position &&
+        lhs.title == rhs.title &&
+        lhs.indexTitle == rhs.indexTitle
 }

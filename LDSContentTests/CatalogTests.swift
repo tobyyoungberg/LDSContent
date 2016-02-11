@@ -130,10 +130,103 @@ class CatalogTests: XCTestCase {
         let libraryCollections = catalog.libraryCollections()
         XCTAssertGreaterThan(libraryCollections.count, 0)
         
-        let firstScripturesLibraryCollection = libraryCollections.find { $0.type == .Scriptures }!
+        let scripturesLibraryCollection = libraryCollections.find { $0.type == .Scriptures }!
         
-        let items = catalog.itemsForLibraryCollectionWithID(firstScripturesLibraryCollection.id)
+        let items = catalog.itemsForLibraryCollectionWithID(scripturesLibraryCollection.id)
         XCTAssertGreaterThan(items.count, 0)
+        
+        let rootLibraryCollection = libraryCollections.first!
+        
+        let libraryCollections2 = catalog.libraryCollectionsForLibraryCollectionWithID(rootLibraryCollection.id)
+        XCTAssertGreaterThan(libraryCollections2.count, 0)
+        
+        let libraryCollection = catalog.libraryCollectionWithID(scripturesLibraryCollection.id)!
+        XCTAssertEqual(libraryCollection, scripturesLibraryCollection)
+        
+        let libraryCollection2 = catalog.libraryCollectionWithExternalID(scripturesLibraryCollection.externalID)!
+        XCTAssertEqual(libraryCollection2, scripturesLibraryCollection)
+        
+        let librarySection = catalog.librarySectionsForLibraryCollectionWithID(rootLibraryCollection.id).first!
+        
+        let libraryCollections3 = catalog.libraryCollectionsForLibrarySectionWithID(librarySection.id)
+        XCTAssertGreaterThan(libraryCollections3.count, 0)
+        
+        let libraryCollections4 = catalog.libraryCollectionsForLibrarySectionWithExternalID(librarySection.externalID)
+        XCTAssertEqual(libraryCollections3, libraryCollections4)
+    }
+    
+    func testLibrarySections() {
+        let scripturesLibraryCollection = catalog.libraryCollections().find { $0.type == .Scriptures }!
+        
+        let librarySections = catalog.librarySectionsForLibraryCollectionWithID(scripturesLibraryCollection.id)
+        XCTAssertGreaterThan(librarySections.count, 0)
+        
+        let librarySections2 = catalog.librarySectionsForLibraryCollectionWithExternalID(scripturesLibraryCollection.externalID)
+        XCTAssertEqual(librarySections2, librarySections)
+        
+        let librarySection = librarySections.first!
+        
+        let librarySection2 = catalog.librarySectionWithID(librarySection.id)
+        XCTAssertEqual(librarySection2, librarySection)
+        
+        let librarySection3 = catalog.librarySectionWithExternalID(librarySection.externalID)
+        XCTAssertEqual(librarySection3, librarySection2)
+    }
+    
+    func testLibraryItems() {
+        let scripturesLibraryCollection = catalog.libraryCollections().find { $0.type == .Scriptures }!
+        let scripturesLibrarySection = catalog.librarySectionsForLibraryCollectionWithID(scripturesLibraryCollection.id).first!
+        
+        let libraryItems = catalog.libraryItemsForLibrarySectionWithID(scripturesLibrarySection.id)
+        XCTAssertGreaterThan(libraryItems.count, 0)
+        
+        let libraryItems2 = catalog.libraryItemsForLibrarySectionWithExternalID(scripturesLibrarySection.externalID)
+        XCTAssertEqual(libraryItems2, libraryItems)
+        
+        let libraryItems3 = catalog.libraryItemsForLibraryCollectionWithID(scripturesLibraryCollection.id)
+        XCTAssertGreaterThan(libraryItems3.count, 0)
+        
+        let libraryItems4 = catalog.libraryItemsForLibraryCollectionWithExternalID(scripturesLibraryCollection.externalID)
+        XCTAssertEqual(libraryItems4, libraryItems3)
+        
+        let libraryItem = libraryItems.first!
+        
+        let libraryItems5 = catalog.libraryItemsWithItemID(libraryItem.itemID)
+        XCTAssertTrue(libraryItems5.contains(libraryItem))
+        
+        let libraryItems6 = catalog.libraryItemsWithItemExternalID(libraryItem.itemExternalID)
+        XCTAssertTrue(libraryItems6.contains(libraryItem))
+        
+        let libraryItems7 = catalog.libraryItemsWithItemExternalIDs(libraryItems.map { $0.itemExternalID })
+        XCTAssertTrue(Set(libraryItems7).isStrictSupersetOf(libraryItems))
+        
+        let libraryItem2 = catalog.libraryItemWithItemID(libraryItem.itemID, inLibraryCollectionWithID: scripturesLibraryCollection.id)
+        XCTAssertEqual(libraryItem2, libraryItem)
+        
+        let libraryItem3 = catalog.libraryItemWithItemExternalID(libraryItem.itemExternalID, inLibraryCollectionWithExternalID: scripturesLibraryCollection.externalID)
+        XCTAssertEqual(libraryItem3, libraryItem)
+        
+        let libraryItem4 = catalog.libraryItemWithID(libraryItem.id)
+        XCTAssertEqual(libraryItem4, libraryItem)
+        
+        let libraryItem5 = catalog.libraryItemWithExternalID(libraryItem.externalID)
+        XCTAssertEqual(libraryItem5, libraryItem)
+    }
+    
+    func testLibraryNodes() {
+        let scripturesLibraryCollection = catalog.libraryCollections().find { $0.type == .Scriptures }!
+        let scripturesLibrarySection = catalog.librarySectionsForLibraryCollectionWithID(scripturesLibraryCollection.id).first!
+        
+        let libraryNodes = catalog.libraryNodesForLibrarySectionWithID(scripturesLibrarySection.id)
+        XCTAssertGreaterThan(libraryNodes.count, 0)
+        
+        let libraryNodes2 = catalog.libraryNodesForLibrarySectionWithExternalID(scripturesLibrarySection.externalID)
+        XCTAssertGreaterThan(libraryNodes2.count, 0)
+    }
+    
+    func testStopwords() {
+        let stopwords = catalog.stopwordsWithLanguageID(1)
+        XCTAssertTrue(Set(stopwords.map { $0.word }).isStrictSupersetOf(["and", "of", "the"]))
     }
     
 }
