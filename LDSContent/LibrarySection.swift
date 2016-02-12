@@ -31,6 +31,16 @@ public struct LibrarySection: Equatable {
     public var position: Int
     public var title: String?
     public var indexTitle: String?
+    
+    public init(id: Int, externalID: String, libraryCollectionID: Int, libraryCollectionExternalID: String, position: Int, title: String?, indexTitle: String?) {
+        self.id = id
+        self.externalID = externalID
+        self.libraryCollectionID = libraryCollectionID
+        self.libraryCollectionExternalID = libraryCollectionExternalID
+        self.position = position
+        self.title = title
+        self.indexTitle = indexTitle
+    }
 
 }
 

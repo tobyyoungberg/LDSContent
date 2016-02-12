@@ -26,8 +26,8 @@ import Swiftification
 
 public class Catalog {
     
-    private let db: Connection!
-    private let noDiacritic: ((Expression<String>) -> Expression<String>)!
+    let db: Connection!
+    let noDiacritic: ((Expression<String>) -> Expression<String>)!
     
     public init?(path: String? = nil) {
         db = try? Connection(path ?? "")
@@ -63,9 +63,17 @@ public class Catalog {
         }
     }
     
+    public var schemaVersion: Int? {
+        return self.intForMetadataKey("schemaVersion")
+    }
+    
+    public var catalogVersion: Int? {
+        return self.intForMetadataKey("catalogVersion")
+    }
+    
 }
 
-private class MetadataTable {
+class MetadataTable {
     
     static let table = Table("metadata")
     static let key = Expression<String>("key")
@@ -89,17 +97,9 @@ extension Catalog {
         }
     }
     
-    public func schemaVersion() -> Int? {
-        return self.intForMetadataKey("schemaVersion")
-    }
-    
-    public func catalogVersion() -> Int? {
-        return self.intForMetadataKey("catalogVersion")
-    }
-    
 }
 
-private class SourceTable {
+class SourceTable {
     
     static let table = Table("source")
     static let id = Expression<Int>("_id")
@@ -134,7 +134,7 @@ extension Catalog {
     
 }
 
-private class ItemCategoryTable {
+class ItemCategoryTable {
     
     static let table = Table("item_category")
     static let id = Expression<Int>("_id")
@@ -154,7 +154,7 @@ extension Catalog {
     
 }
 
-private class ItemTable {
+class ItemTable {
     
     static let table = Table("item")
     static let id = Expression<Int>("_id")
@@ -264,7 +264,7 @@ extension Catalog {
 
 }
 
-private class LanguageTable {
+class LanguageTable {
     
     static let table = Table("language")
     static let id = Expression<Int>("_id")
@@ -317,7 +317,7 @@ extension Catalog {
     
 }
 
-private class LanguageNameTable {
+class LanguageNameTable {
     
     static let table = Table("language_name")
     static let id = Expression<Int>("_id")
@@ -335,7 +335,7 @@ extension Catalog {
     
 }
 
-private class LibrarySectionTable {
+class LibrarySectionTable {
     
     static let table = Table("library_section")
     static let id = Expression<Int>("_id")
@@ -382,7 +382,7 @@ extension Catalog {
     
 }
 
-private class LibraryCollectionTable {
+class LibraryCollectionTable {
     
     static let table = Table("library_collection")
     static let id = Expression<Int>("_id")
@@ -450,13 +450,13 @@ extension Catalog {
 
 }
 
-private class LibraryItemTable {
+class LibraryItemTable {
     
     static let table = Table("library_item")
     static let id = Expression<Int>("_id")
     static let externalID = Expression<String>("external_id")
-    static let librarySectionID = Expression<Int>("library_section_id")
-    static let librarySectionExternalID = Expression<String>("library_section_external_id")
+    static let librarySectionID = Expression<Int?>("library_section_id")
+    static let librarySectionExternalID = Expression<String?>("library_section_external_id")
     static let position = Expression<Int>("position")
     static let title = Expression<String>("title")
     static let obsolete = Expression<Bool>("is_obsolete")
@@ -484,7 +484,7 @@ extension Catalog {
     }
     
     @available(*, deprecated=1.0.0, message="Use `libraryItemsForLibrarySectionWithID(_:)` instead")
-    func libraryItemsForLibrarySectionWithExternalID(librarySectionExternalID: String) -> [LibraryItem] {
+    public func libraryItemsForLibrarySectionWithExternalID(librarySectionExternalID: String) -> [LibraryItem] {
         do {
             return try db.prepare(LibraryItemTable.table.join(ItemTable.table, on: ItemTable.table[ItemTable.id] == LibraryItemTable.itemID).filter(LibraryItemTable.librarySectionExternalID == librarySectionExternalID && [1, 2].contains(ItemTable.platformID)).order(LibraryItemTable.position)).map { LibraryItemTable.fromNamespacedRow($0) }
         } catch {
@@ -565,7 +565,7 @@ extension Catalog {
     
 }
 
-private class StopwordTable {
+class StopwordTable {
     
     static let table = Table("stopword")
     static let id = Expression<Int>("_id")
@@ -585,6 +585,49 @@ extension Catalog {
             return try db.prepare(StopwordTable.table.filter(StopwordTable.languageID == languageID)).map { StopwordTable.fromRow($0) }
         } catch {
             return []
+        }
+    }
+    
+}
+
+class SubitemMetadataTable {
+    
+    static let table = Table("subitem_metadata")
+    static let id = Expression<Int>("_id")
+    static let itemID = Expression<Int>("item_id")
+    static let subitemID = Expression<Int>("subitem_id")
+    static let docID = Expression<String>("doc_id")
+    static let docVersion = Expression<Int>("doc_version")
+    
+}
+
+extension Catalog {
+    
+    public func itemAndSubitemIDForDocID(docID: String) -> (itemID: Int, subitemID: Int)? {
+        return db.pluck(SubitemMetadataTable.table.select(SubitemMetadataTable.itemID, SubitemMetadataTable.subitemID).filter(SubitemMetadataTable.docID == docID)).map { row in
+            return (itemID: row[SubitemMetadataTable.itemID], subitemID: row[SubitemMetadataTable.subitemID])
+        }
+    }
+    
+    public func subitemIDForSubitemWithDocID(docID: String, itemID: Int) -> Int? {
+        return db.pluck(SubitemMetadataTable.table.select(SubitemMetadataTable.subitemID).filter(SubitemMetadataTable.docID == docID && SubitemMetadataTable.itemID == itemID)).map { row in
+            return row[SubitemMetadataTable.subitemID]
+        }
+    }
+    
+    public func docIDForSubitemWithID(subitemID: Int, itemID: Int) -> String? {
+        return db.pluck(SubitemMetadataTable.table.select(SubitemMetadataTable.docID).filter(SubitemMetadataTable.subitemID == subitemID && SubitemMetadataTable.itemID == itemID)).map { row in
+            return row[SubitemMetadataTable.docID]
+        }
+    }
+    
+    public func versionsForDocIDs(docIDs: [String]) -> [String: Int] {
+        do {
+            return [String: Int](try db.prepare(SubitemMetadataTable.table.select(SubitemMetadataTable.docID, SubitemMetadataTable.docVersion).filter(docIDs.contains(SubitemMetadataTable.docID))).map { row in
+                return (row[SubitemMetadataTable.docID], row[SubitemMetadataTable.docVersion])
+            })
+        } catch {
+            return [:]
         }
     }
     

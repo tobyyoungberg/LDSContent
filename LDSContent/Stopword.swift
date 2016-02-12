@@ -27,6 +27,12 @@ public struct Stopword: Equatable {
     public var id: Int
     public var languageID: Int
     public var word: String
+    
+    public init(id: Int, languageID: Int, word: String) {
+        self.id = id
+        self.languageID = languageID
+        self.word = word
+    }
 
 }
 

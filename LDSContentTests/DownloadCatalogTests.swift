@@ -81,7 +81,7 @@ class DownloadCatalogTests: XCTestCase {
                 XCTAssertTrue(destinationURL.checkResourceIsReachableAndReturnError(nil), "Downloaded catalog does not exist")
                 
                 let catalog = Catalog(path: destinationURL.path!)!
-                XCTAssertEqual(catalog.catalogVersion(), catalogVersion)
+                XCTAssertEqual(catalog.catalogVersion, catalogVersion)
             case let .Error(errors):
                 XCTFail("Failed with errors \(errors)")
             }

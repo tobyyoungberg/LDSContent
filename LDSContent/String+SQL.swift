@@ -24,6 +24,18 @@ extension String {
         return result as String
     }
     
+    init?(imageRenditions: [ImageRendition]) {
+        if imageRenditions.isEmpty {
+            return nil
+        }
+        
+        var components = [String]()
+        for imageRendition in imageRenditions {
+            components.append("\(imageRendition.size.width)\(imageRendition.size.height),\(imageRendition.url.absoluteString)")
+        }
+        self.init(components.joinWithSeparator("\n"))
+    }
+    
     func toImageRenditions() -> [ImageRendition]? {
         var imageRenditions = [ImageRendition]()
         

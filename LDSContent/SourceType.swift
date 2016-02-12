@@ -23,7 +23,9 @@
 import Foundation
 
 public enum SourceType: Int {
+
     case Default = 1
     case Secure = 2
     case Foreign = 3
+
 }

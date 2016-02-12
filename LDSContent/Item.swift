@@ -36,6 +36,20 @@ public struct Item: Equatable {
     public var latestVersion: Int
     public var obsolete: Bool
     
+    public init(id: Int, externalID: String, languageID: Int, sourceID: Int, platformID: Int, uri: String, title: String, itemCoverRenditions: [ImageRendition], itemCategoryID: Int, latestVersion: Int, obsolete: Bool) {
+        self.id = id
+        self.externalID = externalID
+        self.languageID = languageID
+        self.sourceID = sourceID
+        self.platformID = platformID
+        self.uri = uri
+        self.title = title
+        self.itemCoverRenditions = itemCoverRenditions
+        self.itemCategoryID = itemCategoryID
+        self.latestVersion = latestVersion
+        self.obsolete = obsolete
+    }
+    
 }
 
 public func == (lhs: Item, rhs: Item) -> Bool {

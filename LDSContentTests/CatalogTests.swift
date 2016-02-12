@@ -21,18 +21,18 @@
 //
 
 import XCTest
-@testable import LDSContent
+import LDSContent
 
 class CatalogTests: XCTestCase {
     
     var catalog: Catalog!
     
     func testSchemaVersion() {
-        XCTAssertEqual(catalog.schemaVersion()!, 3)
+        XCTAssertEqual(catalog.schemaVersion!, 3)
     }
     
     func testCatalogVersion() {
-        XCTAssertGreaterThan(catalog.catalogVersion()!, 0)
+        XCTAssertGreaterThan(catalog.catalogVersion!, 0)
     }
     
     func testSource() {

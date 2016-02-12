@@ -32,6 +32,17 @@ public struct LibraryCollection: LibraryNode, Equatable {
     public var title: String
     public var coverRenditions: [ImageRendition]
     public var type: LibraryCollectionType
+    
+    public init(id: Int, externalID: String, librarySectionID: Int?, librarySectionExternalID: String?, position: Int, title: String, coverRenditions: [ImageRendition], type: LibraryCollectionType) {
+        self.id = id
+        self.externalID = externalID
+        self.librarySectionID = librarySectionID
+        self.librarySectionExternalID = librarySectionExternalID
+        self.position = position
+        self.title = title
+        self.coverRenditions = coverRenditions
+        self.type = type
+    }
 
 }
 
