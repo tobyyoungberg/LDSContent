@@ -28,8 +28,8 @@ class MutableCatalogTests: XCTestCase {
     var catalog: MutableCatalog!
     
     func testSchemaVersion() {
-        catalog.schemaVersion = 3
-        XCTAssertEqual(catalog.schemaVersion, 3)
+        catalog.schemaVersion = Catalog.SchemaVersion
+        XCTAssertEqual(catalog.schemaVersion, Catalog.SchemaVersion)
     }
     
     func testCatalogVersion() {

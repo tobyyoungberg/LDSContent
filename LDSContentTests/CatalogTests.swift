@@ -28,7 +28,7 @@ class CatalogTests: XCTestCase {
     var catalog: Catalog!
     
     func testSchemaVersion() {
-        XCTAssertEqual(catalog.schemaVersion, 3)
+        XCTAssertEqual(catalog.schemaVersion, Catalog.SchemaVersion)
     }
     
     func testCatalogVersion() {

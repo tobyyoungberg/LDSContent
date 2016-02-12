@@ -26,6 +26,8 @@ import Swiftification
 
 public class Catalog {
     
+    public static let SchemaVersion = 3
+    
     let db: Connection!
     let noDiacritic: ((Expression<String>) -> Expression<String>)!
     
