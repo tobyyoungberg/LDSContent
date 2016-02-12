@@ -107,7 +107,9 @@ class LanguagesViewController: UIViewController {
                     break
                 }
                 
-                if let catalog = Catalog(path: path) {
+                do {
+                    let catalog = try Catalog(path: path)
+                    
                     dispatch_async(dispatch_get_main_queue()) {
                         if let uiLanguage = catalog.languageWithISO639_3Code("eng") {
                             self.catalog = catalog
@@ -125,6 +127,9 @@ class LanguagesViewController: UIViewController {
                             self.tableView.reloadData()
                         }
                     }
+                } catch {
+                    NSLog("Failed to connect to catalog: \(error)")
+                    break
                 }
             case let .Error(errors: errors):
                 NSLog("Failed to download catalog with errors %@", errors)

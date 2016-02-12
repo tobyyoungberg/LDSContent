@@ -28,11 +28,11 @@ class CatalogTests: XCTestCase {
     var catalog: Catalog!
     
     func testSchemaVersion() {
-        XCTAssertEqual(catalog.schemaVersion!, 3)
+        XCTAssertEqual(catalog.schemaVersion, 3)
     }
     
     func testCatalogVersion() {
-        XCTAssertGreaterThan(catalog.catalogVersion!, 0)
+        XCTAssertGreaterThan(catalog.catalogVersion, 0)
     }
     
     func testSource() {
@@ -316,7 +316,11 @@ extension CatalogTests {
             session.downloadCatalog(destinationURL: destinationURL) { result in
                 switch result {
                 case .Success:
-                    Static.catalog = Catalog(path: destinationURL.path!)!
+                    do {
+                        Static.catalog = try Catalog(path: destinationURL.path!)
+                    } catch {
+                        NSLog("Failed to connect to catalog: %@", "\(error)")
+                    }
                 case let .Error(errors):
                     NSLog("Failed with errors %@", "\(errors)")
                 }

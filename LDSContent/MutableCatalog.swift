@@ -1,9 +1,23 @@
 //
-//  MutableCatalog.swift
-//  LDSContent
+// Copyright (c) 2016 Hilton Campbell
 //
-//  Created by Hilton Campbell on 2/11/16.
-//  Copyright © 2016 Hilton Campbell. All rights reserved.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 //
 
 import Foundation
@@ -11,34 +25,26 @@ import SQLite
 
 public class MutableCatalog: Catalog {
     
-    public override init?(path: String? = nil) {
-        super.init(path: path)
+    public override init(path: String? = nil) throws {
+        try super.init(path: path)
         
-        if !createDatabaseTables() {
-            return nil
-        }
+        try createDatabaseTables()
     }
     
-    private func createDatabaseTables() -> Bool {
-        do {
-            try db.transaction {
-                if !self.db.tableExists("metadata") {
-                    if let sqlPath = NSBundle(forClass: self.dynamicType).pathForResource("Catalog", ofType: "sql") {
-                        let sql = try String(contentsOfFile: sqlPath, encoding: NSUTF8StringEncoding)
-                        try self.db.execute(sql)
-                    } else {
-                        throw Error.errorWithCode(.Unknown, failureReason: "Failed to load SQL.")
-                    }
+    private func createDatabaseTables() throws {
+        try db.transaction {
+            if !self.db.tableExists("metadata") {
+                if let sqlPath = NSBundle(forClass: self.dynamicType).pathForResource("Catalog", ofType: "sql") {
+                    let sql = try String(contentsOfFile: sqlPath, encoding: NSUTF8StringEncoding)
+                    try self.db.execute(sql)
+                } else {
+                    throw Error.errorWithCode(.Unknown, failureReason: "Unable to locate SQL for catalog.")
                 }
             }
-            
-            return true
-        } catch {
-            return false
         }
     }
     
-    public override var schemaVersion: Int? {
+    public override var schemaVersion: Int {
         get {
             return super.schemaVersion
         }
@@ -47,7 +53,7 @@ public class MutableCatalog: Catalog {
         }
     }
     
-    public override var catalogVersion: Int? {
+    public override var catalogVersion: Int {
         get {
             return super.catalogVersion
         }
@@ -64,23 +70,15 @@ public class MutableCatalog: Catalog {
 
 extension MutableCatalog {
     
-    func setInt(integerValue: Int?, forMetadataKey key: String) {
+    func setInt(integerValue: Int, forMetadataKey key: String) {
         do {
-            if let integerValue = integerValue {
-                try db.run(MetadataTable.table.insert(or: .Replace, MetadataTable.key <- key, MetadataTable.integerValue <- integerValue))
-            } else {
-                try db.run(MetadataTable.table.filter(MetadataTable.key == key).delete())
-            }
+            try db.run(MetadataTable.table.insert(or: .Replace, MetadataTable.key <- key, MetadataTable.integerValue <- integerValue))
         } catch {}
     }
     
-    func setString(stringValue: String?, forMetadataKey key: String) {
+    func setString(stringValue: String, forMetadataKey key: String) {
         do {
-            if let stringValue = stringValue {
-                try db.run(MetadataTable.table.insert(or: .Replace, MetadataTable.key <- key, MetadataTable.stringValue <- stringValue))
-            } else {
-                try db.run(MetadataTable.table.filter(MetadataTable.key == key).delete())
-            }
+            try db.run(MetadataTable.table.insert(or: .Replace, MetadataTable.key <- key, MetadataTable.stringValue <- stringValue))
         } catch {}
     }
     
@@ -109,7 +107,7 @@ extension MutableCatalog {
             ItemTable.externalID <- item.externalID,
             ItemTable.languageID <- item.languageID,
             ItemTable.sourceID <- item.sourceID,
-            ItemTable.platformID <- item.platformID,
+            ItemTable.platformID <- item.platform.rawValue,
             ItemTable.uri <- item.uri,
             ItemTable.title <- item.title,
             ItemTable.itemCoverRenditions <- String(item.itemCoverRenditions),

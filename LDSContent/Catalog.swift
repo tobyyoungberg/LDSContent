@@ -29,13 +29,17 @@ public class Catalog {
     let db: Connection!
     let noDiacritic: ((Expression<String>) -> Expression<String>)!
     
-    public init?(path: String? = nil) {
-        db = try? Connection(path ?? "")
-        if db == nil {
+    let validPlatformIDs = [Platform.All.rawValue, Platform.iOS.rawValue]
+    
+    public init(path: String? = nil) throws {
+        do {
+            db = try Connection(path ?? "")   
+        } catch {
+            db = nil
             noDiacritic = nil
-            return nil
+            throw error
         }
-        
+            
         do {
             try db.execute("PRAGMA synchronous = OFF")
             try db.execute("PRAGMA journal_mode = OFF")
@@ -46,7 +50,7 @@ public class Catalog {
             }
         } catch {
             noDiacritic = nil
-            return nil
+            throw error
         }
     }
     
@@ -63,12 +67,12 @@ public class Catalog {
         }
     }
     
-    public var schemaVersion: Int? {
-        return self.intForMetadataKey("schemaVersion")
+    public var schemaVersion: Int {
+        return self.intForMetadataKey("schemaVersion") ?? 0
     }
     
-    public var catalogVersion: Int? {
-        return self.intForMetadataKey("catalogVersion")
+    public var catalogVersion: Int {
+        return self.intForMetadataKey("catalogVersion") ?? 0
     }
     
 }
@@ -170,11 +174,11 @@ class ItemTable {
     static let obsolete = Expression<Bool>("is_obsolete")
     
     static func fromRow(row: Row) -> Item {
-        return Item(id: row[id], externalID: row[externalID], languageID: row[languageID], sourceID: row[sourceID], platformID: row[platformID], uri: row[uri], title: row[title], itemCoverRenditions: (row[itemCoverRenditions] ?? "").toImageRenditions() ?? [], itemCategoryID: row[itemCategoryID], latestVersion: row[latestVersion], obsolete: row[obsolete])
+        return Item(id: row[id], externalID: row[externalID], languageID: row[languageID], sourceID: row[sourceID], platform: Platform(rawValue: row[platformID]) ?? .All, uri: row[uri], title: row[title], itemCoverRenditions: (row[itemCoverRenditions] ?? "").toImageRenditions() ?? [], itemCategoryID: row[itemCategoryID], latestVersion: row[latestVersion], obsolete: row[obsolete])
     }
     
     static func fromNamespacedRow(row: Row) -> Item {
-        return Item(id: row[ItemTable.table[id]], externalID: row[ItemTable.table[externalID]], languageID: row[ItemTable.table[languageID]], sourceID: row[ItemTable.table[sourceID]], platformID: row[ItemTable.table[platformID]], uri: row[ItemTable.table[uri]], title: row[ItemTable.table[title]], itemCoverRenditions: (row[ItemTable.table[itemCoverRenditions]] ?? "").toImageRenditions() ?? [], itemCategoryID: row[ItemTable.table[itemCategoryID]], latestVersion: row[ItemTable.table[latestVersion]], obsolete: row[ItemTable.table[obsolete]])
+        return Item(id: row[ItemTable.table[id]], externalID: row[ItemTable.table[externalID]], languageID: row[ItemTable.table[languageID]], sourceID: row[ItemTable.table[sourceID]], platform: Platform(rawValue: row[ItemTable.table[platformID]]) ?? .All, uri: row[ItemTable.table[uri]], title: row[ItemTable.table[title]], itemCoverRenditions: (row[ItemTable.table[itemCoverRenditions]] ?? "").toImageRenditions() ?? [], itemCategoryID: row[ItemTable.table[itemCategoryID]], latestVersion: row[ItemTable.table[latestVersion]], obsolete: row[ItemTable.table[obsolete]])
     }
     
 }
@@ -191,7 +195,7 @@ extension Catalog {
     
     public func itemsForLibraryCollectionWithID(id: Int) -> [Item] {
         do {
-            return try db.prepare(ItemTable.table.join(LibraryItemTable.table, on: ItemTable.table[ItemTable.id] == LibraryItemTable.itemID).join(LibrarySectionTable.table, on: LibraryItemTable.librarySectionID == LibrarySectionTable.table[LibrarySectionTable.id]).filter(LibrarySectionTable.libraryCollectionID == id && [1, 2].contains(ItemTable.platformID)).order(LibraryItemTable.position)).map { ItemTable.fromNamespacedRow($0) }
+            return try db.prepare(ItemTable.table.join(LibraryItemTable.table, on: ItemTable.table[ItemTable.id] == LibraryItemTable.itemID).join(LibrarySectionTable.table, on: LibraryItemTable.librarySectionID == LibrarySectionTable.table[LibrarySectionTable.id]).filter(LibrarySectionTable.libraryCollectionID == id && validPlatformIDs.contains(ItemTable.platformID)).order(LibraryItemTable.position)).map { ItemTable.fromNamespacedRow($0) }
         } catch {
             return []
         }
@@ -199,7 +203,7 @@ extension Catalog {
     
     public func itemsWithURIsIn(uris: [String], languageID: Int) -> [Item] {
         do {
-            return try db.prepare(ItemTable.table.filter(uris.contains(ItemTable.uri) && ItemTable.languageID == languageID && [1, 2].contains(ItemTable.platformID))).map { ItemTable.fromRow($0) }
+            return try db.prepare(ItemTable.table.filter(uris.contains(ItemTable.uri) && ItemTable.languageID == languageID && validPlatformIDs.contains(ItemTable.platformID))).map { ItemTable.fromRow($0) }
         } catch {
             return []
         }
@@ -207,7 +211,7 @@ extension Catalog {
     
     public func itemsWithSourceID(sourceID: Int) -> [Item] {
         do {
-            return try db.prepare(ItemTable.table.filter(ItemTable.sourceID == sourceID && [1, 2].contains(ItemTable.platformID))).map { ItemTable.fromRow($0) }
+            return try db.prepare(ItemTable.table.filter(ItemTable.sourceID == sourceID && validPlatformIDs.contains(ItemTable.platformID))).map { ItemTable.fromRow($0) }
         } catch {
             return []
         }
@@ -215,7 +219,7 @@ extension Catalog {
     
     public func itemsWithIDsIn(ids: [Int]) -> [Item] {
         do {
-            return try db.prepare(ItemTable.table.filter(ids.contains(ItemTable.id) && [1, 2].contains(ItemTable.platformID))).map { ItemTable.fromRow($0) }
+            return try db.prepare(ItemTable.table.filter(ids.contains(ItemTable.id) && validPlatformIDs.contains(ItemTable.platformID))).map { ItemTable.fromRow($0) }
         } catch {
             return []
         }
@@ -224,28 +228,28 @@ extension Catalog {
     @available(*, deprecated=1.0.0, message="Use `itemsWithIDsIn(_:)` instead")
     public func itemsWithExternalIDsIn(externalIDs: [String]) -> [Item] {
         do {
-            return try db.prepare(ItemTable.table.filter(externalIDs.contains(ItemTable.externalID) && [1, 2].contains(ItemTable.platformID))).map { ItemTable.fromRow($0) }
+            return try db.prepare(ItemTable.table.filter(externalIDs.contains(ItemTable.externalID) && validPlatformIDs.contains(ItemTable.platformID))).map { ItemTable.fromRow($0) }
         } catch {
             return []
         }
     }
     
     public func itemWithID(id: Int) -> Item? {
-        return db.pluck(ItemTable.table.filter(ItemTable.id == id && [1, 2].contains(ItemTable.platformID))).map { ItemTable.fromRow($0) }
+        return db.pluck(ItemTable.table.filter(ItemTable.id == id && validPlatformIDs.contains(ItemTable.platformID))).map { ItemTable.fromRow($0) }
     }
     
     @available(*, deprecated=1.0.0, message="Use `itemWithID(_:)` instead")
     public func itemWithExternalID(externalID: String) -> Item? {
-        return db.pluck(ItemTable.table.filter(ItemTable.externalID == externalID && [1, 2].contains(ItemTable.platformID))).map { ItemTable.fromRow($0) }
+        return db.pluck(ItemTable.table.filter(ItemTable.externalID == externalID && validPlatformIDs.contains(ItemTable.platformID))).map { ItemTable.fromRow($0) }
     }
     
     public func itemWithURI(uri: String, languageID: Int) -> Item? {
-        return db.pluck(ItemTable.table.filter(ItemTable.uri == uri && ItemTable.languageID == languageID && [1, 2].contains(ItemTable.platformID))).map { ItemTable.fromRow($0) }
+        return db.pluck(ItemTable.table.filter(ItemTable.uri == uri && ItemTable.languageID == languageID && validPlatformIDs.contains(ItemTable.platformID))).map { ItemTable.fromRow($0) }
     }
     
     public func itemsWithTitlesThatContainString(string: String, languageID: Int, limit: Int) -> [Item] {
         do {
-            return try db.prepare(ItemTable.table.filter(noDiacritic(ItemTable.title).like("%\(string.withoutDiacritics().escaped())%", escape: "!") && ItemTable.languageID == languageID && ItemTable.obsolete == false && [1, 2].contains(ItemTable.platformID)).limit(limit)).map { ItemTable.fromRow($0) }
+            return try db.prepare(ItemTable.table.filter(noDiacritic(ItemTable.title).like("%\(string.withoutDiacritics().escaped())%", escape: "!") && ItemTable.languageID == languageID && ItemTable.obsolete == false && validPlatformIDs.contains(ItemTable.platformID)).limit(limit)).map { ItemTable.fromRow($0) }
         } catch {
             return []
         }
@@ -254,7 +258,7 @@ extension Catalog {
     public func itemThatContainsURI(uri: String, languageID: Int) -> Item? {
         var prefix = uri
         while !prefix.isEmpty && prefix != "/" {
-            if let item = db.pluck(ItemTable.table.filter(ItemTable.uri == prefix && ItemTable.languageID == languageID && [1, 2].contains(ItemTable.platformID))).map({ ItemTable.fromRow($0) }) {
+            if let item = db.pluck(ItemTable.table.filter(ItemTable.uri == prefix && ItemTable.languageID == languageID && validPlatformIDs.contains(ItemTable.platformID))).map({ ItemTable.fromRow($0) }) {
                 return item
             }
             prefix = (prefix as NSString).stringByDeletingLastPathComponent
@@ -486,7 +490,7 @@ extension Catalog {
     @available(*, deprecated=1.0.0, message="Use `libraryItemsForLibrarySectionWithID(_:)` instead")
     public func libraryItemsForLibrarySectionWithExternalID(librarySectionExternalID: String) -> [LibraryItem] {
         do {
-            return try db.prepare(LibraryItemTable.table.join(ItemTable.table, on: ItemTable.table[ItemTable.id] == LibraryItemTable.itemID).filter(LibraryItemTable.librarySectionExternalID == librarySectionExternalID && [1, 2].contains(ItemTable.platformID)).order(LibraryItemTable.position)).map { LibraryItemTable.fromNamespacedRow($0) }
+            return try db.prepare(LibraryItemTable.table.join(ItemTable.table, on: ItemTable.table[ItemTable.id] == LibraryItemTable.itemID).filter(LibraryItemTable.librarySectionExternalID == librarySectionExternalID && validPlatformIDs.contains(ItemTable.platformID)).order(LibraryItemTable.position)).map { LibraryItemTable.fromNamespacedRow($0) }
         } catch {
             return []
         }

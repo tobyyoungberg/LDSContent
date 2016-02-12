@@ -29,12 +29,12 @@ class MutableCatalogTests: XCTestCase {
     
     func testSchemaVersion() {
         catalog.schemaVersion = 3
-        XCTAssertEqual(catalog.schemaVersion!, 3)
+        XCTAssertEqual(catalog.schemaVersion, 3)
     }
     
     func testCatalogVersion() {
         catalog.catalogVersion = 250
-        XCTAssertEqual(catalog.catalogVersion!, 250)
+        XCTAssertEqual(catalog.catalogVersion, 250)
     }
     
     func testVacuum() {
@@ -69,7 +69,7 @@ class MutableCatalogTests: XCTestCase {
     }
     
     func testItem() {
-        let item = Item(id: 1, externalID: "1", languageID: 1, sourceID: 1, platformID: 1, uri: "/item", title: "Item", itemCoverRenditions: [], itemCategoryID: 1, latestVersion: 1, obsolete: false)
+        let item = Item(id: 1, externalID: "1", languageID: 1, sourceID: 1, platform: .All, uri: "/item", title: "Item", itemCoverRenditions: [ImageRendition(size: CGSize(width: 10, height: 10), url: NSURL(string: "https://example.org/example.png")!)], itemCategoryID: 1, latestVersion: 1, obsolete: false)
         
         XCTAssertNoThrow(try catalog.addOrUpdateItem(item))
         XCTAssertEqual(catalog.itemWithID(1), item)
@@ -88,7 +88,7 @@ class MutableCatalogTests: XCTestCase {
     }
     
     func testLibraryCollection() {
-        let libraryCollection = LibraryCollection(id: 1, externalID: "1", librarySectionID: nil, librarySectionExternalID: nil, position: 1, title: "collection", coverRenditions: [], type: .Default)
+        let libraryCollection = LibraryCollection(id: 1, externalID: "1", librarySectionID: nil, librarySectionExternalID: nil, position: 1, title: "collection", coverRenditions: [ImageRendition(size: CGSize(width: 10, height: 10), url: NSURL(string: "https://example.org/example.png")!)], type: .Default)
         
         XCTAssertNoThrow(try catalog.addOrUpdateLibraryCollection(libraryCollection))
         XCTAssertEqual(catalog.libraryCollectionWithID(1), libraryCollection)
@@ -129,7 +129,11 @@ class MutableCatalogTests: XCTestCase {
     override func setUp() {
         super.setUp()
         
-        catalog = MutableCatalog()
+        do {
+            catalog = try MutableCatalog()
+        } catch {
+            catalog = nil
+        }
     }
     
 }

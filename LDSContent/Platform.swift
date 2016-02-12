@@ -22,20 +22,10 @@
 
 import Foundation
 
-public struct Stopword: Equatable {
+public enum Platform: Int {
     
-    public var id: Int?
-    public var languageID: Int
-    public var word: String
+    case All = 1
+    case iOS = 2
+    case Android = 3
     
-    public init(id: Int?, languageID: Int, word: String) {
-        self.id = id
-        self.languageID = languageID
-        self.word = word
-    }
-
-}
-
-public func == (lhs: Stopword, rhs: Stopword) -> Bool {
-    return lhs.id == rhs.id && lhs.languageID == rhs.languageID && lhs.word == rhs.word
 }
