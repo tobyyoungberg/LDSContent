@@ -9,7 +9,7 @@ Swift client library for LDS content.
 
 ### Installation
 
-Install with Cocoapods by adding the following to your Podfile:
+Install with CocoaPods by adding the following to your Podfile:
 
 ```
 use_frameworks!
