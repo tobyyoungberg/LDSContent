@@ -41,6 +41,11 @@ public class Session: NSObject {
         operationQueue.addOperation(operation)
     }
     
+    public func downloadItemPackage(destinationURL destinationURL: NSURL, externalID: String, version: Int, completion: (DownloadItemPackageResult) -> Void) {
+        let operation = DownloadItemPackageOperation(session: self, destinationURL: destinationURL, externalID: externalID, version: version, completion: completion)
+        operationQueue.addOperation(operation)
+    }
+    
 }
 
 extension Session: NSURLSessionDelegate {

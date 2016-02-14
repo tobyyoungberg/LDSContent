@@ -24,23 +24,22 @@ import Foundation
 import PSOperations
 import SSZipArchive
 
-class DownloadCatalogOperation: Operation {
+class DownloadItemPackageOperation: Operation {
     
     let session: Session
     let destinationURL: NSURL
     
-    var catalogVersion: Int?
+    let externalID: String
+    let version: Int
     
-    init(session: Session, destinationURL: NSURL, catalogVersion: Int?, completion: (DownloadCatalogResult) -> Void) {
+    init(session: Session, destinationURL: NSURL, externalID: String, version: Int, completion: (DownloadItemPackageResult) -> Void) {
         self.session = session
         self.destinationURL = destinationURL
-        self.catalogVersion = catalogVersion
+        self.externalID = externalID
+        self.version = version
         
         super.init()
         
-        addCondition(CatalogVersionCondition(session: session, catalogVersion: catalogVersion, completion: { condition in
-            self.catalogVersion = condition.catalogVersion
-        }))
         addObserver(BlockObserver(startHandler: nil, produceHandler: nil, finishHandler: { operation, errors in
             if errors.isEmpty {
                 completion(.Success)
@@ -51,15 +50,10 @@ class DownloadCatalogOperation: Operation {
     }
     
     override func execute() {
-        guard let catalogVersion = catalogVersion else {
-            finishWithError(Error.errorWithCode(.Unknown, failureReason: "Unspecified catalog version"))
-            return
-        }
-        
-        downloadCatalog(catalogVersion: catalogVersion) { result in
+        downloadItemPackage(externalID: externalID, version: version) { result in
             switch result {
             case let .Success(location):
-                self.extractCatalog(location: location) { result in
+                self.extractItemPackage(location: location) { result in
                     switch result {
                     case .Success:
                         self.finish()
@@ -78,14 +72,14 @@ class DownloadCatalogOperation: Operation {
         case Error(error: NSError)
     }
     
-    func downloadCatalog(catalogVersion catalogVersion: Int, completion: (DownloadResult) -> Void) {
+    func downloadItemPackage(externalID externalID: String, version: Int, completion: (DownloadResult) -> Void) {
         guard let baseURL = NSURL(string: "https://edge.ldscdn.org/mobile/GospelStudy/beta/") else {
             completion(.Error(error: Error.errorWithCode(.Unknown, failureReason: "Malformed URL")))
             return
         }
         
-        let compressedCatalogURL = baseURL.URLByAppendingPathComponent("v3/catalogs/\(catalogVersion).zip")
-        let request = NSMutableURLRequest(URL: compressedCatalogURL)
+        let compressedItemPackageURL = baseURL.URLByAppendingPathComponent("v3/item-packages/\(externalID)/\(version).zip")
+        let request = NSMutableURLRequest(URL: compressedItemPackageURL)
         
         let task = session.urlSession.downloadTaskWithRequest(request) { location, response, error in
             if let error = error {
@@ -103,14 +97,14 @@ class DownloadCatalogOperation: Operation {
         task.resume()
     }
     
-    enum ExtractCatalogResult {
+    enum ExtractItemPackageResult {
         case Success
         case Error(error: NSError)
     }
     
-    func extractCatalog(location location: NSURL, completion: (ExtractCatalogResult) -> Void) {
+    func extractItemPackage(location location: NSURL, completion: (ExtractItemPackageResult) -> Void) {
         guard let sourcePath = location.path else {
-            completion(.Error(error: Error.errorWithCode(.Unknown, failureReason: "Failed to get compressed catalog path")))
+            completion(.Error(error: Error.errorWithCode(.Unknown, failureReason: "Failed to get compressed item package path")))
             return
         }
         
@@ -131,16 +125,14 @@ class DownloadCatalogOperation: Operation {
             completion(.Error(error: Error.errorWithCode(.Unknown, failureReason: "Failed to get temp directory path")))
             return
         }
-            
+        
         guard SSZipArchive.unzipFileAtPath(sourcePath, toDestination: destinationPath) else {
-            completion(.Error(error: Error.errorWithCode(.Unknown, failureReason: "Failed to decompress catalog")))
+            completion(.Error(error: Error.errorWithCode(.Unknown, failureReason: "Failed to decompress item package")))
             return
         }
         
-        let uncompressedCatalogURL = tempDirectoryURL.URLByAppendingPathComponent("Catalog.sqlite")
-        
         do {
-            try NSFileManager.defaultManager().moveItemAtURL(uncompressedCatalogURL, toURL: destinationURL)
+            try NSFileManager.defaultManager().moveItemAtURL(tempDirectoryURL, toURL: destinationURL)
         } catch let error as NSError {
             completion(.Error(error: error))
             return

@@ -79,16 +79,16 @@ public class Catalog {
     
 }
 
-class MetadataTable {
-    
-    static let table = Table("metadata")
-    static let key = Expression<String>("key")
-    static let integerValue = Expression<Int>("value")
-    static let stringValue = Expression<String>("value")
-    
-}
-
 extension Catalog {
+    
+    class MetadataTable {
+        
+        static let table = Table("metadata")
+        static let key = Expression<String>("key")
+        static let integerValue = Expression<Int>("value")
+        static let stringValue = Expression<String>("value")
+        
+    }
     
     func intForMetadataKey(key: String) -> Int? {
         return db.pluck(MetadataTable.table.filter(MetadataTable.key == key).select(MetadataTable.stringValue)).flatMap { row in
@@ -105,20 +105,20 @@ extension Catalog {
     
 }
 
-class SourceTable {
-    
-    static let table = Table("source")
-    static let id = Expression<Int>("_id")
-    static let name = Expression<String>("name")
-    static let typeID = Expression<Int>("type_id")
-    
-    static func fromRow(row: Row) -> Source {
-        return Source(id: row[id], name: row[name], type: SourceType(rawValue: row[typeID]) ?? .Default)
-    }
-    
-}
-
 extension Catalog {
+    
+    class SourceTable {
+        
+        static let table = Table("source")
+        static let id = Expression<Int>("_id")
+        static let name = Expression<String>("name")
+        static let typeID = Expression<Int>("type_id")
+        
+        static func fromRow(row: Row) -> Source {
+            return Source(id: row[id], name: row[name], type: SourceType(rawValue: row[typeID]) ?? .Default)
+        }
+        
+    }
     
     public func sources() -> [Source] {
         do {
@@ -140,19 +140,19 @@ extension Catalog {
     
 }
 
-class ItemCategoryTable {
-    
-    static let table = Table("item_category")
-    static let id = Expression<Int>("_id")
-    static let name = Expression<String>("name")
-    
-    static func fromRow(row: Row) -> ItemCategory {
-        return ItemCategory(id: row[id], name: row[name])
-    }
-    
-}
-
 extension Catalog {
+    
+    class ItemCategoryTable {
+        
+        static let table = Table("item_category")
+        static let id = Expression<Int>("_id")
+        static let name = Expression<String>("name")
+        
+        static func fromRow(row: Row) -> ItemCategory {
+            return ItemCategory(id: row[id], name: row[name])
+        }
+        
+    }
     
     public func itemCategoryWithID(id: Int) -> ItemCategory? {
         return db.pluck(ItemCategoryTable.table.filter(ItemCategoryTable.id == id)).map { ItemCategoryTable.fromRow($0) }
@@ -160,32 +160,32 @@ extension Catalog {
     
 }
 
-class ItemTable {
-    
-    static let table = Table("item")
-    static let id = Expression<Int>("_id")
-    static let externalID = Expression<String>("external_id")
-    static let languageID = Expression<Int>("language_id")
-    static let sourceID = Expression<Int>("source_id")
-    static let platformID = Expression<Int>("platform_id")
-    static let uri = Expression<String>("uri")
-    static let title = Expression<String>("title")
-    static let itemCoverRenditions = Expression<String?>("item_cover_renditions")
-    static let itemCategoryID = Expression<Int>("item_category_id")
-    static let latestVersion = Expression<Int>("latest_version")
-    static let obsolete = Expression<Bool>("is_obsolete")
-    
-    static func fromRow(row: Row) -> Item {
-        return Item(id: row[id], externalID: row[externalID], languageID: row[languageID], sourceID: row[sourceID], platform: Platform(rawValue: row[platformID]) ?? .All, uri: row[uri], title: row[title], itemCoverRenditions: (row[itemCoverRenditions] ?? "").toImageRenditions() ?? [], itemCategoryID: row[itemCategoryID], latestVersion: row[latestVersion], obsolete: row[obsolete])
-    }
-    
-    static func fromNamespacedRow(row: Row) -> Item {
-        return Item(id: row[ItemTable.table[id]], externalID: row[ItemTable.table[externalID]], languageID: row[ItemTable.table[languageID]], sourceID: row[ItemTable.table[sourceID]], platform: Platform(rawValue: row[ItemTable.table[platformID]]) ?? .All, uri: row[ItemTable.table[uri]], title: row[ItemTable.table[title]], itemCoverRenditions: (row[ItemTable.table[itemCoverRenditions]] ?? "").toImageRenditions() ?? [], itemCategoryID: row[ItemTable.table[itemCategoryID]], latestVersion: row[ItemTable.table[latestVersion]], obsolete: row[ItemTable.table[obsolete]])
-    }
-    
-}
-
 extension Catalog {
+    
+    class ItemTable {
+        
+        static let table = Table("item")
+        static let id = Expression<Int>("_id")
+        static let externalID = Expression<String>("external_id")
+        static let languageID = Expression<Int>("language_id")
+        static let sourceID = Expression<Int>("source_id")
+        static let platformID = Expression<Int>("platform_id")
+        static let uri = Expression<String>("uri")
+        static let title = Expression<String>("title")
+        static let itemCoverRenditions = Expression<String?>("item_cover_renditions")
+        static let itemCategoryID = Expression<Int>("item_category_id")
+        static let latestVersion = Expression<Int>("latest_version")
+        static let obsolete = Expression<Bool>("is_obsolete")
+        
+        static func fromRow(row: Row) -> Item {
+            return Item(id: row[id], externalID: row[externalID], languageID: row[languageID], sourceID: row[sourceID], platform: Platform(rawValue: row[platformID]) ?? .All, uri: row[uri], title: row[title], itemCoverRenditions: (row[itemCoverRenditions] ?? "").toImageRenditions() ?? [], itemCategoryID: row[itemCategoryID], latestVersion: row[latestVersion], obsolete: row[obsolete])
+        }
+        
+        static func fromNamespacedRow(row: Row) -> Item {
+            return Item(id: row[ItemTable.table[id]], externalID: row[ItemTable.table[externalID]], languageID: row[ItemTable.table[languageID]], sourceID: row[ItemTable.table[sourceID]], platform: Platform(rawValue: row[ItemTable.table[platformID]]) ?? .All, uri: row[ItemTable.table[uri]], title: row[ItemTable.table[title]], itemCoverRenditions: (row[ItemTable.table[itemCoverRenditions]] ?? "").toImageRenditions() ?? [], itemCategoryID: row[ItemTable.table[itemCategoryID]], latestVersion: row[ItemTable.table[latestVersion]], obsolete: row[ItemTable.table[obsolete]])
+        }
+        
+    }
     
     public func items() -> [Item] {
         do {
@@ -270,23 +270,23 @@ extension Catalog {
 
 }
 
-class LanguageTable {
-    
-    static let table = Table("language")
-    static let id = Expression<Int>("_id")
-    static let ldsLanguageCode = Expression<String>("lds_language_code")
-    static let iso639_3Code = Expression<String>("iso639_3")
-    static let bcp47Code = Expression<String?>("bcp47")
-    static let rootLibraryCollectionID = Expression<Int>("root_library_collection_id")
-    static let rootLibraryCollectionExternalID = Expression<String>("root_library_collection_external_id")
-    
-    static func fromRow(row: Row) -> Language {
-        return Language(id: row[id], ldsLanguageCode: row[ldsLanguageCode], iso639_3Code: row[iso639_3Code], bcp47Code: row[bcp47Code], rootLibraryCollectionID: row[rootLibraryCollectionID], rootLibraryCollectionExternalID: row[rootLibraryCollectionExternalID])
-    }
-    
-}
-
 extension Catalog {
+    
+    class LanguageTable {
+        
+        static let table = Table("language")
+        static let id = Expression<Int>("_id")
+        static let ldsLanguageCode = Expression<String>("lds_language_code")
+        static let iso639_3Code = Expression<String>("iso639_3")
+        static let bcp47Code = Expression<String?>("bcp47")
+        static let rootLibraryCollectionID = Expression<Int>("root_library_collection_id")
+        static let rootLibraryCollectionExternalID = Expression<String>("root_library_collection_external_id")
+        
+        static func fromRow(row: Row) -> Language {
+            return Language(id: row[id], ldsLanguageCode: row[ldsLanguageCode], iso639_3Code: row[iso639_3Code], bcp47Code: row[bcp47Code], rootLibraryCollectionID: row[rootLibraryCollectionID], rootLibraryCollectionExternalID: row[rootLibraryCollectionExternalID])
+        }
+        
+    }
     
     public func languages() -> [Language] {
         do {
@@ -323,17 +323,17 @@ extension Catalog {
     
 }
 
-class LanguageNameTable {
-    
-    static let table = Table("language_name")
-    static let id = Expression<Int>("_id")
-    static let languageID = Expression<Int>("language_id")
-    static let localizationLanguageID = Expression<Int>("localization_language_id")
-    static let name = Expression<String>("name")
-    
-}
-
 extension Catalog {
+    
+    class LanguageNameTable {
+        
+        static let table = Table("language_name")
+        static let id = Expression<Int>("_id")
+        static let languageID = Expression<Int>("language_id")
+        static let localizationLanguageID = Expression<Int>("localization_language_id")
+        static let name = Expression<String>("name")
+        
+    }
 
     public func nameForLanguageWithID(languageID: Int, inLanguageWithID localizationLanguageID: Int) -> String {
         return db.scalar(LanguageNameTable.table.select(LanguageNameTable.name).filter(LanguageNameTable.languageID == languageID && LanguageNameTable.localizationLanguageID == localizationLanguageID))
@@ -341,24 +341,24 @@ extension Catalog {
     
 }
 
-class LibrarySectionTable {
-    
-    static let table = Table("library_section")
-    static let id = Expression<Int>("_id")
-    static let externalID = Expression<String>("external_id")
-    static let libraryCollectionID = Expression<Int>("library_collection_id")
-    static let libraryCollectionExternalID = Expression<String>("library_collection_external_id")
-    static let position = Expression<Int>("position")
-    static let title = Expression<String?>("title")
-    static let indexTitle = Expression<String?>("index_title")
-    
-    static func fromRow(row: Row) -> LibrarySection {
-        return LibrarySection(id: row[id], externalID: row[externalID], libraryCollectionID: row[libraryCollectionID], libraryCollectionExternalID: row[libraryCollectionExternalID], position: row[position], title: row[title], indexTitle: row[indexTitle])
-    }
-    
-}
-
 extension Catalog {
+    
+    class LibrarySectionTable {
+        
+        static let table = Table("library_section")
+        static let id = Expression<Int>("_id")
+        static let externalID = Expression<String>("external_id")
+        static let libraryCollectionID = Expression<Int>("library_collection_id")
+        static let libraryCollectionExternalID = Expression<String>("library_collection_external_id")
+        static let position = Expression<Int>("position")
+        static let title = Expression<String?>("title")
+        static let indexTitle = Expression<String?>("index_title")
+        
+        static func fromRow(row: Row) -> LibrarySection {
+            return LibrarySection(id: row[id], externalID: row[externalID], libraryCollectionID: row[libraryCollectionID], libraryCollectionExternalID: row[libraryCollectionExternalID], position: row[position], title: row[title], indexTitle: row[indexTitle])
+        }
+        
+    }
     
     public func librarySectionsForLibraryCollectionWithID(id: Int) -> [LibrarySection] {
         do {
@@ -388,29 +388,29 @@ extension Catalog {
     
 }
 
-class LibraryCollectionTable {
-    
-    static let table = Table("library_collection")
-    static let id = Expression<Int>("_id")
-    static let externalID = Expression<String>("external_id")
-    static let librarySectionID = Expression<Int?>("library_section_id")
-    static let librarySectionExternalID = Expression<String?>("library_section_external_id")
-    static let position = Expression<Int>("position")
-    static let title = Expression<String>("title")
-    static let coverRenditions = Expression<String?>("cover_renditions")
-    static let typeID = Expression<Int>("type_id")
-    
-    static func fromRow(row: Row) -> LibraryCollection {
-        return LibraryCollection(id: row[id], externalID: row[externalID], librarySectionID: row[librarySectionID], librarySectionExternalID: row[librarySectionExternalID], position: row[position], title: row[title], coverRenditions: (row[coverRenditions] ?? "").toImageRenditions() ?? [], type: LibraryCollectionType(rawValue: row[typeID]) ?? .Default)
-    }
-    
-    static func fromNamespacedRow(row: Row) -> LibraryCollection {
-        return LibraryCollection(id: row[LibraryCollectionTable.table[id]], externalID: row[LibraryCollectionTable.table[externalID]], librarySectionID: row[LibraryCollectionTable.table[librarySectionID]], librarySectionExternalID: row[LibraryCollectionTable.table[librarySectionExternalID]], position: row[LibraryCollectionTable.table[position]], title: row[LibraryCollectionTable.table[title]], coverRenditions: (row[LibraryCollectionTable.table[coverRenditions]] ?? "").toImageRenditions() ?? [], type: LibraryCollectionType(rawValue: row[LibraryCollectionTable.table[typeID]]) ?? .Default)
-    }
-    
-}
-
 extension Catalog {
+    
+    class LibraryCollectionTable {
+        
+        static let table = Table("library_collection")
+        static let id = Expression<Int>("_id")
+        static let externalID = Expression<String>("external_id")
+        static let librarySectionID = Expression<Int?>("library_section_id")
+        static let librarySectionExternalID = Expression<String?>("library_section_external_id")
+        static let position = Expression<Int>("position")
+        static let title = Expression<String>("title")
+        static let coverRenditions = Expression<String?>("cover_renditions")
+        static let typeID = Expression<Int>("type_id")
+        
+        static func fromRow(row: Row) -> LibraryCollection {
+            return LibraryCollection(id: row[id], externalID: row[externalID], librarySectionID: row[librarySectionID], librarySectionExternalID: row[librarySectionExternalID], position: row[position], title: row[title], coverRenditions: (row[coverRenditions] ?? "").toImageRenditions() ?? [], type: LibraryCollectionType(rawValue: row[typeID]) ?? .Default)
+        }
+        
+        static func fromNamespacedRow(row: Row) -> LibraryCollection {
+            return LibraryCollection(id: row[LibraryCollectionTable.table[id]], externalID: row[LibraryCollectionTable.table[externalID]], librarySectionID: row[LibraryCollectionTable.table[librarySectionID]], librarySectionExternalID: row[LibraryCollectionTable.table[librarySectionExternalID]], position: row[LibraryCollectionTable.table[position]], title: row[LibraryCollectionTable.table[title]], coverRenditions: (row[LibraryCollectionTable.table[coverRenditions]] ?? "").toImageRenditions() ?? [], type: LibraryCollectionType(rawValue: row[LibraryCollectionTable.table[typeID]]) ?? .Default)
+        }
+        
+    }
     
     public func libraryCollections() -> [LibraryCollection] {
         do {
@@ -456,30 +456,30 @@ extension Catalog {
 
 }
 
-class LibraryItemTable {
-    
-    static let table = Table("library_item")
-    static let id = Expression<Int>("_id")
-    static let externalID = Expression<String>("external_id")
-    static let librarySectionID = Expression<Int?>("library_section_id")
-    static let librarySectionExternalID = Expression<String?>("library_section_external_id")
-    static let position = Expression<Int>("position")
-    static let title = Expression<String>("title")
-    static let obsolete = Expression<Bool>("is_obsolete")
-    static let itemID = Expression<Int>("item_id")
-    static let itemExternalID = Expression<String>("item_external_id")
-    
-    static func fromRow(row: Row) -> LibraryItem {
-        return LibraryItem(id: row[id], externalID: row[externalID], librarySectionID: row[librarySectionID], librarySectionExternalID: row[librarySectionExternalID], position: row[position], title: row[title], obsolete: row[obsolete], itemID: row[itemID], itemExternalID: row[itemExternalID])
-    }
-    
-    static func fromNamespacedRow(row: Row) -> LibraryItem {
-        return LibraryItem(id: row[LibraryItemTable.table[id]], externalID: row[LibraryItemTable.table[externalID]], librarySectionID: row[LibraryItemTable.table[librarySectionID]], librarySectionExternalID: row[LibraryItemTable.table[librarySectionExternalID]], position: row[LibraryItemTable.table[position]], title: row[LibraryItemTable.table[title]], obsolete: row[LibraryItemTable.table[obsolete]], itemID: row[LibraryItemTable.table[itemID]], itemExternalID: row[LibraryItemTable.table[itemExternalID]])
-    }
-    
-}
-
 extension Catalog {
+    
+    class LibraryItemTable {
+        
+        static let table = Table("library_item")
+        static let id = Expression<Int>("_id")
+        static let externalID = Expression<String>("external_id")
+        static let librarySectionID = Expression<Int?>("library_section_id")
+        static let librarySectionExternalID = Expression<String?>("library_section_external_id")
+        static let position = Expression<Int>("position")
+        static let title = Expression<String>("title")
+        static let obsolete = Expression<Bool>("is_obsolete")
+        static let itemID = Expression<Int>("item_id")
+        static let itemExternalID = Expression<String>("item_external_id")
+        
+        static func fromRow(row: Row) -> LibraryItem {
+            return LibraryItem(id: row[id], externalID: row[externalID], librarySectionID: row[librarySectionID], librarySectionExternalID: row[librarySectionExternalID], position: row[position], title: row[title], obsolete: row[obsolete], itemID: row[itemID], itemExternalID: row[itemExternalID])
+        }
+        
+        static func fromNamespacedRow(row: Row) -> LibraryItem {
+            return LibraryItem(id: row[LibraryItemTable.table[id]], externalID: row[LibraryItemTable.table[externalID]], librarySectionID: row[LibraryItemTable.table[librarySectionID]], librarySectionExternalID: row[LibraryItemTable.table[librarySectionExternalID]], position: row[LibraryItemTable.table[position]], title: row[LibraryItemTable.table[title]], obsolete: row[LibraryItemTable.table[obsolete]], itemID: row[LibraryItemTable.table[itemID]], itemExternalID: row[LibraryItemTable.table[itemExternalID]])
+        }
+        
+    }
     
     public func libraryItemsForLibrarySectionWithID(librarySectionID: Int) -> [LibraryItem] {
         do {
@@ -571,20 +571,20 @@ extension Catalog {
     
 }
 
-class StopwordTable {
-    
-    static let table = Table("stopword")
-    static let id = Expression<Int>("_id")
-    static let languageID = Expression<Int>("language_id")
-    static let word = Expression<String>("word")
-    
-    static func fromRow(row: Row) -> Stopword {
-        return Stopword(id: row[id], languageID: row[languageID], word: row[word])
-    }
-    
-}
-
 extension Catalog {
+    
+    class StopwordTable {
+        
+        static let table = Table("stopword")
+        static let id = Expression<Int>("_id")
+        static let languageID = Expression<Int>("language_id")
+        static let word = Expression<String>("word")
+        
+        static func fromRow(row: Row) -> Stopword {
+            return Stopword(id: row[id], languageID: row[languageID], word: row[word])
+        }
+        
+    }
     
     public func stopwordsWithLanguageID(languageID: Int) -> [Stopword] {
         do {
@@ -596,18 +596,18 @@ extension Catalog {
     
 }
 
-class SubitemMetadataTable {
-    
-    static let table = Table("subitem_metadata")
-    static let id = Expression<Int>("_id")
-    static let itemID = Expression<Int>("item_id")
-    static let subitemID = Expression<Int>("subitem_id")
-    static let docID = Expression<String>("doc_id")
-    static let docVersion = Expression<Int>("doc_version")
-    
-}
-
 extension Catalog {
+    
+    class SubitemMetadataTable {
+        
+        static let table = Table("subitem_metadata")
+        static let id = Expression<Int>("_id")
+        static let itemID = Expression<Int>("item_id")
+        static let subitemID = Expression<Int>("subitem_id")
+        static let docID = Expression<String>("doc_id")
+        static let docVersion = Expression<Int>("doc_version")
+        
+    }
     
     public func itemAndSubitemIDForDocID(docID: String) -> (itemID: Int, subitemID: Int)? {
         return db.pluck(SubitemMetadataTable.table.select(SubitemMetadataTable.itemID, SubitemMetadataTable.subitemID).filter(SubitemMetadataTable.docID == docID)).map { row in

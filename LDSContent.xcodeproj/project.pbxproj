@@ -25,6 +25,10 @@
 		D93CAA361C6BDC3E00C21A46 /* String+SQL.swift in Sources */ = {isa = PBXBuildFile; fileRef = D93CAA351C6BDC3E00C21A46 /* String+SQL.swift */; };
 		D95B2BC71C6D504B00D7230D /* XCTAsserts.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95B2BC61C6D504B00D7230D /* XCTAsserts.swift */; };
 		D95B2BD01C6E413100D7230D /* Platform.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95B2BCF1C6E413100D7230D /* Platform.swift */; };
+		D9B32A321C70195300A0304D /* ItemPackage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B32A311C70195300A0304D /* ItemPackage.swift */; };
+		D9B32A341C701E3200A0304D /* ItemPackageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B32A331C701E3200A0304D /* ItemPackageTests.swift */; };
+		D9B32A361C701E9E00A0304D /* DownloadItemPackageResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B32A351C701E9E00A0304D /* DownloadItemPackageResult.swift */; };
+		D9B32A381C701EEA00A0304D /* DownloadItemPackageOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B32A371C701EEA00A0304D /* DownloadItemPackageOperation.swift */; };
 		D9BBF3301C6C040E00F7D9E6 /* LibraryNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9BBF32F1C6C040E00F7D9E6 /* LibraryNode.swift */; };
 		D9D3AEEA1C6A982200E2681A /* LDSContent.h in Headers */ = {isa = PBXBuildFile; fileRef = D9D3AEE91C6A982200E2681A /* LDSContent.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D9D3AEF81C6A9A2400E2681A /* FetchCatalogVersionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9D3AEF71C6A9A2400E2681A /* FetchCatalogVersionTests.swift */; };
@@ -75,6 +79,10 @@
 		D93CAA351C6BDC3E00C21A46 /* String+SQL.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+SQL.swift"; sourceTree = "<group>"; };
 		D95B2BC61C6D504B00D7230D /* XCTAsserts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XCTAsserts.swift; sourceTree = "<group>"; };
 		D95B2BCF1C6E413100D7230D /* Platform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Platform.swift; sourceTree = "<group>"; };
+		D9B32A311C70195300A0304D /* ItemPackage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ItemPackage.swift; sourceTree = "<group>"; };
+		D9B32A331C701E3200A0304D /* ItemPackageTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ItemPackageTests.swift; sourceTree = "<group>"; };
+		D9B32A351C701E9E00A0304D /* DownloadItemPackageResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadItemPackageResult.swift; sourceTree = "<group>"; };
+		D9B32A371C701EEA00A0304D /* DownloadItemPackageOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadItemPackageOperation.swift; sourceTree = "<group>"; };
 		D9BBF32F1C6C040E00F7D9E6 /* LibraryNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibraryNode.swift; sourceTree = "<group>"; };
 		D9D3AEE61C6A982200E2681A /* LDSContent.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = LDSContent.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D9D3AEE91C6A982200E2681A /* LDSContent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LDSContent.h; sourceTree = "<group>"; };
@@ -148,8 +156,18 @@
 				D93CAA291C6B9EE100C21A46 /* FetchCatalogVersionResult.swift */,
 				D93CAA1F1C6B79BD00C21A46 /* DownloadCatalogOperation.swift */,
 				D93CAA2B1C6BA06400C21A46 /* DownloadCatalogResult.swift */,
+				D9B32A371C701EEA00A0304D /* DownloadItemPackageOperation.swift */,
+				D9B32A351C701E9E00A0304D /* DownloadItemPackageResult.swift */,
 			);
 			name = Install;
+			sourceTree = "<group>";
+		};
+		D9B32A301C70194400A0304D /* Item Package */ = {
+			isa = PBXGroup;
+			children = (
+				D9B32A311C70195300A0304D /* ItemPackage.swift */,
+			);
+			name = "Item Package";
 			sourceTree = "<group>";
 		};
 		D9D3AEDC1C6A982200E2681A = {
@@ -178,6 +196,7 @@
 				D93CAA1E1C6B799200C21A46 /* Install */,
 				D9D3AF161C6AB96200E2681A /* Catalog */,
 				D9E9CBCD1C6D12000077B613 /* Mutable Catalog */,
+				D9B32A301C70194400A0304D /* Item Package */,
 				D9D3AEEB1C6A982200E2681A /* Info.plist */,
 				D9D3AEE91C6A982200E2681A /* LDSContent.h */,
 			);
@@ -191,6 +210,7 @@
 				D93CAA2D1C6BA0CC00C21A46 /* DownloadCatalogTests.swift */,
 				D93CAA331C6BB52C00C21A46 /* CatalogTests.swift */,
 				D90DF2651C6D160C0033A89C /* MutableCatalogTests.swift */,
+				D9B32A331C701E3200A0304D /* ItemPackageTests.swift */,
 				D95B2BC61C6D504B00D7230D /* XCTAsserts.swift */,
 				D9D3AEF91C6A9A2400E2681A /* Info.plist */,
 			);
@@ -425,12 +445,15 @@
 				D93CAA361C6BDC3E00C21A46 /* String+SQL.swift in Sources */,
 				D9D3AF071C6AB1A500E2681A /* Source.swift in Sources */,
 				D93CAA301C6BB17200C21A46 /* CatalogVersionCondition.swift in Sources */,
+				D9B32A361C701E9E00A0304D /* DownloadItemPackageResult.swift in Sources */,
 				D90DF2641C6D139B0033A89C /* Connection+Extras.swift in Sources */,
 				D9D3AF0F1C6AB32F00E2681A /* LibraryCollectionType.swift in Sources */,
 				D95B2BD01C6E413100D7230D /* Platform.swift in Sources */,
+				D9B32A321C70195300A0304D /* ItemPackage.swift in Sources */,
 				D9D3AF181C6AB96D00E2681A /* Catalog.swift in Sources */,
 				D93CAA201C6B79BD00C21A46 /* DownloadCatalogOperation.swift in Sources */,
 				D9D3AF091C6AB1E000E2681A /* SourceType.swift in Sources */,
+				D9B32A381C701EEA00A0304D /* DownloadItemPackageOperation.swift in Sources */,
 				D9D3AF0B1C6AB22600E2681A /* ItemCategory.swift in Sources */,
 				D9D3AF051C6AB07F00E2681A /* Language.swift in Sources */,
 				D9D3AF151C6AB74E00E2681A /* Stopword.swift in Sources */,
@@ -455,6 +478,7 @@
 				D90DF2661C6D160C0033A89C /* MutableCatalogTests.swift in Sources */,
 				D95B2BC71C6D504B00D7230D /* XCTAsserts.swift in Sources */,
 				D93CAA341C6BB52C00C21A46 /* CatalogTests.swift in Sources */,
+				D9B32A341C701E3200A0304D /* ItemPackageTests.swift in Sources */,
 				D9D3AEF81C6A9A2400E2681A /* FetchCatalogVersionTests.swift in Sources */,
 				D93CAA2E1C6BA0CC00C21A46 /* DownloadCatalogTests.swift in Sources */,
 			);
