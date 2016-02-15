@@ -23,6 +23,7 @@
 import Foundation
 import SQLite
 import Swiftification
+import FTS3HTMLTokenizer
 
 public class ItemPackage {
     
@@ -39,6 +40,8 @@ public class ItemPackage {
         try db.execute("PRAGMA synchronous = OFF")
         try db.execute("PRAGMA journal_mode = OFF")
         try db.execute("PRAGMA temp_store = MEMORY")
+        
+        registerTokenizer(db.handle, UnsafeMutablePointer<Int8>(("HTMLTokenizer" as NSString).UTF8String))
     }
     
     public func inTransaction(closure: () throws -> Void) throws {
@@ -123,6 +126,76 @@ extension ItemPackage {
     
     public func subitemContentWithSubitemID(subitemID: Int) -> SubitemContent? {
         return db.pluck(SubitemContentView.table.filter(SubitemContentView.subitemID == subitemID)).map { SubitemContentView.fromRow($0) }
+    }
+    
+}
+
+extension ItemPackage {
+    
+    class SubitemContentVirtualTable {
+        
+        static let table = VirtualTable("subitem_content_fts")
+        static let id = Expression<Int>("_id")
+        static let subitemID = Expression<Int>("subitem_id")
+        static let title = Expression<String>("title")
+        static let uri = Expression<String>("uri")
+        static let contentHTML = Expression<String>("content_html")
+        
+        static func fromRow(row: [Binding?], iso639_3Code: String, keywordSearch: Bool) -> SearchResult {
+            return SearchResult(subitemID: Int(row[2] as! Int64), uri: row[4] as! String, title: row[3] as! String, matchRanges: matchRangesFromOffsets(row[0] as! String, keywordSearch: keywordSearch), iso639_3Code: iso639_3Code, snippet: row[1] as! String)
+        }
+        
+        static func matchRangesFromOffsets(offsets: String, keywordSearch: Bool) -> [NSRange] {
+            var matchRanges = [NSRange]()
+            
+            let scanner = NSScanner(string: offsets)
+            while !scanner.atEnd {
+                var columnNumber = 0
+                if !scanner.scanInteger(&columnNumber) {
+                    return []
+                }
+                
+                var termNumber = 0
+                if !scanner.scanInteger(&termNumber) {
+                    return []
+                }
+                
+                var byteOffset = 0
+                if !scanner.scanInteger(&byteOffset) {
+                    return []
+                }
+                
+                var byteSize = 0
+                if !scanner.scanInteger(&byteSize) {
+                    return []
+                }
+                
+                let range = NSMakeRange(byteOffset, byteSize)
+                if !keywordSearch && termNumber != 0, let lastRange = matchRanges.popLast() {
+                    // Combine into single range for exact phrase matches
+                    let combinedRange = NSMakeRange(lastRange.location, (range.location - lastRange.location) + range.length)
+                    matchRanges.append(combinedRange)
+                } else {
+                    // Don't try to combine search tokens on keyword search
+                    matchRanges.append(range)
+                }
+            }
+            return matchRanges
+        }
+        
+    }
+
+    public func searchResultsForString(searchString: String) -> [SearchResult] {
+        let iso639_3Code = self.iso639_3Code!
+        let keywordSearch = (searchString.rangeOfString("^\\\".*\\\"$", options: .RegularExpressionSearch) != nil)
+        
+        do {
+            return try db.prepare("SELECT offsets(subitem_content_fts) AS offsets, snippet(subitem_content_fts, '<em class=\"searchMatch\">', '</em>', '…', -1, 35) AS snippet, subitem_content_fts.subitem_id, subitem.title, subitem.uri FROM subitem_content_fts LEFT JOIN subitem ON subitem._id = subitem_content_fts.subitem_id WHERE subitem_content_fts.content_html MATCH ? ORDER BY subitem_content_fts.subitem_id", searchString).map { row in
+                return SubitemContentVirtualTable.fromRow(row, iso639_3Code: iso639_3Code, keywordSearch: keywordSearch)
+            }
+        } catch {
+            return []
+        }
     }
     
 }

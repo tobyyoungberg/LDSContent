@@ -59,6 +59,17 @@ class ItemPackageTests: XCTestCase {
         XCTAssertNotNil(subitemContent!.data)
     }
     
+    func testSearchResults() {
+        let searchResults = itemPackage.searchResultsForString("alma")
+        XCTAssertGreaterThan(searchResults.count, 0)
+        
+        let searchResult = searchResults.first!
+        let subitemContent = itemPackage.subitemContentWithSubitemID(searchResult.subitemID)!
+        
+        let string = String(data: subitemContent.data.subdataWithRange(searchResult.matchRanges.first!), encoding: NSUTF8StringEncoding)
+        XCTAssertEqual(string, "Alma")
+    }
+    
     func testSubitemContentRange() {
         let subitemContentRange = itemPackage.rangeOfParagraphWithID("title1", inSubitemWithID: 1)
         XCTAssertGreaterThan(subitemContentRange!.id, 0)
