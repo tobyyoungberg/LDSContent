@@ -105,3 +105,125 @@ extension ItemPackage {
     }
     
 }
+
+extension ItemPackage {
+    
+    class SubitemContentView {
+        
+        static let table = View("subitem_content")
+        static let id = Expression<Int>("_id")
+        static let subitemID = Expression<Int>("subitem_id")
+        static let data = Expression<NSData>("content_html")
+        
+        static func fromRow(row: Row) -> SubitemContent {
+            return SubitemContent(id: row[id], subitemID: row[subitemID], data: row[data])
+        }
+        
+    }
+    
+    public func subitemContentWithSubitemID(subitemID: Int) -> SubitemContent? {
+        return db.pluck(SubitemContentView.table.filter(SubitemContentView.subitemID == subitemID)).map { SubitemContentView.fromRow($0) }
+    }
+    
+}
+
+extension ItemPackage {
+    
+    class SubitemContentRangeTable {
+        
+        static let table = Table("subitem_content_range")
+        static let id = Expression<Int>("_id")
+        static let subitemID = Expression<Int>("subitem_id")
+        static let paragraphID = Expression<String>("paragraph_id")
+        static let startIndex = Expression<Int>("start_index")
+        static let endIndex = Expression<Int>("end_index")
+        
+        static func fromRow(row: Row) -> SubitemContentRange {
+            return SubitemContentRange(id: row[id], subitemID: row[subitemID], paragraphID: row[paragraphID], range: rangeFromRow(row))
+        }
+        
+        static func rangeFromRow(row: Row) -> NSRange {
+            let startIndex = row[SubitemContentRangeTable.startIndex]
+            let endIndex = row[SubitemContentRangeTable.endIndex]
+            return NSMakeRange(startIndex, endIndex - startIndex)
+        }
+        
+    }
+    
+    public func rangeOfParagraphWithID(paragraphID: String, inSubitemWithID subitemID: Int) -> SubitemContentRange? {
+        return db.pluck(SubitemContentRangeTable.table.filter(SubitemContentRangeTable.subitemID == subitemID && SubitemContentRangeTable.paragraphID == paragraphID)).map { row in
+            return SubitemContentRangeTable.fromRow(row)
+        }
+    }
+    
+    public func rangesOfParagraphWithIDs(paragraphIDs: [String], inSubitemWithID subitemID: Int) -> [SubitemContentRange] {
+        do {
+            return try db.prepare(SubitemContentRangeTable.table.filter(paragraphIDs.contains(SubitemContentRangeTable.paragraphID) && SubitemContentRangeTable.subitemID == subitemID).order(SubitemContentRangeTable.subitemID, SubitemContentRangeTable.startIndex)).map { SubitemContentRangeTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
+}
+
+extension ItemPackage {
+    
+    class SubitemTable {
+        
+        static let table = Table("subitem")
+        static let id = Expression<Int>("_id")
+        static let uri = Expression<String>("uri")
+        static let docID = Expression<String>("doc_id")
+        static let docVersion = Expression<Int>("doc_version")
+        static let position = Expression<Int>("position")
+        static let titleHTML = Expression<String>("title_html")
+        static let title = Expression<String>("title")
+        static let webURL = Expression<String>("web_url")
+        
+        static func fromRow(row: Row) -> Subitem {
+            return Subitem(id: row[id], uri: row[uri], docID: row[docID], docVersion: row[docVersion], position: row[position], titleHTML: row[titleHTML], title: row[title], webURL: NSURL(string: row[webURL]))
+        }
+        
+    }
+    
+    public func subitemWithURI(uri: String) -> Subitem? {
+        return db.pluck(SubitemTable.table.filter(SubitemTable.uri == uri)).map { SubitemTable.fromRow($0) }
+    }
+    
+    public func subitemWithDocID(docID: String) -> Subitem? {
+        return db.pluck(SubitemTable.table.filter(SubitemTable.docID == docID)).map { SubitemTable.fromRow($0) }
+    }
+    
+    public func subitemWithID(id: Int) -> Subitem? {
+        return db.pluck(SubitemTable.table.filter(SubitemTable.id == id)).map { SubitemTable.fromRow($0) }
+    }
+    
+    public func subitemAtPosition(position: Int) -> Subitem? {
+        return db.pluck(SubitemTable.table.filter(SubitemTable.position == position)).map { SubitemTable.fromRow($0) }
+    }
+    
+    public func subitems() -> [Subitem] {
+        do {
+            return try db.prepare(SubitemTable.table.order(SubitemTable.position)).map { SubitemTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
+    public func subitemsWithURIs(uris: [String]) -> [Subitem] {
+        do {
+            return try db.prepare(SubitemTable.table.filter(uris.contains(SubitemTable.uri)).order(SubitemTable.position)).map { SubitemTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
+    public func subitemsWithURIPrefixedByURI(uri: String) -> [Subitem] {
+        do {
+            return try db.prepare(SubitemTable.table.filter(SubitemTable.uri.like("\(uri.escaped())%", escape: "!")).order(SubitemTable.position)).map { SubitemTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
+}

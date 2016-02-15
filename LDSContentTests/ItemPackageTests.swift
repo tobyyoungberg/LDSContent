@@ -51,6 +51,57 @@ class ItemPackageTests: XCTestCase {
         XCTAssertEqual(itemPackage.itemExternalID, "_scriptures_bofm_000")
     }
     
+    func testSubitemContent() {
+        let subitemID = 1
+        let subitemContent = itemPackage.subitemContentWithSubitemID(subitemID)
+        XCTAssertGreaterThan(subitemContent!.id, 0)
+        XCTAssertEqual(subitemContent!.subitemID, subitemID)
+        XCTAssertNotNil(subitemContent!.data)
+    }
+    
+    func testSubitemContentRange() {
+        let subitemContentRange = itemPackage.rangeOfParagraphWithID("title1", inSubitemWithID: 1)
+        XCTAssertGreaterThan(subitemContentRange!.id, 0)
+        XCTAssertEqual(subitemContentRange!.subitemID, 1)
+        XCTAssertEqual(subitemContentRange!.paragraphID, "title1")
+        XCTAssertGreaterThan(subitemContentRange!.range.location, 0)
+        XCTAssertGreaterThan(subitemContentRange!.range.length, 0)
+        
+        let subitemContentRanges = itemPackage.rangesOfParagraphWithIDs(["title1", "subtitle1"], inSubitemWithID: 1)
+        XCTAssertEqual(subitemContentRanges.count, 2)
+        for subitemContentRange in subitemContentRanges {
+            XCTAssertGreaterThan(subitemContentRange.id, 0)
+            XCTAssertEqual(subitemContentRange.subitemID, 1)
+            XCTAssertGreaterThan(subitemContentRange.range.location, 0)
+            XCTAssertGreaterThan(subitemContentRange.range.length, 0)
+        }
+    }
+    
+    func testSubitem() {
+        let uri = "/scriptures/bofm/1-ne/1"
+        let subitem = itemPackage.subitemWithURI(uri)!
+        XCTAssertGreaterThan(subitem.id, 0)
+        XCTAssertEqual(subitem.uri, uri)
+        
+        let subitem2 = itemPackage.subitemWithDocID(subitem.docID)!
+        XCTAssertEqual(subitem2, subitem)
+        
+        let subitem3 = itemPackage.subitemWithID(subitem.id)!
+        XCTAssertEqual(subitem3, subitem)
+        
+        let subitem4 = itemPackage.subitemAtPosition(subitem.position)!
+        XCTAssertEqual(subitem4, subitem)
+        
+        let subitems = itemPackage.subitems()
+        XCTAssertGreaterThan(subitems.count, 10)
+        
+        let subitems2 = itemPackage.subitemsWithURIs(["/scriptures/bofm/alma/5", "/scriptures/bofm/enos/1"])
+        XCTAssertEqual(subitems2.count, 2)
+        
+        let subitems3 = itemPackage.subitemsWithURIPrefixedByURI("/scriptures/bofm")
+        XCTAssertEqual(subitems3, subitems)
+    }
+    
 }
 
 extension ItemPackageTests {
