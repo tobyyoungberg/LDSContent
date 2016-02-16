@@ -26,6 +26,7 @@ import LDSContent
 class ItemPackageTests: XCTestCase {
     
     var itemPackage: ItemPackage!
+    var itemPackage2: ItemPackage!
     
     func testSchemaVersion() {
         XCTAssertEqual(itemPackage.schemaVersion, Catalog.SchemaVersion)
@@ -113,6 +114,77 @@ class ItemPackageTests: XCTestCase {
         XCTAssertEqual(subitems3, subitems)
     }
     
+    func testRelatedContentItem() {
+        let uri = "/scriptures/bofm/1-ne/1"
+        let subitem = itemPackage.subitemWithURI(uri)!
+        let relatedContentItems = itemPackage.relatedContentItemsForSubitemWithID(subitem.id)
+        XCTAssertGreaterThan(relatedContentItems.count, 0)
+    }
+    
+    func testRelatedAudioItem() {
+        let uri = "/scriptures/bofm/1-ne/1"
+        let subitem = itemPackage.subitemWithURI(uri)!
+        
+        let relatedAudioItems = itemPackage.relatedAudioItemsForSubitemWithID(subitem.id)
+        XCTAssertGreaterThan(relatedAudioItems.count, 0)
+        
+        let uriPrefix = "/scriptures/bofm/1-ne"
+        XCTAssertTrue(itemPackage.hasRelatedAudioItemsForSubitemsPrefixedByURI(uriPrefix))
+        
+        let relatedAudioItems2 = itemPackage.relatedAudioItemsForSubitemsPrefixedByURI(uriPrefix)
+        XCTAssertGreaterThan(relatedAudioItems2.count, relatedAudioItems.count)
+    }
+    
+    func testNavCollection() {
+        let navCollection = itemPackage.rootNavCollection()!
+        XCTAssertNil(navCollection.navSectionID)
+        
+        let navCollection2 = itemPackage.navCollectionWithID(navCollection.id)
+        XCTAssertEqual(navCollection2, navCollection)
+        
+        let navCollection3 = itemPackage.navCollectionWithURI(navCollection.uri)
+        XCTAssertEqual(navCollection3, navCollection)
+        
+        let navCollections = itemPackage.navCollectionsForNavSectionWithID(2)
+        XCTAssertGreaterThan(navCollections.count, 0)
+    }
+    
+    func testNavCollectionIndexEntry() {
+        let navCollectionIndexEntry = itemPackage2.navCollectionIndexEntryWithID(1)!
+        XCTAssertGreaterThan(navCollectionIndexEntry.navCollectionID, 0)
+        
+        let navCollection = itemPackage2.rootNavCollection()!
+        let navCollectionIndexEntries = itemPackage2.navCollectionIndexEntriesForNavCollectionWithID(navCollection.id)
+        XCTAssertGreaterThan(navCollectionIndexEntries.count, 0)
+    }
+    
+    func testNavSection() {
+        let navSection = itemPackage.navSectionWithID(1)!
+        XCTAssertGreaterThan(navSection.navCollectionID, 0)
+        
+        let navSections = itemPackage.navSectionsForNavCollectionWithID(1)
+        XCTAssertGreaterThan(navSections.count, 0)
+    }
+    
+    func testNavItem() {
+        let navItems = itemPackage.navItemsForNavSectionWithID(1)
+        XCTAssertGreaterThan(navItems.count, 0)
+        
+        let navItem = navItems.first!
+        
+        let navItem2 = itemPackage.navItemWithURI(navItem.uri)
+        XCTAssertEqual(navItem2, navItem)
+    }
+    
+    func testNavNodes() {
+        let navCollection = itemPackage.rootNavCollection()!
+        let navSections = itemPackage.navSectionsForNavCollectionWithID(navCollection.id)
+        let navSection = navSections.first!
+        
+        let navNodes = itemPackage.navNodesForNavSectionWithID(navSection.id)
+        XCTAssertGreaterThan(navNodes.count, 0)
+    }
+    
 }
 
 extension ItemPackageTests {
@@ -120,6 +192,7 @@ extension ItemPackageTests {
     struct Static {
         static var tempDirectoryURL: NSURL!
         static var itemPackage: ItemPackage!
+        static var itemPackage2: ItemPackage!
     }
     
     override class func tearDown() {
@@ -133,7 +206,7 @@ extension ItemPackageTests {
     override func setUp() {
         super.setUp()
         
-        if Static.itemPackage == nil {
+        if Static.itemPackage == nil || Static.itemPackage2 == nil {
             Static.tempDirectoryURL = NSURL(fileURLWithPath: NSTemporaryDirectory()).URLByAppendingPathComponent(NSProcessInfo.processInfo().globallyUniqueString)
             do {
                 try NSFileManager.defaultManager().createDirectoryAtURL(Static.tempDirectoryURL, withIntermediateDirectories: true, attributes: nil)
@@ -163,28 +236,51 @@ extension ItemPackageTests {
             }
             dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, Int64(30 * NSEC_PER_SEC)))
             
-            if let catalog = catalog, language = catalog.languageWithISO639_3Code("eng"), item = catalog.itemWithURI("/scriptures/bofm", languageID: language.id) {
-                let destinationURL = Static.tempDirectoryURL.URLByAppendingPathComponent("\(item.externalID)-\(item.latestVersion)")
-                
-                let semaphore = dispatch_semaphore_create(0)
-                session.downloadItemPackage(destinationURL: destinationURL, externalID: item.externalID, version: item.latestVersion) { result in
-                    switch result {
-                    case .Success:
-                        do {
-                            Static.itemPackage = try ItemPackage(path: destinationURL.URLByAppendingPathComponent("package.sqlite").path!)
-                        } catch {
-                            NSLog("Failed to connect to catalog: %@", "\(error)")
+            if let catalog = catalog, language = catalog.languageWithISO639_3Code("eng") {
+                if let item = catalog.itemWithURI("/scriptures/bofm", languageID: language.id) {
+                    let destinationURL = Static.tempDirectoryURL.URLByAppendingPathComponent("\(item.externalID)-\(item.latestVersion)")
+                    
+                    let semaphore = dispatch_semaphore_create(0)
+                    session.downloadItemPackage(destinationURL: destinationURL, externalID: item.externalID, version: item.latestVersion) { result in
+                        switch result {
+                        case .Success:
+                            do {
+                                Static.itemPackage = try ItemPackage(path: destinationURL.URLByAppendingPathComponent("package.sqlite").path!)
+                            } catch {
+                                NSLog("Failed to connect to catalog: %@", "\(error)")
+                            }
+                        case let .Error(errors):
+                            NSLog("Failed with errors %@", "\(errors)")
                         }
-                    case let .Error(errors):
-                        NSLog("Failed with errors %@", "\(errors)")
+                        dispatch_semaphore_signal(semaphore)
                     }
-                    dispatch_semaphore_signal(semaphore)
+                    dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, Int64(30 * NSEC_PER_SEC)))
                 }
-                dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, Int64(30 * NSEC_PER_SEC)))
+                
+                if let item = catalog.itemWithURI("/scriptures/dc-testament", languageID: language.id) {
+                    let destinationURL = Static.tempDirectoryURL.URLByAppendingPathComponent("\(item.externalID)-\(item.latestVersion)")
+                    
+                    let semaphore = dispatch_semaphore_create(0)
+                    session.downloadItemPackage(destinationURL: destinationURL, externalID: item.externalID, version: item.latestVersion) { result in
+                        switch result {
+                        case .Success:
+                            do {
+                                Static.itemPackage2 = try ItemPackage(path: destinationURL.URLByAppendingPathComponent("package.sqlite").path!)
+                            } catch {
+                                NSLog("Failed to connect to catalog: %@", "\(error)")
+                            }
+                        case let .Error(errors):
+                            NSLog("Failed with errors %@", "\(errors)")
+                        }
+                        dispatch_semaphore_signal(semaphore)
+                    }
+                    dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, Int64(30 * NSEC_PER_SEC)))
+                }
             }
         }
         
         itemPackage = Static.itemPackage
+        itemPackage2 = Static.itemPackage2
     }
     
 }

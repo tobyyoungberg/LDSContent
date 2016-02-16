@@ -300,3 +300,226 @@ extension ItemPackage {
     }
     
 }
+
+extension ItemPackage {
+    
+    class RelatedContentItemTable {
+        
+        static let table = Table("related_content_item")
+        static let id = Expression<Int>("_id")
+        static let subitemID = Expression<Int>("subitem_id")
+        static let refID = Expression<String>("ref_id")
+        static let labelHTML = Expression<String>("label_html")
+        static let originID = Expression<String>("origin_id")
+        static let contentHTML = Expression<String>("content_html")
+        static let wordOffset = Expression<Int>("word_offset")
+        static let byteLocation = Expression<Int>("byte_location")
+        
+        static func fromRow(row: Row) -> RelatedContentItem {
+            return RelatedContentItem(id: row[id], subitemID: row[subitemID], refID: row[refID], labelHTML: row[labelHTML], originID: row[originID], contentHTML: row[contentHTML], wordOffset: row[wordOffset], byteLocation: row[byteLocation])
+        }
+        
+    }
+    
+    public func relatedContentItemsForSubitemWithID(subitemID: Int) -> [RelatedContentItem] {
+        do {
+            return try db.prepare(RelatedContentItemTable.table.filter(RelatedContentItemTable.subitemID == subitemID).order(RelatedContentItemTable.byteLocation)).map { RelatedContentItemTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
+}
+
+extension ItemPackage {
+    
+    class RelatedAudioItemTable {
+        
+        static let table = Table("related_audio_item")
+        static let id = Expression<Int>("_id")
+        static let subitemID = Expression<Int>("subitem_id")
+        static let mediaURL = Expression<String>("media_url")
+        static let fileSize = Expression<Int>("file_size")
+        static let duration = Expression<Int>("duration")
+        
+        static func fromRow(row: Row) -> RelatedAudioItem {
+            return RelatedAudioItem(id: row[id], subitemID: row[subitemID], mediaURL: NSURL(string: row[mediaURL])!, fileSize: row[fileSize], duration: row[duration])
+        }
+        
+        static func fromNamespacedRow(row: Row) -> RelatedAudioItem {
+            return RelatedAudioItem(id: row[RelatedAudioItemTable.table[id]], subitemID: row[RelatedAudioItemTable.table[subitemID]], mediaURL: NSURL(string: row[RelatedAudioItemTable.table[mediaURL]])!, fileSize: row[RelatedAudioItemTable.table[fileSize]], duration: row[RelatedAudioItemTable.table[duration]])
+        }
+        
+    }
+    
+    public func relatedAudioItemsForSubitemWithID(subitemID: Int) -> [RelatedAudioItem] {
+        do {
+            return try db.prepare(RelatedAudioItemTable.table.filter(RelatedAudioItemTable.subitemID == subitemID)).map { RelatedAudioItemTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
+    public func hasRelatedAudioItemsForSubitemsPrefixedByURI(uri: String) -> Bool {
+        return db.scalar(RelatedAudioItemTable.table.join(SubitemTable.table, on: RelatedAudioItemTable.subitemID == SubitemTable.table[SubitemTable.id]).filter(SubitemTable.uri.like("\(uri.escaped())%", escape: "!")).count) > 0
+    }
+    
+    public func relatedAudioItemsForSubitemsPrefixedByURI(uri: String) -> [RelatedAudioItem] {
+        do {
+            return try db.prepare(RelatedAudioItemTable.table.join(SubitemTable.table, on: RelatedAudioItemTable.subitemID == SubitemTable.table[SubitemTable.id]).filter(SubitemTable.uri.like("\(uri.escaped())%", escape: "!"))).map { RelatedAudioItemTable.fromNamespacedRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
+}
+
+extension ItemPackage {
+    
+    class NavCollectionTable {
+        
+        static let table = Table("nav_collection")
+        static let id = Expression<Int>("_id")
+        static let navSectionID = Expression<Int?>("nav_section_id")
+        static let position = Expression<Int>("position")
+        static let imageRenditions = Expression<String?>("image_renditions")
+        static let titleHTML = Expression<String>("title_html")
+        static let subtitle = Expression<String?>("subtitle")
+        static let uri = Expression<String>("uri")
+        
+        static func fromRow(row: Row) -> NavCollection {
+            return NavCollection(id: row[id], navSectionID: row[navSectionID], position: row[position], imageRenditions: (row[imageRenditions] ?? "").toImageRenditions() ?? [], titleHTML: row[titleHTML], subtitle: row[subtitle], uri: row[uri])
+        }
+        
+    }
+    
+    public func rootNavCollection() -> NavCollection? {
+        return db.pluck(NavCollectionTable.table.filter(NavCollectionTable.navSectionID == nil)).map { NavCollectionTable.fromRow($0) }
+    }
+    
+    public func navCollectionWithID(id: Int) -> NavCollection? {
+        return db.pluck(NavCollectionTable.table.filter(NavCollectionTable.id == id)).map { NavCollectionTable.fromRow($0) }
+    }
+    
+    public func navCollectionWithURI(uri: String) -> NavCollection? {
+        return db.pluck(NavCollectionTable.table.filter(NavCollectionTable.uri == uri)).map { NavCollectionTable.fromRow($0) }
+    }
+    
+    public func navCollectionsForNavSectionWithID(navSectionID: Int) -> [NavCollection] {
+        do {
+            return try db.prepare(NavCollectionTable.table.filter(NavCollectionTable.navSectionID == navSectionID).order(NavCollectionTable.position)).map { NavCollectionTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
+}
+
+extension ItemPackage {
+    
+    class NavCollectionIndexEntryTable {
+        
+        static let table = Table("nav_collection_index_entry")
+        static let id = Expression<Int>("_id")
+        static let navCollectionID = Expression<Int>("nav_collection_id")
+        static let position = Expression<Int>("position")
+        static let title = Expression<String>("title")
+        static let refNavCollectionID = Expression<Int?>("ref_nav_collection_id")
+        static let refNavItemID = Expression<Int?>("ref_nav_item_id")
+        
+        static func fromRow(row: Row) -> NavCollectionIndexEntry {
+            return NavCollectionIndexEntry(id: row[id], navCollectionID: row[navCollectionID], position: row[position], title: row[title], refNavCollectionID: row[refNavCollectionID], refNavItemID: row[refNavItemID])
+        }
+        
+    }
+    
+    public func navCollectionIndexEntryWithID(id: Int) -> NavCollectionIndexEntry? {
+        return db.pluck(NavCollectionIndexEntryTable.table.filter(NavCollectionIndexEntryTable.id == id)).map { NavCollectionIndexEntryTable.fromRow($0) }
+    }
+    
+    public func navCollectionIndexEntriesForNavCollectionWithID(navCollectionID: Int) -> [NavCollectionIndexEntry] {
+        do {
+            return try db.prepare(NavCollectionIndexEntryTable.table.filter(NavCollectionIndexEntryTable.navCollectionID == navCollectionID).order(NavCollectionIndexEntryTable.position)).map { NavCollectionIndexEntryTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
+}
+
+extension ItemPackage {
+    
+    class NavSectionTable {
+        
+        static let table = Table("nav_section")
+        static let id = Expression<Int>("_id")
+        static let navCollectionID = Expression<Int>("nav_collection_id")
+        static let position = Expression<Int>("position")
+        static let indentLevel = Expression<Int>("indent_level")
+        static let title = Expression<String?>("title")
+        
+        static func fromRow(row: Row) -> NavSection {
+            return NavSection(id: row[id], navCollectionID: row[navCollectionID], position: row[position], indentLevel: row[indentLevel], title: row[title])
+        }
+        
+    }
+    
+    public func navSectionWithID(id: Int) -> NavSection? {
+        return db.pluck(NavSectionTable.table.filter(NavSectionTable.id == id)).map { NavSectionTable.fromRow($0) }
+    }
+    
+    public func navSectionsForNavCollectionWithID(navCollectionID: Int) -> [NavSection] {
+        do {
+            return try db.prepare(NavSectionTable.table.filter(NavSectionTable.navCollectionID == navCollectionID).order(NavSectionTable.position)).map { NavSectionTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
+}
+
+extension ItemPackage {
+    
+    class NavItemTable {
+        
+        static let table = Table("nav_item")
+        static let id = Expression<Int>("_id")
+        static let navSectionID = Expression<Int>("nav_section_id")
+        static let position = Expression<Int>("position")
+        static let imageRenditions = Expression<String?>("image_renditions")
+        static let titleHTML = Expression<String>("title_html")
+        static let subtitle = Expression<String?>("subtitle")
+        static let preview = Expression<String?>("preview")
+        static let uri = Expression<String>("uri")
+        static let subitemID = Expression<Int>("subitem_id")
+        
+        static func fromRow(row: Row) -> NavItem {
+            return NavItem(id: row[id], navSectionID: row[navSectionID], position: row[position], imageRenditions: (row[imageRenditions] ?? "").toImageRenditions() ?? [], titleHTML: row[titleHTML], subtitle: row[subtitle], preview: row[preview], uri: row[uri], subitemID: row[subitemID])
+        }
+        
+    }
+    
+    public func navItemWithURI(uri: String) -> NavItem? {
+        return db.pluck(NavItemTable.table.filter(NavItemTable.uri == uri)).map { NavItemTable.fromRow($0) }
+    }
+    
+    public func navItemsForNavSectionWithID(navSectionID: Int) -> [NavItem] {
+        do {
+            return try db.prepare(NavItemTable.table.filter(NavItemTable.navSectionID == navSectionID).order(NavItemTable.position)).map { NavItemTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
+}
+
+extension ItemPackage {
+    
+    public func navNodesForNavSectionWithID(navSectionID: Int) -> [NavNode] {
+        var navNodes = [NavNode]()
+        navNodes += navCollectionsForNavSectionWithID(navSectionID).map { $0 as NavNode }
+        navNodes += navItemsForNavSectionWithID(navSectionID).map { $0 as NavNode }
+        return navNodes.sort { $0.position < $1.position }
+    }
+    
+}
