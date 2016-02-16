@@ -225,7 +225,7 @@ extension MutableItemPackage {
         return NavSection(id: Int(id), navCollectionID: navCollectionID, position: position, indentLevel: indentLevel, title: title)
     }
     
-    public func addNavItemWithNavSectionID(navSectionID: Int, position: Int, imageRenditions: [ImageRendition], titleHTML: String, subtitle: String?, preview: String?, URI uri: String, subitemID: Int) throws -> NavItem {
+    public func addNavItemWithNavSectionID(navSectionID: Int, position: Int, imageRenditions: [ImageRendition], titleHTML: String, subtitle: String?, preview: String?, uri: String, subitemID: Int) throws -> NavItem {
         let id = try db.run(NavItemTable.table.insert(
             NavItemTable.navSectionID <- navSectionID,
             NavItemTable.position <- position,

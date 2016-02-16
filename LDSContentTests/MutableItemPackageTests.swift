@@ -115,7 +115,7 @@ class MutableItemPacakgeTests: XCTestCase {
     }
     
     func testNavItem() {
-        let navItem = try! itemPackage.addNavItemWithNavSectionID(1, position: 1, imageRenditions: [ImageRendition(size: CGSize(width: 10, height: 10), url: NSURL(string: "https://example.org/example.png")!)], titleHTML: "title", subtitle: nil, preview: nil, URI: "sparky", subitemID: 1)
+        let navItem = try! itemPackage.addNavItemWithNavSectionID(1, position: 1, imageRenditions: [ImageRendition(size: CGSize(width: 10, height: 10), url: NSURL(string: "https://example.org/example.png")!)], titleHTML: "title", subtitle: nil, preview: nil, uri: "sparky", subitemID: 1)
         
         let navItem2 = itemPackage.navItemWithURI("sparky")
         XCTAssertEqual(navItem2, navItem)
