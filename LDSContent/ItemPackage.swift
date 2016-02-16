@@ -116,10 +116,10 @@ extension ItemPackage {
         static let table = View("subitem_content")
         static let id = Expression<Int>("_id")
         static let subitemID = Expression<Int>("subitem_id")
-        static let data = Expression<NSData>("content_html")
+        static let contentHTML = Expression<NSData>("content_html")
         
         static func fromRow(row: Row) -> SubitemContent {
-            return SubitemContent(id: row[id], subitemID: row[subitemID], data: row[data])
+            return SubitemContent(id: row[id], subitemID: row[subitemID], contentHTML: row[contentHTML])
         }
         
     }
@@ -137,9 +137,7 @@ extension ItemPackage {
         static let table = VirtualTable("subitem_content_fts")
         static let id = Expression<Int>("_id")
         static let subitemID = Expression<Int>("subitem_id")
-        static let title = Expression<String>("title")
-        static let uri = Expression<String>("uri")
-        static let contentHTML = Expression<String>("content_html")
+        static let contentHTML = Expression<NSData>("content_html")
         
         static func fromRow(row: [Binding?], iso639_3Code: String, keywordSearch: Bool) -> SearchResult {
             return SearchResult(subitemID: Int(row[2] as! Int64), uri: row[4] as! String, title: row[3] as! String, matchRanges: matchRangesFromOffsets(row[0] as! String, keywordSearch: keywordSearch), iso639_3Code: iso639_3Code, snippet: row[1] as! String)
@@ -520,6 +518,53 @@ extension ItemPackage {
         navNodes += navCollectionsForNavSectionWithID(navSectionID).map { $0 as NavNode }
         navNodes += navItemsForNavSectionWithID(navSectionID).map { $0 as NavNode }
         return navNodes.sort { $0.position < $1.position }
+    }
+    
+}
+
+extension ItemPackage {
+    
+    class ParagraphMetadataTable {
+        
+        static let table = Table("paragraph_metadata")
+        static let id = Expression<Int>("_id")
+        static let subitemID = Expression<Int>("subitem_id")
+        static let paragraphID = Expression<String>("paragraph_id")
+        static let paragraphAID = Expression<String>("paragraph_aid")
+        static let verseNumber = Expression<String?>("verse_number")
+        
+        static func fromRow(row: Row) -> ParagraphMetadata {
+            return ParagraphMetadata(id: row[id], subitemID: row[subitemID], paragraphID: row[paragraphID], paragraphAID: row[paragraphAID], verseNumber: row[verseNumber])
+        }
+        
+        static func fromNamespacedRow(row: Row) -> ParagraphMetadata {
+            return ParagraphMetadata(id: row[ParagraphMetadataTable.table[id]], subitemID: row[ParagraphMetadataTable.table[subitemID]], paragraphID: row[ParagraphMetadataTable.table[paragraphID]], paragraphAID: row[ParagraphMetadataTable.table[paragraphAID]], verseNumber: row[ParagraphMetadataTable.table[verseNumber]])
+        }
+        
+    }
+    
+    public func paragraphMetadataForParagraphIDs(paragraphIDs: [String], subitemID: Int) -> [ParagraphMetadata] {
+        do {
+            return try db.prepare(ParagraphMetadataTable.table.filter(paragraphIDs.contains(ParagraphMetadataTable.paragraphID) && ParagraphMetadataTable.subitemID == subitemID)).map { ParagraphMetadataTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
+    public func paragraphMetadataForParagraphAIDs(paragraphAIDs: [String], subitemID: Int) -> [ParagraphMetadata] {
+        do {
+            return try db.prepare(ParagraphMetadataTable.table.filter(paragraphAIDs.contains(ParagraphMetadataTable.paragraphAID) && ParagraphMetadataTable.subitemID == subitemID)).map { ParagraphMetadataTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
+    public func paragraphMetadataForParagraphAIDs(paragraphAIDs: [String], docID: String) -> [ParagraphMetadata] {
+        do {
+            return try db.prepare(ParagraphMetadataTable.table.join(SubitemTable.table, on: ParagraphMetadataTable.subitemID == SubitemTable.table[SubitemTable.id]).filter(paragraphAIDs.contains(ParagraphMetadataTable.paragraphAID) && SubitemTable.docID == docID)).map { ParagraphMetadataTable.fromNamespacedRow($0) }
+        } catch {
+            return []
+        }
     }
     
 }

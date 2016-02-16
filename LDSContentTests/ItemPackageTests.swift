@@ -57,7 +57,7 @@ class ItemPackageTests: XCTestCase {
         let subitemContent = itemPackage.subitemContentWithSubitemID(subitemID)
         XCTAssertGreaterThan(subitemContent!.id, 0)
         XCTAssertEqual(subitemContent!.subitemID, subitemID)
-        XCTAssertNotNil(subitemContent!.data)
+        XCTAssertNotNil(subitemContent!.contentHTML)
     }
     
     func testSearchResults() {
@@ -67,7 +67,7 @@ class ItemPackageTests: XCTestCase {
         let searchResult = searchResults.first!
         let subitemContent = itemPackage.subitemContentWithSubitemID(searchResult.subitemID)!
         
-        let string = String(data: subitemContent.data.subdataWithRange(searchResult.matchRanges.first!), encoding: NSUTF8StringEncoding)
+        let string = String(data: subitemContent.contentHTML.subdataWithRange(searchResult.matchRanges.first!), encoding: NSUTF8StringEncoding)
         XCTAssertEqual(string, "Alma")
     }
     
@@ -183,6 +183,22 @@ class ItemPackageTests: XCTestCase {
         
         let navNodes = itemPackage.navNodesForNavSectionWithID(navSection.id)
         XCTAssertGreaterThan(navNodes.count, 0)
+    }
+    
+    func testParagraphMetadata() {
+        let uri = "/scriptures/bofm/1-ne/1"
+        let subitem = itemPackage.subitemWithURI(uri)!
+        
+        let paragraphIDs = ["p1", "p2", "p7"]
+        
+        let paragraphMetadata = itemPackage.paragraphMetadataForParagraphIDs(paragraphIDs, subitemID: subitem.id)
+        XCTAssertEqual(paragraphMetadata.count, paragraphIDs.count)
+        
+        let paragraphMetadata2 = itemPackage.paragraphMetadataForParagraphAIDs(paragraphMetadata.map { $0.paragraphAID }, subitemID: subitem.id)
+        XCTAssertEqual(paragraphMetadata2, paragraphMetadata)
+        
+        let paragraphMetadata3 = itemPackage.paragraphMetadataForParagraphAIDs(paragraphMetadata.map { $0.paragraphAID }, docID: subitem.docID)
+        XCTAssertEqual(paragraphMetadata3, paragraphMetadata)
     }
     
 }
