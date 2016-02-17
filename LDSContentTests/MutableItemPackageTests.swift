@@ -61,11 +61,75 @@ class MutableItemPacakgeTests: XCTestCase {
         XCTAssertNoThrow(try itemPackage.vacuum())
     }
     
+    func testSubitem() {
+        let subitem = try! itemPackage.addSubitemWithURI("/scriptures/bofm/1-ne/1", docID: "1", docVersion: 1, position: 1, titleHTML: "1 Nephi 1", title: "1 Nephi 1", webURL: NSURL(string: "https://www.lds.org/scriptures/bofm/1-ne/1")!)
+        
+        XCTAssertNoThrow(try itemPackage.addSubitemContentWithSubitemID(subitem.id, contentHTML: "<p>CATS: All your base are belong to us.</p>".dataUsingEncoding(NSUTF8StringEncoding)!))
+        
+        let searchResults = itemPackage.searchResultsForString("base")
+        XCTAssertGreaterThan(searchResults.count, 0)
+    }
+    
+    func testRange() {
+        XCTAssertNoThrow(try itemPackage.addRange(NSMakeRange(3, 10), forParagraphWithID: "p1", subitemID: 1))
+        
+        let subitemContentRange = itemPackage.rangeOfParagraphWithID("p1", inSubitemWithID: 1)!
+        XCTAssertEqual(subitemContentRange.subitemID, 1)
+        XCTAssertEqual(subitemContentRange.paragraphID, "p1")
+        XCTAssertEqual(subitemContentRange.range, NSMakeRange(3, 10))
+    }
+    
+    func testRelatedContentItem() {
+        XCTAssertNoThrow(try itemPackage.addRelatedContentItemWithSubitemID(1, refID: "1", labelHTML: "2", originID: "3", contentHTML: "4", wordOffset: 13, byteLocation: 97))
+        
+        let relatedContentItems = itemPackage.relatedContentItemsForSubitemWithID(1)
+        XCTAssertGreaterThan(relatedContentItems.count, 0)
+    }
+    
+    func testRelatedAudioItem() {
+        XCTAssertNoThrow(try itemPackage.addRelatedAudioItemWithSubitemID(1, mediaURL: NSURL(string: "https://www.example.com/audio.mp3")!, fileSize: 1000, duration: 370))
+        
+        let relatedAudioItems = itemPackage.relatedAudioItemsForSubitemWithID(1)
+        XCTAssertGreaterThan(relatedAudioItems.count, 0)
+    }
+    
+    func testNavCollection() {
+        let navCollection = try! itemPackage.addNavCollectionWithNavSectionID(nil, position: 1, imageRenditions: [ImageRendition(size: CGSize(width: 10, height: 10), url: NSURL(string: "https://example.org/example.png")!)], titleHTML: "title", subtitle: nil, uri: "/scriptures/bofm")
+        
+        let navCollection2 = itemPackage.navCollectionWithID(navCollection.id)
+        XCTAssertEqual(navCollection2, navCollection)
+    }
+    
+    func testNavCollectionIndexEntry() {
+        let navCollectionIndexEntry = try! itemPackage.addNavCollectionIndexEntryWithNavCollectionID(1, position: 1, title: "title", refNavCollectionID: 1, refNavItemID: nil)
+        
+        let navCollectionIndexEntry2 = itemPackage.navCollectionIndexEntryWithID(navCollectionIndexEntry.id)
+        XCTAssertEqual(navCollectionIndexEntry2, navCollectionIndexEntry)
+    }
+    
+    func testNavSection() {
+        let navSection = try! itemPackage.addNavSectionWithNavCollectionID(1, position: 1, title: nil, indentLevel: 1)
+        
+        let navSection2 = itemPackage.navSectionWithID(navSection.id)
+        XCTAssertEqual(navSection2, navSection)
+    }
+    
+    func testNavItem() {
+        let navItem = try! itemPackage.addNavItemWithNavSectionID(1, position: 1, imageRenditions: [ImageRendition(size: CGSize(width: 10, height: 10), url: NSURL(string: "https://example.org/example.png")!)], titleHTML: "title", subtitle: nil, preview: nil, uri: "sparky", subitemID: 1)
+        
+        let navItem2 = itemPackage.navItemWithURI("sparky")
+        XCTAssertEqual(navItem2, navItem)
+    }
+    
+    func testParagraphMetadata() {
+        XCTAssertNoThrow(try itemPackage.addParagraphID("p1", paragraphAID: "1", subitemID: 1, verseNumber: "1"))
+    }
+    
     override func setUp() {
         super.setUp()
         
         do {
-            itemPackage = try MutableItemPackage(iso639_1Code: "en")
+            itemPackage = try MutableItemPackage(iso639_1Code: "en", iso639_3Code: "eng")
         } catch {
             itemPackage = nil
         }

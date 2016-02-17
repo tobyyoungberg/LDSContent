@@ -1,39 +1,28 @@
 PODS:
-  - FTS3HTMLTokenizer (1.1.1):
+  - FTS3HTMLTokenizer (2.0.0):
     - snowball
   - GMCMultiImage (1.0.6)
   - PSOperations (2.1.0)
   - snowball (2014.11.09)
   - SQLite.swift (0.9.2)
   - SSZipArchive (1.1)
-  - Swiftification (5.0.0)
+  - Swiftification (5.1.0)
 
 DEPENDENCIES:
-  - FTS3HTMLTokenizer (from `https://github.com/hiltonc/FTS3HTMLTokenizer.git`, branch
-    `sqlite3`)
+  - FTS3HTMLTokenizer (~> 2.0)
   - GMCMultiImage
   - PSOperations
   - SQLite.swift (~> 0.9.2)
   - SSZipArchive
   - Swiftification
 
-EXTERNAL SOURCES:
-  FTS3HTMLTokenizer:
-    :branch: sqlite3
-    :git: https://github.com/hiltonc/FTS3HTMLTokenizer.git
-
-CHECKOUT OPTIONS:
-  FTS3HTMLTokenizer:
-    :commit: 894abdec8259ee2079118bd6838dcfdae75c20a4
-    :git: https://github.com/hiltonc/FTS3HTMLTokenizer.git
-
 SPEC CHECKSUMS:
-  FTS3HTMLTokenizer: a75fa27116c51425fe1a231a1e321089a7cd9839
+  FTS3HTMLTokenizer: 399c839644d5a30e331459ec284f83d57982ea58
   GMCMultiImage: f7dd7e2e39faaec1197e6ba44864c98c0ed3906a
   PSOperations: ced5d50e2ce4ec28dcdb2ff121c04f56b479fa7b
   snowball: 5b3459998ce383e974960f1ec5ddba8fd3e50bfb
   SQLite.swift: 5dca22dbf6634fdb9c3270fae9491830804e9b2d
   SSZipArchive: de3d215ab73f87db627f81f2ce24f1731e3886c3
-  Swiftification: cf7c49e2689beb8aefbb9b00ba655dc7b9b1d06e
+  Swiftification: b391a27ac36499f00d0551ecc3b5bea9da70d76a
 
 COCOAPODS: 0.39.0

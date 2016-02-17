@@ -22,22 +22,28 @@
 
 import Foundation
 
-public struct SubitemContent: Equatable {
+public struct ParagraphMetadata: Equatable {
     
     public var id: Int
     public var subitemID: Int
-    public var contentHTML: NSData
+    public var paragraphID: String
+    public var paragraphAID: String
+    public var verseNumber: String?
     
-    public init(id: Int, subitemID: Int, contentHTML: NSData) {
+    public init(id: Int, subitemID: Int, paragraphID: String, paragraphAID: String, verseNumber: String?) {
         self.id = id
         self.subitemID = subitemID
-        self.contentHTML = contentHTML
+        self.paragraphID = paragraphID
+        self.paragraphAID = paragraphAID
+        self.verseNumber = verseNumber
     }
     
 }
 
-public func == (lhs: SubitemContent, rhs: SubitemContent) -> Bool {
+public func == (lhs: ParagraphMetadata, rhs: ParagraphMetadata) -> Bool {
     return lhs.id == rhs.id &&
         lhs.subitemID == rhs.subitemID &&
-        lhs.contentHTML == rhs.contentHTML
+        lhs.paragraphID == rhs.paragraphID &&
+        lhs.paragraphAID == rhs.paragraphAID &&
+        lhs.verseNumber == rhs.verseNumber
 }

@@ -45,6 +45,7 @@
 		D9C012891C72C8890025D78A /* MutableItemPackage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9C012881C72C8890025D78A /* MutableItemPackage.swift */; };
 		D9C0128D1C72C8F70025D78A /* ItemPackage.sql in Resources */ = {isa = PBXBuildFile; fileRef = D9C0128C1C72C8F70025D78A /* ItemPackage.sql */; };
 		D9C012901C7377460025D78A /* MutableItemPackageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9C0128F1C7377460025D78A /* MutableItemPackageTests.swift */; };
+		D9C012921C73BBEE0025D78A /* ParagraphMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9C012911C73BBEE0025D78A /* ParagraphMetadata.swift */; };
 		D9D3AEEA1C6A982200E2681A /* LDSContent.h in Headers */ = {isa = PBXBuildFile; fileRef = D9D3AEE91C6A982200E2681A /* LDSContent.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D9D3AEF81C6A9A2400E2681A /* FetchCatalogVersionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9D3AEF71C6A9A2400E2681A /* FetchCatalogVersionTests.swift */; };
 		D9D3AEFA1C6A9A2400E2681A /* LDSContent.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9D3AEE61C6A982200E2681A /* LDSContent.framework */; };
@@ -114,6 +115,7 @@
 		D9C012881C72C8890025D78A /* MutableItemPackage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MutableItemPackage.swift; sourceTree = "<group>"; };
 		D9C0128C1C72C8F70025D78A /* ItemPackage.sql */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ItemPackage.sql; sourceTree = "<group>"; };
 		D9C0128F1C7377460025D78A /* MutableItemPackageTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MutableItemPackageTests.swift; sourceTree = "<group>"; };
+		D9C012911C73BBEE0025D78A /* ParagraphMetadata.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParagraphMetadata.swift; sourceTree = "<group>"; };
 		D9D3AEE61C6A982200E2681A /* LDSContent.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = LDSContent.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D9D3AEE91C6A982200E2681A /* LDSContent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LDSContent.h; sourceTree = "<group>"; };
 		D9D3AEEB1C6A982200E2681A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -207,6 +209,7 @@
 				D9C012811C72BF150025D78A /* NavSection.swift */,
 				D9C012831C72C14D0025D78A /* NavItem.swift */,
 				D9C012851C72C4DD0025D78A /* NavNode.swift */,
+				D9C012911C73BBEE0025D78A /* ParagraphMetadata.swift */,
 			);
 			name = "Item Package";
 			sourceTree = "<group>";
@@ -529,6 +532,7 @@
 				D9D3AF151C6AB74E00E2681A /* Stopword.swift in Sources */,
 				D9D3AF111C6AB56A00E2681A /* LibrarySection.swift in Sources */,
 				D9D3AF031C6AAD5D00E2681A /* ImageRendition.swift in Sources */,
+				D9C012921C73BBEE0025D78A /* ParagraphMetadata.swift in Sources */,
 				D93CAA261C6B7FD000C21A46 /* Session.swift in Sources */,
 				D9D3AF0D1C6AB31200E2681A /* LibraryCollection.swift in Sources */,
 				D93CAA281C6B9E8A00C21A46 /* FetchCatalogVersionOperation.swift in Sources */,
