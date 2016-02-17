@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
   
   s.dependency 'PSOperations'
   s.dependency 'SQLite.swift', '~> 0.9.2'
+  s.dependency 'FTS3HTMLTokenizer', '~> 2.0'
   s.dependency 'Swiftification'
   s.dependency 'SSZipArchive'
-  s.dependency 'FTS3HTMLTokenizer'
 end
