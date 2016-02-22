@@ -22,7 +22,8 @@
 
 import Foundation
 
-public enum DownloadCatalogResult {
-    case Success(location: NSURL)
+public enum InstallItemPackageResult {
+    case Success(itemPackage: ItemPackage)
+    case AlreadyInstalled(itemPackage: ItemPackage)
     case Error(errors: [NSError])
 }

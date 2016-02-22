@@ -27,13 +27,13 @@ import SSZipArchive
 class DownloadCatalogOperation: Operation {
     
     let session: Session
-    let destinationURL: NSURL
     
     var catalogVersion: Int?
+    let tempDirectoryURL: NSURL
     
-    init(session: Session, destinationURL: NSURL, catalogVersion: Int?, completion: (DownloadCatalogResult) -> Void) {
+    init(session: Session, catalogVersion: Int?, completion: (DownloadCatalogResult) -> Void) {
         self.session = session
-        self.destinationURL = destinationURL
+        self.tempDirectoryURL = NSURL(fileURLWithPath: NSTemporaryDirectory()).URLByAppendingPathComponent(NSProcessInfo.processInfo().globallyUniqueString)
         self.catalogVersion = catalogVersion
         
         super.init()
@@ -43,10 +43,14 @@ class DownloadCatalogOperation: Operation {
         }))
         addObserver(BlockObserver(startHandler: nil, produceHandler: nil, finishHandler: { operation, errors in
             if errors.isEmpty {
-                completion(.Success)
+                completion(.Success(location: self.tempDirectoryURL.URLByAppendingPathComponent("Catalog.sqlite")))
             } else {
                 completion(.Error(errors: errors))
             }
+            
+            do {
+                try NSFileManager.defaultManager().removeItemAtURL(self.tempDirectoryURL)
+            } catch {}
         }))
     }
     
@@ -114,17 +118,11 @@ class DownloadCatalogOperation: Operation {
             return
         }
         
-        let tempDirectoryURL = NSURL(fileURLWithPath: NSTemporaryDirectory()).URLByAppendingPathComponent(NSProcessInfo.processInfo().globallyUniqueString)
         do {
             try NSFileManager.defaultManager().createDirectoryAtURL(tempDirectoryURL, withIntermediateDirectories: true, attributes: nil)
         } catch let error as NSError {
             completion(.Error(error: error))
             return
-        }
-        defer {
-            do {
-                try NSFileManager.defaultManager().removeItemAtURL(tempDirectoryURL)
-            } catch {}
         }
         
         guard let destinationPath = tempDirectoryURL.path else {
@@ -139,9 +137,8 @@ class DownloadCatalogOperation: Operation {
         
         let uncompressedCatalogURL = tempDirectoryURL.URLByAppendingPathComponent("Catalog.sqlite")
         
-        do {
-            try NSFileManager.defaultManager().moveItemAtURL(uncompressedCatalogURL, toURL: destinationURL)
-        } catch let error as NSError {
+        var error: NSError?
+        if !uncompressedCatalogURL.checkResourceIsReachableAndReturnError(&error), let error = error {
             completion(.Error(error: error))
             return
         }

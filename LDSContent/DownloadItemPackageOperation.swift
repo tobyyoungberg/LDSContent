@@ -27,14 +27,14 @@ import SSZipArchive
 class DownloadItemPackageOperation: Operation {
     
     let session: Session
-    let destinationURL: NSURL
+    let tempDirectoryURL: NSURL
     
     let externalID: String
     let version: Int
     
-    init(session: Session, destinationURL: NSURL, externalID: String, version: Int, completion: (DownloadItemPackageResult) -> Void) {
+    init(session: Session, externalID: String, version: Int, completion: (DownloadItemPackageResult) -> Void) {
         self.session = session
-        self.destinationURL = destinationURL
+        self.tempDirectoryURL = NSURL(fileURLWithPath: NSTemporaryDirectory()).URLByAppendingPathComponent(NSProcessInfo.processInfo().globallyUniqueString)
         self.externalID = externalID
         self.version = version
         
@@ -42,10 +42,14 @@ class DownloadItemPackageOperation: Operation {
         
         addObserver(BlockObserver(startHandler: nil, produceHandler: nil, finishHandler: { operation, errors in
             if errors.isEmpty {
-                completion(.Success)
+                completion(.Success(location: self.tempDirectoryURL))
             } else {
                 completion(.Error(errors: errors))
             }
+            
+            do {
+                try NSFileManager.defaultManager().removeItemAtURL(self.tempDirectoryURL)
+            } catch {}
         }))
     }
     
@@ -108,7 +112,6 @@ class DownloadItemPackageOperation: Operation {
             return
         }
         
-        let tempDirectoryURL = NSURL(fileURLWithPath: NSTemporaryDirectory()).URLByAppendingPathComponent(NSProcessInfo.processInfo().globallyUniqueString)
         do {
             try NSFileManager.defaultManager().createDirectoryAtURL(tempDirectoryURL, withIntermediateDirectories: true, attributes: nil)
         } catch let error as NSError {
@@ -131,9 +134,10 @@ class DownloadItemPackageOperation: Operation {
             return
         }
         
-        do {
-            try NSFileManager.defaultManager().moveItemAtURL(tempDirectoryURL, toURL: destinationURL)
-        } catch let error as NSError {
+        let uncompressedPackageURL = tempDirectoryURL.URLByAppendingPathComponent("package.sqlite")
+        
+        var error: NSError?
+        if !uncompressedPackageURL.checkResourceIsReachableAndReturnError(&error), let error = error {
             completion(.Error(error: error))
             return
         }

@@ -26,27 +26,18 @@ import LDSContent
 class DownloadCatalogTests: XCTestCase {
     
     func testDownloadLatestCatalog() {
-        let tempDirectoryURL = NSURL(fileURLWithPath: NSTemporaryDirectory()).URLByAppendingPathComponent(NSProcessInfo.processInfo().globallyUniqueString)
-        do {
-            try NSFileManager.defaultManager().createDirectoryAtURL(tempDirectoryURL, withIntermediateDirectories: true, attributes: nil)
-        } catch {
-            XCTFail("Failed to create temp directory with error \(error)")
-        }
-        defer {
-            do {
-                try NSFileManager.defaultManager().removeItemAtURL(tempDirectoryURL)
-            } catch {}
-        }
-        
         let session = Session()
         
-        let destinationURL = tempDirectoryURL.URLByAppendingPathComponent("Catalog.sqlite")
-        
         let expectation = expectationWithDescription("Download latest catalog")
-        session.downloadCatalog(destinationURL: destinationURL) { result in
+        session.downloadCatalog { result in
             switch result {
-            case .Success:
-                XCTAssertTrue(destinationURL.checkResourceIsReachableAndReturnError(nil))
+            case let .Success(location):
+                do {
+                    let catalog = try Catalog(path: location.path!)
+                    XCTAssertGreaterThan(catalog.catalogVersion, 0)
+                } catch {
+                    XCTFail("Failed to connect to catalog: \(error)")
+                }
             case let .Error(errors):
                 XCTFail("Failed with errors \(errors)")
             }
@@ -56,32 +47,16 @@ class DownloadCatalogTests: XCTestCase {
     }
     
     func testDownloadSpecificCatalog() {
-        let tempDirectoryURL = NSURL(fileURLWithPath: NSTemporaryDirectory()).URLByAppendingPathComponent(NSProcessInfo.processInfo().globallyUniqueString)
-        do {
-            try NSFileManager.defaultManager().createDirectoryAtURL(tempDirectoryURL, withIntermediateDirectories: true, attributes: nil)
-        } catch {
-            XCTFail("Failed to create temp directory with error \(error)")
-        }
-        defer {
-            do {
-                try NSFileManager.defaultManager().removeItemAtURL(tempDirectoryURL)
-            } catch {}
-        }
-        
         let session = Session()
-        
-        let destinationURL = tempDirectoryURL.URLByAppendingPathComponent("Catalog.sqlite")
         
         let catalogVersion = 250
         
         let expectation = expectationWithDescription("Download latest catalog")
-        session.downloadCatalog(destinationURL: destinationURL, catalogVersion: catalogVersion) { result in
+        session.downloadCatalog(catalogVersion: catalogVersion) { result in
             switch result {
-            case .Success:
-                XCTAssertTrue(destinationURL.checkResourceIsReachableAndReturnError(nil), "Downloaded catalog does not exist")
-                
+            case let .Success(location):
                 do {
-                    let catalog = try Catalog(path: destinationURL.path!)
+                    let catalog = try Catalog(path: location.path!)
                     XCTAssertEqual(catalog.catalogVersion, catalogVersion)
                 } catch {
                     XCTFail("Failed to connect to catalog: \(error)")

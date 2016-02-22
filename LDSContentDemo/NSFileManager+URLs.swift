@@ -22,7 +22,14 @@
 
 import Foundation
 
-public enum DownloadCatalogResult {
-    case Success(location: NSURL)
-    case Error(errors: [NSError])
+extension NSFileManager {
+    
+    static var documentURL: NSURL {
+        return NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).last!
+    }
+    
+    static var privateDocumentsURL: NSURL {
+        return NSFileManager.defaultManager().URLsForDirectory(.LibraryDirectory, inDomains: .UserDomainMask).last!.URLByAppendingPathComponent("Private Documents")
+    }
+    
 }

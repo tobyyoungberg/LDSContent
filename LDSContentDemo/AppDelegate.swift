@@ -21,14 +21,32 @@
 //
 
 import UIKit
+import LDSContent
+import SVProgressHUD
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var window: UIWindow?
     
+    lazy var contentController: ContentController! = {
+        let location = NSFileManager.privateDocumentsURL.URLByAppendingPathComponent("Content")
+        do {
+            try NSFileManager.defaultManager().createDirectoryAtURL(location, withIntermediateDirectories: true, attributes: nil)
+        } catch {}
+        return try! ContentController(location: location)
+    }()
+    
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        let viewController = LanguagesViewController()
+        do {
+            try NSFileManager.defaultManager().createDirectoryAtURL(NSFileManager.privateDocumentsURL, withIntermediateDirectories: true, attributes: nil)
+        } catch {}
+        do {
+            try NSFileManager.privateDocumentsURL.setResourceValue(true, forKey: NSURLIsExcludedFromBackupKey)
+        } catch {}
+        
+        
+        let viewController = LanguagesViewController(contentController: contentController)
         
         let navigationController = UINavigationController(rootViewController: viewController)
         
@@ -37,6 +55,35 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.makeKeyAndVisible()
         
         return true
+    }
+    
+    func applicationDidBecomeActive(application: UIApplication) {
+        NSLog("Updating catalog")
+        
+        let showUI = (contentController.catalog == nil)
+        if showUI {
+            SVProgressHUD.showWithStatus("Installing catalog", maskType: .None)
+        }
+        
+        contentController.updateCatalog { result in
+            switch result {
+            case let .Success(catalog):
+                NSLog("Updated catalog to v%li.%li", catalog.schemaVersion, catalog.catalogVersion)
+            case let .AlreadyCurrent(catalog):
+                NSLog("Catalog is already up-to-date (v%li.%li)", catalog.schemaVersion, catalog.catalogVersion)
+            case let .Error(errors):
+                NSLog("Failed to update catalog: %@", "\(errors)")
+            }
+            
+            dispatch_async(dispatch_get_main_queue()) {
+                switch result {
+                case .Success, .AlreadyCurrent:
+                    SVProgressHUD.showSuccessWithStatus("Installed")
+                case .Error:
+                    SVProgressHUD.showErrorWithStatus("Failed")
+                }
+            }
+        }
     }
     
 }

@@ -70,15 +70,23 @@ public class MutableCatalog: Catalog {
 
 extension MutableCatalog {
     
-    func setInt(integerValue: Int, forMetadataKey key: String) {
+    func setInt(integerValue: Int?, forMetadataKey key: String) {
         do {
-            try db.run(MetadataTable.table.insert(or: .Replace, MetadataTable.key <- key, MetadataTable.integerValue <- integerValue))
+            if let integerValue = integerValue {
+                try db.run(MetadataTable.table.insert(or: .Replace, MetadataTable.key <- key, MetadataTable.integerValue <- integerValue))
+            } else {
+                try db.run(MetadataTable.table.filter(MetadataTable.key == key).delete())
+            }
         } catch {}
     }
     
-    func setString(stringValue: String, forMetadataKey key: String) {
+    func setString(stringValue: String?, forMetadataKey key: String) {
         do {
-            try db.run(MetadataTable.table.insert(or: .Replace, MetadataTable.key <- key, MetadataTable.stringValue <- stringValue))
+            if let stringValue = stringValue {
+                try db.run(MetadataTable.table.insert(or: .Replace, MetadataTable.key <- key, MetadataTable.stringValue <- stringValue))
+            } else {
+                try db.run(MetadataTable.table.filter(MetadataTable.key == key).delete())
+            }
         } catch {}
     }
     

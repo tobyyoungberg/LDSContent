@@ -22,7 +22,8 @@
 
 import Foundation
 
-public enum DownloadCatalogResult {
-    case Success(location: NSURL)
+public enum UpdateCatalogResult {
+    case Success(catalog: Catalog)
+    case AlreadyCurrent(catalog: Catalog)
     case Error(errors: [NSError])
 }
