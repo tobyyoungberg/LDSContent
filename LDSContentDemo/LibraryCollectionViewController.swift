@@ -23,14 +23,15 @@
 import UIKit
 import LDSContent
 import Swiftification
+import SVProgressHUD
 
 class LibraryCollectionViewController: UIViewController {
     
-    let catalog: Catalog
+    let contentController: ContentController
     let libraryCollection: LibraryCollection
     
-    init(catalog: Catalog, libraryCollection: LibraryCollection) {
-        self.catalog = catalog
+    init(contentController: ContentController, libraryCollection: LibraryCollection) {
+        self.contentController = contentController
         self.libraryCollection = libraryCollection
         
         super.init(nibName: nil, bundle: nil)
@@ -71,8 +72,26 @@ class LibraryCollectionViewController: UIViewController {
         view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("|[tableView]|", options: [], metrics: nil, views: views))
         view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[tableView]|", options: [], metrics: nil, views: views))
         
+        contentController.catalogUpdateObservers.add(self, operationQueue: .mainQueue(), self.dynamicType.catalogDidUpdate)
+        catalog = contentController.catalog
         reloadData()
-        tableView.reloadData()
+    }
+    
+    var catalog: Catalog?
+    var sections = [(librarySection: LibrarySection, libraryNodes: [LibraryNode])]()
+    
+    func reloadData() {
+        guard let catalog = catalog else { return }
+        
+        let librarySections = catalog.librarySectionsForLibraryCollectionWithID(libraryCollection.id)
+        sections = librarySections.map { librarySection in
+            return (librarySection: librarySection, libraryNodes: catalog.libraryNodesForLibrarySectionWithID(librarySection.id))
+        }
+    }
+    
+    func catalogDidUpdate(catalog: Catalog) {
+        self.catalog = catalog
+        reloadData()
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -87,15 +106,6 @@ class LibraryCollectionViewController: UIViewController {
         super.viewDidAppear(animated)
         
         tableView.flashScrollIndicators()
-    }
-    
-    var sections = [(librarySection: LibrarySection, libraryNodes: [LibraryNode])]()
-    
-    func reloadData() {
-        let librarySections = catalog.librarySectionsForLibraryCollectionWithID(libraryCollection.id)
-        sections = librarySections.map { librarySection in
-            return (librarySection: librarySection, libraryNodes: catalog.libraryNodesForLibrarySectionWithID(librarySection.id))
-        }
     }
     
 }
@@ -121,12 +131,7 @@ extension LibraryCollectionViewController: UITableViewDataSource {
         
         let libraryNode = sections[indexPath.section].libraryNodes[indexPath.row]
         cell.textLabel?.text = libraryNode.title
-        
-        if libraryNode is LibraryCollection {
-            cell.accessoryType = .DisclosureIndicator
-        } else {
-            cell.accessoryType = .None
-        }
+        cell.accessoryType = .DisclosureIndicator
         
         return cell
     }
@@ -139,11 +144,39 @@ extension LibraryCollectionViewController: UITableViewDelegate {
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let libraryNode = sections[indexPath.section].libraryNodes[indexPath.row]
-        if let libraryCollection = libraryNode as? LibraryCollection {
-            let viewController = LibraryCollectionViewController(catalog: catalog, libraryCollection: libraryCollection)
+        switch libraryNode {
+        case let libraryCollection as LibraryCollection:
+            let viewController = LibraryCollectionViewController(contentController: contentController, libraryCollection: libraryCollection)
             
             navigationController?.pushViewController(viewController, animated: true)
-        } else {
+        case let libraryItem as LibraryItem:
+            if let itemPackage = contentController.itemPackageForItemWithID(libraryItem.itemID) {
+                if let rootItemNavCollection = itemPackage.rootNavCollection() {
+                    let viewController = ItemNavCollectionViewController(contentController: contentController, itemID: libraryItem.itemID, itemNavCollection: rootItemNavCollection)
+                    
+                    navigationController?.pushViewController(viewController, animated: true)
+                } else {
+                    tableView.deselectRowAtIndexPath(indexPath, animated: false)
+                }
+            } else {
+                if let item = catalog?.itemWithID(libraryItem.itemID) {
+                    SVProgressHUD.showWithStatus("Installing item", maskType: .None)
+                    
+                    contentController.installItemPackageForItem(item) { result in
+                        switch result {
+                        case .Success, .AlreadyInstalled:
+                            SVProgressHUD.showSuccessWithStatus("Installed")
+                        case let .Error(errors):
+                            NSLog("Failed to install item package: %@", "\(errors)")
+                            
+                            SVProgressHUD.showErrorWithStatus("Failed")
+                        }
+                    }
+                }
+                
+                tableView.deselectRowAtIndexPath(indexPath, animated: false)
+            }
+        default:
             tableView.deselectRowAtIndexPath(indexPath, animated: false)
         }
     }

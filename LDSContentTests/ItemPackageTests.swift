@@ -25,6 +25,7 @@ import LDSContent
 
 class ItemPackageTests: XCTestCase {
     
+    static var contentController: ContentController!
     var itemPackage: ItemPackage!
     var itemPackage2: ItemPackage!
     
@@ -205,15 +206,21 @@ class ItemPackageTests: XCTestCase {
 
 extension ItemPackageTests {
     
-    struct Static {
-        static var tempDirectoryURL: NSURL!
-        static var itemPackage: ItemPackage!
-        static var itemPackage2: ItemPackage!
+    override class func setUp() {
+        super.setUp()
+        
+        do {
+            let tempDirectoryURL = NSURL(fileURLWithPath: NSTemporaryDirectory()).URLByAppendingPathComponent(NSProcessInfo.processInfo().globallyUniqueString)
+            try NSFileManager.defaultManager().createDirectoryAtURL(tempDirectoryURL, withIntermediateDirectories: true, attributes: nil)
+            contentController = try ContentController(location: tempDirectoryURL)
+        } catch {
+            NSLog("Failed to create content controller: %@", "\(error)")
+        }
     }
     
     override class func tearDown() {
         do {
-            try NSFileManager.defaultManager().removeItemAtURL(Static.tempDirectoryURL)
+            try NSFileManager.defaultManager().removeItemAtURL(contentController.location)
         } catch {}
         
         super.tearDown()
@@ -222,81 +229,58 @@ extension ItemPackageTests {
     override func setUp() {
         super.setUp()
         
-        if Static.itemPackage == nil || Static.itemPackage2 == nil {
-            Static.tempDirectoryURL = NSURL(fileURLWithPath: NSTemporaryDirectory()).URLByAppendingPathComponent(NSProcessInfo.processInfo().globallyUniqueString)
-            do {
-                try NSFileManager.defaultManager().createDirectoryAtURL(Static.tempDirectoryURL, withIntermediateDirectories: true, attributes: nil)
-            } catch {
-                NSLog("Failed to create temp directory with error %@", "\(error)")
-                return
-            }
-            
-            let session = Session()
-            
-            let destinationURL = Static.tempDirectoryURL.URLByAppendingPathComponent("Catalog.sqlite")
-            
-            var catalog: Catalog?
+        if let catalog = loadCatalog() {
+            itemPackage = loadItemPackageForItemWithURI("/scriptures/bofm", iso639_3Code: "eng", inCatalog: catalog)
+            itemPackage2 = loadItemPackageForItemWithURI("/scriptures/dc-testament", iso639_3Code: "eng", inCatalog: catalog)
+        }
+    }
+    
+    private func loadCatalog() -> Catalog? {
+        var catalog = ItemPackageTests.contentController.catalog
+        if catalog == nil {
             let semaphore = dispatch_semaphore_create(0)
-            session.downloadCatalog(destinationURL: destinationURL) { result in
+            ItemPackageTests.contentController.updateCatalog { result in
                 switch result {
-                case .Success:
-                    do {
-                        catalog = try Catalog(path: destinationURL.path!)
-                    } catch {
-                        NSLog("Failed to connect to catalog: %@", "\(error)")
-                    }
+                case let .Success(newCatalog):
+                    catalog = newCatalog
+                case let .AlreadyCurrent(newCatalog):
+                    catalog = newCatalog
                 case let .Error(errors):
                     NSLog("Failed with errors %@", "\(errors)")
                 }
+                
                 dispatch_semaphore_signal(semaphore)
             }
-            dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, Int64(30 * NSEC_PER_SEC)))
-            
-            if let catalog = catalog, language = catalog.languageWithISO639_3Code("eng") {
-                if let item = catalog.itemWithURI("/scriptures/bofm", languageID: language.id) {
-                    let destinationURL = Static.tempDirectoryURL.URLByAppendingPathComponent("\(item.externalID)-\(item.latestVersion)")
-                    
-                    let semaphore = dispatch_semaphore_create(0)
-                    session.downloadItemPackage(destinationURL: destinationURL, externalID: item.externalID, version: item.latestVersion) { result in
-                        switch result {
-                        case .Success:
-                            do {
-                                Static.itemPackage = try ItemPackage(path: destinationURL.URLByAppendingPathComponent("package.sqlite").path!)
-                            } catch {
-                                NSLog("Failed to connect to catalog: %@", "\(error)")
-                            }
-                        case let .Error(errors):
-                            NSLog("Failed with errors %@", "\(errors)")
-                        }
-                        dispatch_semaphore_signal(semaphore)
-                    }
-                    dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, Int64(30 * NSEC_PER_SEC)))
-                }
-                
-                if let item = catalog.itemWithURI("/scriptures/dc-testament", languageID: language.id) {
-                    let destinationURL = Static.tempDirectoryURL.URLByAppendingPathComponent("\(item.externalID)-\(item.latestVersion)")
-                    
-                    let semaphore = dispatch_semaphore_create(0)
-                    session.downloadItemPackage(destinationURL: destinationURL, externalID: item.externalID, version: item.latestVersion) { result in
-                        switch result {
-                        case .Success:
-                            do {
-                                Static.itemPackage2 = try ItemPackage(path: destinationURL.URLByAppendingPathComponent("package.sqlite").path!)
-                            } catch {
-                                NSLog("Failed to connect to catalog: %@", "\(error)")
-                            }
-                        case let .Error(errors):
-                            NSLog("Failed with errors %@", "\(errors)")
-                        }
-                        dispatch_semaphore_signal(semaphore)
-                    }
-                    dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, Int64(30 * NSEC_PER_SEC)))
-                }
+            if dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, Int64(30 * NSEC_PER_SEC))) != 0 {
+                NSLog("Timed out updating catalog")
             }
         }
+        return catalog
+    }
+    
+    private func loadItemPackageForItemWithURI(uri: String, iso639_3Code: String, inCatalog catalog: Catalog) -> ItemPackage? {
+        guard let language = catalog.languageWithISO639_3Code(iso639_3Code), item = catalog.itemWithURI(uri, languageID: language.id) else { return nil }
         
-        itemPackage = Static.itemPackage
-        itemPackage2 = Static.itemPackage2
+        var itemPackage = ItemPackageTests.contentController.itemPackageForItemWithID(item.id)
+        if itemPackage == nil {
+            let semaphore = dispatch_semaphore_create(0)
+            ItemPackageTests.contentController.installItemPackageForItem(item) { result in
+                switch result {
+                case let .Success(newItemPackage):
+                    itemPackage = newItemPackage
+                case let .AlreadyInstalled(newItemPackage):
+                    itemPackage = newItemPackage
+                case let .Error(errors):
+                    NSLog("Failed with errors %@", "\(errors)")
+                }
+                
+                dispatch_semaphore_signal(semaphore)
+            }
+            if dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, Int64(30 * NSEC_PER_SEC))) != 0 {
+                NSLog("Timed out installing item package")
+            }
+        }
+        return itemPackage
     }
     
 }

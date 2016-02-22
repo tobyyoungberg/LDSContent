@@ -36,13 +36,13 @@ public class Session: NSObject {
         operationQueue.addOperation(operation)
     }
     
-    public func downloadCatalog(destinationURL destinationURL: NSURL, catalogVersion: Int? = nil, completion: (DownloadCatalogResult) -> Void) {
-        let operation = DownloadCatalogOperation(session: self, destinationURL: destinationURL, catalogVersion: catalogVersion, completion: completion)
+    public func downloadCatalog(catalogVersion catalogVersion: Int? = nil, completion: (DownloadCatalogResult) -> Void) {
+        let operation = DownloadCatalogOperation(session: self, catalogVersion: catalogVersion, completion: completion)
         operationQueue.addOperation(operation)
     }
     
-    public func downloadItemPackage(destinationURL destinationURL: NSURL, externalID: String, version: Int, completion: (DownloadItemPackageResult) -> Void) {
-        let operation = DownloadItemPackageOperation(session: self, destinationURL: destinationURL, externalID: externalID, version: version, completion: completion)
+    public func downloadItemPackage(externalID externalID: String, version: Int, completion: (DownloadItemPackageResult) -> Void) {
+        let operation = DownloadItemPackageOperation(session: self, externalID: externalID, version: version, completion: completion)
         operationQueue.addOperation(operation)
     }
     

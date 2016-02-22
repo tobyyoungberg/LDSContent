@@ -25,6 +25,7 @@ import LDSContent
 
 class CatalogTests: XCTestCase {
     
+    static var contentController: ContentController!
     var catalog: Catalog!
     
     func testSchemaVersion() {
@@ -283,14 +284,21 @@ class CatalogTests: XCTestCase {
 
 extension CatalogTests {
     
-    struct Static {
-        static var tempDirectoryURL: NSURL!
-        static var catalog: Catalog!
+    override class func setUp() {
+        super.setUp()
+        
+        do {
+            let tempDirectoryURL = NSURL(fileURLWithPath: NSTemporaryDirectory()).URLByAppendingPathComponent(NSProcessInfo.processInfo().globallyUniqueString)
+            try NSFileManager.defaultManager().createDirectoryAtURL(tempDirectoryURL, withIntermediateDirectories: true, attributes: nil)
+            contentController = try ContentController(location: tempDirectoryURL)
+        } catch {
+            NSLog("Failed to create content controller: %@", "\(error)")
+        }
     }
     
     override class func tearDown() {
         do {
-            try NSFileManager.defaultManager().removeItemAtURL(Static.tempDirectoryURL)
+            try NSFileManager.defaultManager().removeItemAtURL(contentController.location)
         } catch {}
         
         super.tearDown()
@@ -299,37 +307,30 @@ extension CatalogTests {
     override func setUp() {
         super.setUp()
         
-        if Static.catalog == nil {
-            Static.tempDirectoryURL = NSURL(fileURLWithPath: NSTemporaryDirectory()).URLByAppendingPathComponent(NSProcessInfo.processInfo().globallyUniqueString)
-            do {
-                try NSFileManager.defaultManager().createDirectoryAtURL(Static.tempDirectoryURL, withIntermediateDirectories: true, attributes: nil)
-            } catch {
-                NSLog("Failed to create temp directory with error %@", "\(error)")
-                return
-            }
-            
-            let session = Session()
-            
-            let destinationURL = Static.tempDirectoryURL.URLByAppendingPathComponent("Catalog.sqlite")
-            
+        self.catalog = loadCatalog()
+    }
+    
+    private func loadCatalog() -> Catalog? {
+        var catalog = CatalogTests.contentController.catalog
+        if catalog == nil {
             let semaphore = dispatch_semaphore_create(0)
-            session.downloadCatalog(destinationURL: destinationURL) { result in
+            CatalogTests.contentController.updateCatalog { result in
                 switch result {
-                case .Success:
-                    do {
-                        Static.catalog = try Catalog(path: destinationURL.path!)
-                    } catch {
-                        NSLog("Failed to connect to catalog: %@", "\(error)")
-                    }
+                case let .Success(newCatalog):
+                    catalog = newCatalog
+                case let .AlreadyCurrent(newCatalog):
+                    catalog = newCatalog
                 case let .Error(errors):
                     NSLog("Failed with errors %@", "\(errors)")
                 }
+                
                 dispatch_semaphore_signal(semaphore)
             }
-            dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, Int64(30 * NSEC_PER_SEC)))
+            if dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, Int64(30 * NSEC_PER_SEC))) != 0 {
+                NSLog("Timed out updating catalog")
+            }
         }
-        
-        catalog = Static.catalog
+        return catalog
     }
 
 }

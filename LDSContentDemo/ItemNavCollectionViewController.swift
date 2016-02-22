@@ -22,19 +22,25 @@
 
 import UIKit
 import LDSContent
+import Swiftification
+import SVProgressHUD
 
-class LanguagesViewController: UIViewController {
+class ItemNavCollectionViewController: UIViewController {
     
     let contentController: ContentController
+    let itemID: Int
+    let itemNavCollection: NavCollection
     
-    init(contentController: ContentController) {
+    init(contentController: ContentController, itemID: Int, itemNavCollection: NavCollection) {
         self.contentController = contentController
+        self.itemID = itemID
+        self.itemNavCollection = itemNavCollection
         
         super.init(nibName: nil, bundle: nil)
         
         automaticallyAdjustsScrollViewInsets = false
         
-        title = "Languages"
+        title = itemNavCollection.titleHTML
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -56,7 +62,7 @@ class LanguagesViewController: UIViewController {
         
         automaticallyAdjustsScrollViewInsets = true
         
-        tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: LanguagesViewController.CellIdentifier)
+        tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: ItemNavCollectionViewController.CellIdentifier)
         tableView.estimatedRowHeight = 44
         
         view.addSubview(tableView)
@@ -68,40 +74,27 @@ class LanguagesViewController: UIViewController {
         view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("|[tableView]|", options: [], metrics: nil, views: views))
         view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[tableView]|", options: [], metrics: nil, views: views))
         
-        contentController.catalogUpdateObservers.add(self, operationQueue: .mainQueue(), self.dynamicType.catalogDidUpdate)
-        catalog = contentController.catalog
+        contentController.itemPackageUpdateObservers.add(self, operationQueue: .mainQueue(), self.dynamicType.itemPackageDidUpdate)
+        itemPackage = contentController.itemPackageForItemWithID(itemID)
         reloadData()
     }
     
-    var catalog: Catalog?
-    var uiLanguage: Language?
-    var languages = [Language]()
+    var itemPackage: ItemPackage?
+    var sections = [(itemNavSection: NavSection, itemNavNodes: [NavNode])]()
     
     func reloadData() {
-        guard let catalog = catalog, uiLanguage = catalog.languageWithISO639_3Code("eng") else { return }
+        guard let itemPackage = itemPackage else { return }
         
-        let languages = catalog.languages()
-        
-        let nameByLanguageID = [Int: String](languages.map { language in
-            return (language.id, catalog.nameForLanguageWithID(language.id, inLanguageWithID: uiLanguage.id))
-        })
-        
-        self.uiLanguage = uiLanguage
-        self.languages = languages.sort { language1, language2 in
-            if language1.id == uiLanguage.id {
-                return true
-            }
-            if language2.id == uiLanguage.id {
-                return false
-            }
-            return nameByLanguageID[language1.id] < nameByLanguageID[language2.id]
+        let itemNavSections = itemPackage.navSectionsForNavCollectionWithID(itemNavCollection.id)
+        sections = itemNavSections.map { itemNavSection in
+            return (itemNavSection: itemNavSection, itemNavNodes: itemPackage.navNodesForNavSectionWithID(itemNavSection.id))
         }
-        
-        tableView.reloadData()
     }
     
-    func catalogDidUpdate(catalog: Catalog) {
-        self.catalog = catalog
+    func itemPackageDidUpdate(itemPackage: ItemPackage) {
+        guard itemPackage.itemID == itemID else { return }
+        
+        self.itemPackage = itemPackage
         reloadData()
     }
     
@@ -123,24 +116,31 @@ class LanguagesViewController: UIViewController {
 
 // MARK: - UITableViewDataSource
 
-extension LanguagesViewController: UITableViewDataSource {
+extension ItemNavCollectionViewController: UITableViewDataSource {
     
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return 1
+        return sections.count
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return languages.count
+        return sections[section].itemNavNodes.count
+    }
+    
+    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return sections[section].itemNavSection.title
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier(LanguagesViewController.CellIdentifier, forIndexPath: indexPath)
+        let cell = tableView.dequeueReusableCellWithIdentifier(ItemNavCollectionViewController.CellIdentifier, forIndexPath: indexPath)
         
-        let language = languages[indexPath.row]
-        if let catalog = catalog, uiLanguage = uiLanguage {
-            cell.textLabel?.text = catalog.nameForLanguageWithID(language.id, inLanguageWithID: uiLanguage.id)
+        let itemNavNode = sections[indexPath.section].itemNavNodes[indexPath.row]
+        cell.textLabel?.text = itemNavNode.titleHTML
+        
+        if itemNavNode is NavCollection {
+            cell.accessoryType = .DisclosureIndicator
+        } else {
+            cell.accessoryType = .None
         }
-        cell.accessoryType = .DisclosureIndicator
         
         return cell
     }
@@ -149,15 +149,18 @@ extension LanguagesViewController: UITableViewDataSource {
 
 // MARK: - UITableViewDelegate
 
-extension LanguagesViewController: UITableViewDelegate {
+extension ItemNavCollectionViewController: UITableViewDelegate {
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        let language = languages[indexPath.row]
-        if let catalog = catalog, rootLibraryCollection = catalog.libraryCollectionWithID(language.rootLibraryCollectionID) {
-            let viewController = LibraryCollectionViewController(contentController: contentController, libraryCollection: rootLibraryCollection)
+        let itemNavNode = sections[indexPath.section].itemNavNodes[indexPath.row]
+        switch itemNavNode {
+        case let itemNavCollection as NavCollection:
+            let viewController = ItemNavCollectionViewController(contentController: contentController, itemID: itemID, itemNavCollection: itemNavCollection)
             
             navigationController?.pushViewController(viewController, animated: true)
-        } else {
+        case _ as NavItem:
+            tableView.deselectRowAtIndexPath(indexPath, animated: false)
+        default:
             tableView.deselectRowAtIndexPath(indexPath, animated: false)
         }
     }
