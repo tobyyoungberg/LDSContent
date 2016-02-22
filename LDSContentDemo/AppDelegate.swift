@@ -34,7 +34,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         do {
             try NSFileManager.defaultManager().createDirectoryAtURL(location, withIntermediateDirectories: true, attributes: nil)
         } catch {}
-        return try! ContentController(location: location)
+        return try? ContentController(location: location)
     }()
     
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
