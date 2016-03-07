@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "LDSContent"
-  s.version      = "1.1.0"
+  s.version      = "1.1.1"
   s.summary      = "Swift client library for LDS content."
   s.author       = 'Hilton Campbell'
   s.homepage     = "https://github.com/CrossWaterBridge/LDSContent"
@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '8.0'
   s.osx.deployment_target = '10.11'
   s.source_files = "LDSContent/*.swift"
-  s.resources    = "LDSContent/*.sql"
+  s.resources    = "LDSContent/*.{sql,json}"
   s.requires_arc = true
   
   s.dependency 'PSOperations'

@@ -26,7 +26,17 @@ import Swiftification
 
 public class Catalog {
     
-    public static let SchemaVersion = 3
+    /// The current schema version.
+    ///
+    /// The value is stored in `Schema.json`, so that it can also be read from scripts.
+    public static let SchemaVersion: Int = {
+        guard let
+            path = NSBundle(forClass: Catalog.self).pathForResource("Schema", ofType: "json"),
+            data = NSData(contentsOfFile: path),
+            dictionary = (try? NSJSONSerialization.JSONObjectWithData(data, options: [])) as? [String:Int],
+            schemaVersion = dictionary["schemaVersion"] else { fatalError("Failed to load schema version") }
+        return schemaVersion
+    }()
     
     let db: Connection!
     let noDiacritic: ((Expression<String>) -> Expression<String>)!
