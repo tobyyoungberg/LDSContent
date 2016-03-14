@@ -16,6 +16,7 @@ target 'LDSContent' do
 end
 
 target 'LDSContentTests' do
+    # Required by LDSContent
     pod 'PSOperations'
     pod 'SQLite.swift', '~> 0.9.2'
     pod 'FTS3HTMLTokenizer', '~> 2.0', :inhibit_warnings => true
@@ -26,10 +27,12 @@ end
 target 'LDSContentDemo' do
     xcodeproj 'LDSContentDemo.xcodeproj'
     
+    pod 'SVProgressHUD'
+    
+    # Required by LDSContent
     pod 'PSOperations'
     pod 'SQLite.swift', '~> 0.9.2'
     pod 'FTS3HTMLTokenizer', '~> 2.0', :inhibit_warnings => true
     pod 'Swiftification'
     pod 'SSZipArchive'
-    pod 'SVProgressHUD'
 end
