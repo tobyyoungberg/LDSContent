@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "LDSContent"
-  s.version      = "1.1.1"
+  s.version      = "1.1.2"
   s.summary      = "Swift client library for LDS content."
   s.author       = 'Hilton Campbell'
   s.homepage     = "https://github.com/CrossWaterBridge/LDSContent"
@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   s.requires_arc = true
   
   s.dependency 'PSOperations'
-  s.dependency 'SQLite.swift', '~> 0.9.2'
+  s.dependency 'SQLite.swift', '~> 0.10.1'
   s.dependency 'FTS3HTMLTokenizer', '~> 2.0'
   s.dependency 'Swiftification'
   s.dependency 'SSZipArchive'
