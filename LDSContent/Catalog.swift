@@ -38,8 +38,8 @@ public class Catalog {
         return schemaVersion
     }()
     
-    let db: Connection!
-    let noDiacritic: ((Expression<String>) -> Expression<String>)!
+    let db: Connection
+    let noDiacritic: ((Expression<String>) -> Expression<String>)
     
     let validPlatformIDs = [Platform.All.rawValue, Platform.iOS.rawValue]
     
@@ -47,8 +47,6 @@ public class Catalog {
         do {
             db = try Connection(path ?? "")   
         } catch {
-            db = nil
-            noDiacritic = nil
             throw error
         }
             
@@ -61,7 +59,6 @@ public class Catalog {
                 return string.withoutDiacritics()
             }
         } catch {
-            noDiacritic = nil
             throw error
         }
     }

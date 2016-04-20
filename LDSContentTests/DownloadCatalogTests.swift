@@ -21,7 +21,7 @@
 //
 
 import XCTest
-import LDSContent
+@testable import LDSContent
 
 class DownloadCatalogTests: XCTestCase {
     
@@ -29,20 +29,28 @@ class DownloadCatalogTests: XCTestCase {
         let session = Session()
         
         let expectation = expectationWithDescription("Download latest catalog")
-        session.downloadCatalog { result in
+        session.fetchCatalogVersion { result in
             switch result {
-            case let .Success(location):
-                do {
-                    let catalog = try Catalog(path: location.path!)
-                    XCTAssertGreaterThan(catalog.catalogVersion, 0)
-                } catch {
-                    XCTFail("Failed to connect to catalog: \(error)")
+            case let .Success(availableCatalogVersion):
+                session.downloadCatalog(catalogVersion: availableCatalogVersion) { result in
+                    switch result {
+                    case let .Success(location):
+                        do {
+                            let catalog = try Catalog(path: location.path!)
+                            XCTAssertGreaterThan(catalog.catalogVersion, 0)
+                        } catch {
+                            XCTFail("Failed to connect to catalog: \(error)")
+                        }
+                    case let .Error(errors):
+                        XCTFail("Failed with errors \(errors)")
+                    }
+                    expectation.fulfill()
                 }
             case let .Error(errors):
-                XCTFail("Failed with errors \(errors)")
+                XCTFail("Failed to fetch version with errors \(errors)")
             }
-            expectation.fulfill()
         }
+        
         waitForExpectationsWithTimeout(30, handler: nil)
     }
     

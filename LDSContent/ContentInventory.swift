@@ -25,7 +25,7 @@ import SQLite
 
 class ContentInventory {
     
-    let db: Connection!
+    let db: Connection
     
     private static let currentVersion = 1
     
@@ -33,7 +33,6 @@ class ContentInventory {
         do {
             db = try Connection(path ?? "")
         } catch {
-            db = nil
             throw error
         }
         
@@ -57,11 +56,11 @@ class ContentInventory {
     
     var databaseVersion: Int {
         get {
-            return Int(db?.scalar("PRAGMA user_version") as? Int64 ?? 0)
+            return Int(db.scalar("PRAGMA user_version") as? Int64 ?? 0)
         }
         set {
             do {
-                try db?.run("PRAGMA user_version = \(newValue)")
+                try db.run("PRAGMA user_version = \(newValue)")
             } catch {}
         }
     }

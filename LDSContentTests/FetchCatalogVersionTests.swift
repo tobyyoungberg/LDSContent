@@ -21,7 +21,7 @@
 //
 
 import XCTest
-import LDSContent
+@testable import LDSContent
 
 class FetchCatalogVersionTests: XCTestCase {
     

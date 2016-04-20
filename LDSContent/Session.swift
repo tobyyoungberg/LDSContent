@@ -23,7 +23,7 @@
 import Foundation
 import PSOperations
 
-public class Session: NSObject {
+class Session: NSObject {
     
     lazy var urlSession: NSURLSession = {
         return NSURLSession(configuration: NSURLSessionConfiguration.ephemeralSessionConfiguration(), delegate: self, delegateQueue: nil)
@@ -31,17 +31,17 @@ public class Session: NSObject {
     
     let operationQueue = OperationQueue()
     
-    public func fetchCatalogVersion(completion completion: (FetchCatalogVersionResult) -> Void) {
+    func fetchCatalogVersion(completion completion: (FetchCatalogVersionResult) -> Void) {
         let operation = FetchCatalogVersionOperation(session: self, completion: completion)
         operationQueue.addOperation(operation)
     }
     
-    public func downloadCatalog(catalogVersion catalogVersion: Int? = nil, completion: (DownloadCatalogResult) -> Void) {
+    func downloadCatalog(catalogVersion catalogVersion: Int, completion: (DownloadCatalogResult) -> Void) {
         let operation = DownloadCatalogOperation(session: self, catalogVersion: catalogVersion, completion: completion)
         operationQueue.addOperation(operation)
     }
     
-    public func downloadItemPackage(externalID externalID: String, version: Int, completion: (DownloadItemPackageResult) -> Void) {
+    func downloadItemPackage(externalID externalID: String, version: Int, completion: (DownloadItemPackageResult) -> Void) {
         let operation = DownloadItemPackageOperation(session: self, externalID: externalID, version: version, completion: completion)
         operationQueue.addOperation(operation)
     }
@@ -50,8 +50,8 @@ public class Session: NSObject {
 
 extension Session: NSURLSessionDelegate {
     
-    public func URLSession(session: NSURLSession, didReceiveChallenge challenge: NSURLAuthenticationChallenge, completionHandler: (NSURLSessionAuthChallengeDisposition, NSURLCredential?) -> Void) {
-        completionHandler(.UseCredential, NSURLCredential(forTrust: challenge.protectionSpace.serverTrust!))
+    func URLSession(session: NSURLSession, didReceiveChallenge challenge: NSURLAuthenticationChallenge, completionHandler: (NSURLSessionAuthChallengeDisposition, NSURLCredential?) -> Void) {
+        completionHandler(.UseCredential, challenge.protectionSpace.serverTrust.flatMap { NSURLCredential(forTrust: $0) })
     }
     
 }

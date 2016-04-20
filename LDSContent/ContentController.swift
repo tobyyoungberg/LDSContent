@@ -28,7 +28,7 @@ public class ContentController {
     
     public let location: NSURL
     
-    let contentInventory: ContentInventory!
+    let contentInventory: ContentInventory
     let session = Session()
     
     public let catalogUpdateObservers = ObserverSet<Catalog>()
@@ -41,7 +41,6 @@ public class ContentController {
         do {
             contentInventory = try ContentInventory(path: location.URLByAppendingPathComponent("Inventory.sqlite").path)
         } catch {
-            contentInventory = nil
             throw error
         }
     }

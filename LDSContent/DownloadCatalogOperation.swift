@@ -28,19 +28,16 @@ class DownloadCatalogOperation: Operation {
     
     let session: Session
     
-    var catalogVersion: Int?
+    let catalogVersion: Int
     let tempDirectoryURL: NSURL
     
-    init(session: Session, catalogVersion: Int?, completion: (DownloadCatalogResult) -> Void) {
+    init(session: Session, catalogVersion: Int, completion: (DownloadCatalogResult) -> Void) {
         self.session = session
         self.tempDirectoryURL = NSURL(fileURLWithPath: NSTemporaryDirectory()).URLByAppendingPathComponent(NSProcessInfo.processInfo().globallyUniqueString)
         self.catalogVersion = catalogVersion
         
         super.init()
         
-        addCondition(CatalogVersionCondition(session: session, catalogVersion: catalogVersion, completion: { condition in
-            self.catalogVersion = condition.catalogVersion
-        }))
         addObserver(BlockObserver(startHandler: nil, produceHandler: nil, finishHandler: { operation, errors in
             if errors.isEmpty {
                 completion(.Success(location: self.tempDirectoryURL.URLByAppendingPathComponent("Catalog.sqlite")))
@@ -55,11 +52,6 @@ class DownloadCatalogOperation: Operation {
     }
     
     override func execute() {
-        guard let catalogVersion = catalogVersion else {
-            finishWithError(Error.errorWithCode(.Unknown, failureReason: "Unspecified catalog version"))
-            return
-        }
-        
         downloadCatalog(catalogVersion: catalogVersion) { result in
             switch result {
             case let .Success(location):

@@ -20,7 +20,6 @@
 		D93CAA2A1C6B9EE100C21A46 /* FetchCatalogVersionResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = D93CAA291C6B9EE100C21A46 /* FetchCatalogVersionResult.swift */; };
 		D93CAA2C1C6BA06400C21A46 /* DownloadCatalogResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = D93CAA2B1C6BA06400C21A46 /* DownloadCatalogResult.swift */; };
 		D93CAA2E1C6BA0CC00C21A46 /* DownloadCatalogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D93CAA2D1C6BA0CC00C21A46 /* DownloadCatalogTests.swift */; };
-		D93CAA301C6BB17200C21A46 /* CatalogVersionCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = D93CAA2F1C6BB17200C21A46 /* CatalogVersionCondition.swift */; };
 		D93CAA341C6BB52C00C21A46 /* CatalogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D93CAA331C6BB52C00C21A46 /* CatalogTests.swift */; };
 		D93CAA361C6BDC3E00C21A46 /* String+SQL.swift in Sources */ = {isa = PBXBuildFile; fileRef = D93CAA351C6BDC3E00C21A46 /* String+SQL.swift */; };
 		D959AE841C8DDF4000B94425 /* Schema.json in Resources */ = {isa = PBXBuildFile; fileRef = D959AE831C8DDF4000B94425 /* Schema.json */; };
@@ -538,7 +537,6 @@
 				D9C0127E1C729DCD0025D78A /* NavCollection.swift in Sources */,
 				D9B32A3E1C72352800A0304D /* SubitemContentRange.swift in Sources */,
 				D9C012801C72B8700025D78A /* NavCollectionIndexEntry.swift in Sources */,
-				D93CAA301C6BB17200C21A46 /* CatalogVersionCondition.swift in Sources */,
 				D9C0127A1C7297840025D78A /* RelatedContentItem.swift in Sources */,
 				D9B32A401C72369200A0304D /* NSRange.swift in Sources */,
 				D9B32A361C701E9E00A0304D /* DownloadItemPackageResult.swift in Sources */,

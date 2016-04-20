@@ -27,13 +27,12 @@ import FTS3HTMLTokenizer
 
 public class ItemPackage {
     
-    let db: Connection!
+    let db: Connection
     
     public init(path: String? = nil) throws {
         do {
             db = try Connection(path ?? "")
         } catch {
-            db = nil
             throw error
         }
         
