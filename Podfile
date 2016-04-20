@@ -9,7 +9,7 @@ xcodeproj 'LDSContent.xcodeproj'
 
 target 'LDSContent' do
     pod 'PSOperations'
-    pod 'SQLite.swift', '~> 0.9.2'
+    pod 'SQLite.swift'
     pod 'FTS3HTMLTokenizer', '~> 2.0', :inhibit_warnings => true
     pod 'Swiftification'
     pod 'SSZipArchive'
@@ -18,7 +18,7 @@ end
 target 'LDSContentTests' do
     # Required by LDSContent
     pod 'PSOperations'
-    pod 'SQLite.swift', '~> 0.9.2'
+    pod 'SQLite.swift'
     pod 'FTS3HTMLTokenizer', '~> 2.0', :inhibit_warnings => true
     pod 'Swiftification'
     pod 'SSZipArchive'
@@ -31,7 +31,7 @@ target 'LDSContentDemo' do
     
     # Required by LDSContent
     pod 'PSOperations'
-    pod 'SQLite.swift', '~> 0.9.2'
+    pod 'SQLite.swift'
     pod 'FTS3HTMLTokenizer', '~> 2.0', :inhibit_warnings => true
     pod 'Swiftification'
     pod 'SSZipArchive'

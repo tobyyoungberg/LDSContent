@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   s.requires_arc = true
   
   s.dependency 'PSOperations'
-  s.dependency 'SQLite.swift', '~> 0.10.1'
+  s.dependency 'SQLite.swift'
   s.dependency 'FTS3HTMLTokenizer', '~> 2.0'
   s.dependency 'Swiftification'
   s.dependency 'SSZipArchive'
