@@ -121,6 +121,7 @@ extension MutableCatalog {
             ItemTable.itemCoverRenditions <- String(item.itemCoverRenditions),
             ItemTable.itemCategoryID <- item.itemCategoryID,
             ItemTable.version <- item.version,
+            ItemTable.latestVersion <- item.version,
             ItemTable.obsolete <- item.obsolete
         ))
     }
