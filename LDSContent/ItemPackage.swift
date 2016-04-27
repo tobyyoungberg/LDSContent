@@ -199,45 +199,6 @@ extension ItemPackage {
 
 extension ItemPackage {
     
-    class SubitemContentRangeTable {
-        
-        static let table = Table("subitem_content_range")
-        static let id = Expression<Int>("_id")
-        static let subitemID = Expression<Int>("subitem_id")
-        static let paragraphID = Expression<String>("paragraph_id")
-        static let startIndex = Expression<Int>("start_index")
-        static let endIndex = Expression<Int>("end_index")
-        
-        static func fromRow(row: Row) -> SubitemContentRange {
-            return SubitemContentRange(id: row[id], subitemID: row[subitemID], paragraphID: row[paragraphID], range: rangeFromRow(row))
-        }
-        
-        static func rangeFromRow(row: Row) -> NSRange {
-            let startIndex = row[SubitemContentRangeTable.startIndex]
-            let endIndex = row[SubitemContentRangeTable.endIndex]
-            return NSMakeRange(startIndex, endIndex - startIndex)
-        }
-        
-    }
-    
-    public func rangeOfParagraphWithID(paragraphID: String, inSubitemWithID subitemID: Int) -> SubitemContentRange? {
-        return db.pluck(SubitemContentRangeTable.table.filter(SubitemContentRangeTable.subitemID == subitemID && SubitemContentRangeTable.paragraphID == paragraphID)).map { row in
-            return SubitemContentRangeTable.fromRow(row)
-        }
-    }
-    
-    public func rangesOfParagraphWithIDs(paragraphIDs: [String], inSubitemWithID subitemID: Int) -> [SubitemContentRange] {
-        do {
-            return try db.prepare(SubitemContentRangeTable.table.filter(paragraphIDs.contains(SubitemContentRangeTable.paragraphID) && SubitemContentRangeTable.subitemID == subitemID).order(SubitemContentRangeTable.subitemID, SubitemContentRangeTable.startIndex)).map { SubitemContentRangeTable.fromRow($0) }
-        } catch {
-            return []
-        }
-    }
-    
-}
-
-extension ItemPackage {
-    
     class SubitemTable {
         
         static let table = Table("subitem")
@@ -249,9 +210,10 @@ extension ItemPackage {
         static let titleHTML = Expression<String>("title_html")
         static let title = Expression<String>("title")
         static let webURL = Expression<String>("web_url")
+        static let contentType = Expression<ContentType>("content_type")
         
         static func fromRow(row: Row) -> Subitem {
-            return Subitem(id: row[id], uri: row[uri], docID: row[docID], docVersion: row[docVersion], position: row[position], titleHTML: row[titleHTML], title: row[title], webURL: NSURL(string: row[webURL]))
+            return Subitem(id: row[id], uri: row[uri], docID: row[docID], docVersion: row[docVersion], position: row[position], titleHTML: row[titleHTML], title: row[title], webURL: NSURL(string: row[webURL]), contentType: row.get(contentType))
         }
         
     }
@@ -291,6 +253,14 @@ extension ItemPackage {
     public func subitemsWithURIPrefixedByURI(uri: String) -> [Subitem] {
         do {
             return try db.prepare(SubitemTable.table.filter(SubitemTable.uri.like("\(uri.escaped())%", escape: "!")).order(SubitemTable.position)).map { SubitemTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
+    public func subitemsWithAuthor(author: Author) -> [Subitem] {
+        do {
+            return try db.prepare(SubitemTable.table.filter(SubitemTable.id == SubitemAuthorTable.subitemID && SubitemAuthorTable.authorID == author.id).order(SubitemTable.position)).map { SubitemTable.fromRow($0) }
         } catch {
             return []
         }
@@ -531,13 +501,15 @@ extension ItemPackage {
         static let paragraphID = Expression<String>("paragraph_id")
         static let paragraphAID = Expression<String>("paragraph_aid")
         static let verseNumber = Expression<String?>("verse_number")
+        static let startIndex = Expression<Int>("start_index")
+        static let endIndex = Expression<Int>("end_index")
         
         static func fromRow(row: Row) -> ParagraphMetadata {
-            return ParagraphMetadata(id: row[id], subitemID: row[subitemID], paragraphID: row[paragraphID], paragraphAID: row[paragraphAID], verseNumber: row[verseNumber])
+            return ParagraphMetadata(id: row[id], subitemID: row[subitemID], paragraphID: row[paragraphID], paragraphAID: row[paragraphAID], verseNumber: row[verseNumber], range: NSRange(location: row[startIndex], length: row[endIndex] - row[startIndex]))
         }
         
         static func fromNamespacedRow(row: Row) -> ParagraphMetadata {
-            return ParagraphMetadata(id: row[ParagraphMetadataTable.table[id]], subitemID: row[ParagraphMetadataTable.table[subitemID]], paragraphID: row[ParagraphMetadataTable.table[paragraphID]], paragraphAID: row[ParagraphMetadataTable.table[paragraphAID]], verseNumber: row[ParagraphMetadataTable.table[verseNumber]])
+            return ParagraphMetadata(id: row[ParagraphMetadataTable.table[id]], subitemID: row[ParagraphMetadataTable.table[subitemID]], paragraphID: row[ParagraphMetadataTable.table[paragraphID]], paragraphAID: row[ParagraphMetadataTable.table[paragraphAID]], verseNumber: row[ParagraphMetadataTable.table[verseNumber]], range: NSRange(location: row[ParagraphMetadataTable.table[startIndex]], length: row[ParagraphMetadataTable.table[endIndex]] - row[ParagraphMetadataTable.table[startIndex]]))
         }
         
     }
@@ -564,6 +536,112 @@ extension ItemPackage {
         } catch {
             return []
         }
+    }
+    
+    public func paragraphMetadataForParagraphID(paragraphID: String, subitemID: Int) -> ParagraphMetadata? {
+        return db.pluck(ParagraphMetadataTable.table.filter(ParagraphMetadataTable.subitemID == subitemID && ParagraphMetadataTable.paragraphID == paragraphID)).map { ParagraphMetadataTable.fromRow($0) }
+    }
+    
+}
+
+extension ItemPackage {
+    
+    class AuthorTable {
+        static let table = Table("author")
+        static let id = Expression<Int64>("_id")
+        static let givenName = Expression<String>("given_name")
+        static let familyName = Expression<String>("family_name")
+        
+        static func fromRow(row: Row) -> Author {
+            return Author(id: row[id], givenName: row[givenName], familyName: row[familyName])
+        }
+    }
+    
+    public func authorsOfSubitemWithID(subitemID: Int) -> [Author] {
+        do {
+            return try db.prepare(AuthorTable.table.filter(SubitemAuthorTable.subitemID == subitemID && AuthorTable.id == SubitemAuthorTable.authorID).order(AuthorTable.familyName).order(AuthorTable.givenName)).map { AuthorTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
+    public func authorWithGivenName(givenName: String, familyName: String) -> Author? {
+        return db.pluck(AuthorTable.table.filter(AuthorTable.givenName.lowercaseString == givenName.lowercaseString && AuthorTable.familyName.lowercaseString == familyName.lowercaseString)).map { AuthorTable.fromRow($0) }
+    }
+    
+}
+
+extension ItemPackage {
+    
+    class RoleTable {
+        static let table = Table("role")
+        static let id = Expression<Int64>("_id")
+        static let name = Expression<String>("name")
+        static let position = Expression<Int>("position")
+        
+        static func fromRow(row: Row) -> Role {
+            return Role(id: row[id], name: row[name], position: row[position])
+        }
+    }
+    
+    public func roleWithName(name: String) -> Role? {
+        return db.pluck(RoleTable.table.filter(RoleTable.name.lowercaseString == name.lowercaseString)).map { RoleTable.fromRow($0) }
+    }
+    
+}
+
+extension ItemPackage {
+    
+    class AuthorRoleTable {
+        static let table = Table("author_role")
+        static let id = Expression<Int64>("_id")
+        static let authorID = Expression<Int64>("author_id")
+        static let roleID = Expression<Int64>("role_id")
+        static let position = Expression<Int>("position")
+        
+        static func fromRow(row: Row) -> AuthorRole {
+            return AuthorRole(id: row[id], authorID: row[authorID], roleID: row[roleID], position: row[position])
+        }
+    }
+    
+}
+
+extension ItemPackage {
+    
+    class SubitemAuthorTable {
+        static let table = Table("subitem_author")
+        static let id = Expression<Int64>("_id")
+        static let subitemID = Expression<Int>("subitem_id")
+        static let authorID = Expression<Int64>("author_id")
+    }
+    
+}
+
+extension ItemPackage {
+    
+    class TopicTable {
+        static let table = Table("topic")
+        static let id = Expression<Int64>("_id")
+        static let name = Expression<String>("name")
+        
+        static func fromRow(row: Row) -> Topic {
+            return Topic(id: row[id], name: row[name])
+        }
+    }
+    
+    public func topicWithName(name: String) -> Topic? {
+        return db.pluck(TopicTable.table.filter(TopicTable.name.lowercaseString == name.lowercaseString)).map { TopicTable.fromRow($0) }
+    }
+    
+}
+
+extension ItemPackage {
+    
+    class SubitemTopicTable {
+        static let table = Table("subitem_topic")
+        static let id = Expression<Int64>("_id")
+        static let subitemID = Expression<Int>("subitem_id")
+        static let topicID = Expression<Int64>("topic_id")
     }
     
 }

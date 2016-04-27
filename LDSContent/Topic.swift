@@ -22,31 +22,18 @@
 
 import Foundation
 
-public struct ParagraphMetadata: Equatable {
+public struct Topic: Equatable {
     
-    public var id: Int
-    public var subitemID: Int
-    public var paragraphID: String
-    public var paragraphAID: String
-    public var verseNumber: String?
-    public var range: NSRange
+    public var id: Int64
+    public var name: String
     
-    public init(id: Int, subitemID: Int, paragraphID: String, paragraphAID: String, verseNumber: String?, range: NSRange) {
+    public init(id: Int64, name: String) {
         self.id = id
-        self.subitemID = subitemID
-        self.paragraphID = paragraphID
-        self.paragraphAID = paragraphAID
-        self.verseNumber = verseNumber
-        self.range = range
+        self.name = name
     }
     
 }
 
-public func == (lhs: ParagraphMetadata, rhs: ParagraphMetadata) -> Bool {
-    return lhs.id == rhs.id &&
-        lhs.subitemID == rhs.subitemID &&
-        lhs.paragraphID == rhs.paragraphID &&
-        lhs.paragraphAID == rhs.paragraphAID &&
-        lhs.verseNumber == rhs.verseNumber &&
-        lhs.range == rhs.range
+public func == (lhs: Topic, rhs: Topic) -> Bool {
+    return lhs.id == rhs.id && lhs.name == rhs.name
 }

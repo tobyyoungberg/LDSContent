@@ -14,6 +14,7 @@ CREATE TABLE subitem (
     web_url TEXT NOT NULL,
     doc_id TEXT NOT NULL,
     doc_version INTEGER NOT NULL,
+    content_type INTEGER NOT NULL DEFAULT 1,
     UNIQUE(uri),
     UNIQUE(position)
     );
@@ -23,17 +24,6 @@ CREATE VIRTUAL TABLE subitem_content_fts USING fts4(subitem_id, content_html, to
 
 CREATE VIEW subitem_content AS
     SELECT rowid AS _id, c0subitem_id AS subitem_id, c1content_html AS content_html FROM subitem_content_fts_content;
-
-CREATE TABLE subitem_content_range (
-    _id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    subitem_id INTEGER NOT NULL,
-    paragraph_id TEXT NOT NULL,
-    start_index INTEGER NOT NULL,
-    end_index INTEGER NOT NULL,
-    UNIQUE(subitem_id, paragraph_id)
-    );
-        CREATE INDEX subitem_content_range_subitem_index ON subitem_content_range (subitem_id);
-        CREATE INDEX subitem_content_range_paraid_index ON subitem_content_range (paragraph_id);
 
 CREATE TABLE related_content_item (
     _id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -113,6 +103,54 @@ CREATE TABLE paragraph_metadata (
     paragraph_id TEXT NOT NULL,
     paragraph_aid TEXT NOT NULL,
     verse_number TEXT,
+    start_index INTEGER NOT NULL,
+    end_index INTEGER NOT NULL,
     UNIQUE(subitem_id, paragraph_id)
     );
         CREATE INDEX paragraph_metadata_paragraph_aid_idx ON paragraph_metadata (paragraph_aid);
+
+CREATE TABLE author (
+    _id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    given_name TEXT NOT NULL,
+    family_name TEXT NOT NULL,
+    UNIQUE(given_name, family_name)
+    );
+        CREATE INDEX author_given_name_idx ON author (given_name);
+        CREATE INDEX author_family_name_idx ON author (family_name);
+
+CREATE TABLE role (
+    _id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    position INTEGER NOT NULL,
+    UNIQUE(NAME)
+    );
+        CREATE INDEX role_name_idx ON role (name);
+
+CREATE TABLE subitem_author (
+    _id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    subitem_id INTEGER NOT NULL REFERENCES subitem(_id),
+    author_id INTEGER NOT NULL REFERENCES subitem(_id),
+    UNIQUE(subitem_id, author_id)
+    );
+
+CREATE TABLE author_role (
+    _id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    author_id INTEGER NOT NULL REFERENCES author(_id),
+    role_id INTEGER NOT NULL REFERENCES role(_id),
+    position INTEGER NOT NULL,
+    UNIQUE(author_id, role_id)
+    );
+
+CREATE TABLE topic (
+    _id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    UNIQUE(name)
+    );
+        CREATE INDEX topic_name_idx ON topic (name);
+
+CREATE TABLE subitem_topic (
+    _id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    subitem_id INTEGER NOT NULL REFERENCES subitem(_id),
+    topic_id INTEGER NOT NULL REFERENCES topic(_id),
+    UNIQUE(subitem_id, topic_id)
+    );

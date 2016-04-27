@@ -83,7 +83,7 @@ CREATE TABLE item (
     title TEXT NOT NULL,
     item_cover_renditions TEXT,
     item_category_id INTEGER NOT NULL,
-    latest_version INTEGER NOT NULL,
+    version INTEGER NOT NULL,
     is_obsolete INTEGER NOT NULL,
     UNIQUE(external_id)
     );

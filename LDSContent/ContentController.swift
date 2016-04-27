@@ -113,10 +113,10 @@ public class ContentController {
     /// Downloads and installs a specific version of an item, if not installed already.
     public func installItemPackageForItem(item: Item, completion: (InstallItemPackageResult) -> Void) {
         let itemDirectoryURL = location.URLByAppendingPathComponent("Item/\(item.id)")
-        let versionDirectoryURL = itemDirectoryURL.URLByAppendingPathComponent("\(Catalog.SchemaVersion).\(item.latestVersion)")
+        let versionDirectoryURL = itemDirectoryURL.URLByAppendingPathComponent("\(Catalog.SchemaVersion).\(item.version)")
         let itemPackageURL = versionDirectoryURL.URLByAppendingPathComponent("package.sqlite")
         
-        if let installedVersion = contentInventory.installedVersionOfItemWithID(item.id) where installedVersion.schemaVersion == Catalog.SchemaVersion && installedVersion.itemPackageVersion == item.latestVersion {
+        if let installedVersion = contentInventory.installedVersionOfItemWithID(item.id) where installedVersion.schemaVersion == Catalog.SchemaVersion && installedVersion.itemPackageVersion == item.version {
             do {
                 let itemPackage = try ItemPackage(path: itemPackageURL.path)
                 completion(.AlreadyInstalled(itemPackage: itemPackage))
@@ -124,7 +124,7 @@ public class ContentController {
                 completion(.Error(errors: [error]))
             }
         } else {
-            session.downloadItemPackage(externalID: item.externalID, version: item.latestVersion) { result in
+            session.downloadItemPackage(externalID: item.externalID, version: item.version) { result in
                 switch result {
                 case let .Success(location):
                     do {
@@ -137,7 +137,7 @@ public class ContentController {
                     do {
                         let itemPackage = try ItemPackage(path: itemPackageURL.path)
                         
-                        try self.contentInventory.setSchemaVersion(Catalog.SchemaVersion, itemPackageVersion: item.latestVersion, forItemWithID: item.id)
+                        try self.contentInventory.setSchemaVersion(Catalog.SchemaVersion, itemPackageVersion: item.version, forItemWithID: item.id)
                         
                         self.itemPackageUpdateObservers.notify(itemPackage)
                         

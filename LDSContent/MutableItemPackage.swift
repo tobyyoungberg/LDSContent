@@ -132,7 +132,7 @@ extension MutableItemPackage {
 
 extension MutableItemPackage {
     
-    public func addSubitemWithURI(uri: String, docID: String, docVersion: Int, position: Int, titleHTML: String, title: String, webURL: NSURL) throws -> Subitem {
+    public func addSubitemWithURI(uri: String, docID: String, docVersion: Int, position: Int, titleHTML: String, title: String, webURL: NSURL, contentType: ContentType = .Default) throws -> Subitem {
         let id = try db.run(SubitemTable.table.insert(
             SubitemTable.uri <- uri,
             SubitemTable.docID <- docID,
@@ -140,10 +140,11 @@ extension MutableItemPackage {
             SubitemTable.position <- position,
             SubitemTable.titleHTML <- titleHTML,
             SubitemTable.title <- title,
-            SubitemTable.webURL <- webURL.absoluteString
+            SubitemTable.webURL <- webURL.absoluteString,
+            SubitemTable.contentType <- contentType
         ))
         
-        return Subitem(id: Int(id), uri: uri, docID: docID, docVersion: docVersion, position: position, titleHTML: titleHTML, title: title, webURL: webURL)
+        return Subitem(id: Int(id), uri: uri, docID: docID, docVersion: docVersion, position: position, titleHTML: titleHTML, title: title, webURL: webURL, contentType: contentType)
     }
     
     public func addSubitemContentWithSubitemID(subitemID: Int, contentHTML: NSData) throws -> SubitemContent {
@@ -153,15 +154,6 @@ extension MutableItemPackage {
         ))
         
         return SubitemContent(id: Int(id), subitemID: subitemID, contentHTML: contentHTML)
-    }
-
-    public func addRange(range: NSRange, forParagraphWithID paragraphID: String, subitemID: Int) throws {
-        try db.run(SubitemContentRangeTable.table.insert(
-            SubitemContentRangeTable.subitemID <- subitemID,
-            SubitemContentRangeTable.paragraphID <- paragraphID,
-            SubitemContentRangeTable.startIndex <- range.location,
-            SubitemContentRangeTable.endIndex <- range.location + range.length
-        ))
     }
 
     public func addRelatedContentItemWithSubitemID(subitemID: Int, refID: String, labelHTML: String, originID: String, contentHTML: String, wordOffset: Int, byteLocation: Int) throws -> RelatedContentItem {
@@ -240,12 +232,72 @@ extension MutableItemPackage {
         return NavItem(id: Int(id), navSectionID: navSectionID, position: position, imageRenditions: imageRenditions, titleHTML: titleHTML, subtitle: subtitle, preview: preview, uri: uri, subitemID: subitemID)
     }
     
-    public func addParagraphID(paragraphID: String, paragraphAID: String, subitemID: Int, verseNumber: String?) throws {
+    public func addParagraphMetadata(paragraphID paragraphID: String, paragraphAID: String, subitemID: Int, verseNumber: String?, range: NSRange) throws {
         try db.run(ParagraphMetadataTable.table.insert(
             ParagraphMetadataTable.subitemID <- subitemID,
             ParagraphMetadataTable.paragraphID <- paragraphID,
             ParagraphMetadataTable.paragraphAID <- paragraphAID,
-            ParagraphMetadataTable.verseNumber <- verseNumber
+            ParagraphMetadataTable.verseNumber <- verseNumber,
+            ParagraphMetadataTable.startIndex <- range.location,
+            ParagraphMetadataTable.endIndex <- range.location + range.length
+        ))
+    }
+    
+    public func addAuthor(givenName givenName: String, familyName: String) throws -> Author {
+        if let author = authorWithGivenName(givenName, familyName: familyName) {
+            return author
+        }
+        
+        let id = try db.run(AuthorTable.table.insert(or: .Ignore,
+            AuthorTable.givenName <- givenName,
+            AuthorTable.familyName <- familyName
+        ))
+        return Author(id: id, givenName: givenName, familyName: familyName)
+    }
+    
+    public func addRole(name name: String, position: Int) throws -> Role {
+        if let role = roleWithName(name) {
+            return role
+        }
+        
+        let id = try db.run(RoleTable.table.insert(or: .Ignore,
+            RoleTable.name <- name,
+            RoleTable.position <- position
+        ))
+        return Role(id: id, name: name, position: position)
+    }
+    
+    public func addAuthorRole(author author: Author, role: Role, position: Int) throws -> AuthorRole {
+        let id = try db.run(AuthorRoleTable.table.insert(or: .Ignore,
+            AuthorRoleTable.authorID <- author.id,
+            AuthorRoleTable.roleID <- role.id,
+            AuthorRoleTable.position <- position
+        ))
+        return AuthorRole(id: id, authorID: author.id, roleID: role.id, position: position)
+    }
+    
+    public func addSubitemAuthor(subitem: Subitem, author: Author) throws {
+        try db.run(SubitemAuthorTable.table.insert(or: .Ignore,
+            SubitemAuthorTable.subitemID <- subitem.id,
+            SubitemAuthorTable.authorID <- author.id
+        ))
+    }
+    
+    public func addTopic(name: String) throws -> Topic {
+        if let topic = topicWithName(name) {
+            return topic
+        }
+        
+        let id = try db.run(TopicTable.table.insert(
+            TopicTable.name <- name
+        ))
+        return Topic(id: id, name: name)
+    }
+    
+    public func addSubitemTopic(subitem: Subitem, topic: Topic) throws {
+        try db.run(SubitemTopicTable.table.insert(or: .Ignore,
+            SubitemTopicTable.subitemID <- subitem.id,
+            SubitemTopicTable.topicID <- topic.id
         ))
     }
     

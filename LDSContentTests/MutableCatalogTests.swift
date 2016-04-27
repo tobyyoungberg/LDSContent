@@ -69,7 +69,7 @@ class MutableCatalogTests: XCTestCase {
     }
     
     func testItem() {
-        let item = Item(id: 1, externalID: "1", languageID: 1, sourceID: 1, platform: .All, uri: "/item", title: "Item", itemCoverRenditions: [ImageRendition(size: CGSize(width: 10, height: 10), url: NSURL(string: "https://example.org/example.png")!)], itemCategoryID: 1, latestVersion: 1, obsolete: false)
+        let item = Item(id: 1, externalID: "1", languageID: 1, sourceID: 1, platform: .All, uri: "/item", title: "Item", itemCoverRenditions: [ImageRendition(size: CGSize(width: 10, height: 10), url: NSURL(string: "https://example.org/example.png")!)], itemCategoryID: 1, version: 1, obsolete: false)
         
         XCTAssertNoThrow(try catalog.addOrUpdateItem(item))
         XCTAssertEqual(catalog.itemWithID(1), item)

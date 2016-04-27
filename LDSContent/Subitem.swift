@@ -32,8 +32,9 @@ public struct Subitem: Equatable {
     public var titleHTML: String
     public var title: String
     public var webURL: NSURL?
+    public var contentType: ContentType
     
-    public init(id: Int, uri: String, docID: String, docVersion: Int, position: Int, titleHTML: String, title: String, webURL: NSURL?) {
+    public init(id: Int, uri: String, docID: String, docVersion: Int, position: Int, titleHTML: String, title: String, webURL: NSURL?, contentType: ContentType) {
         self.id = id
         self.uri = uri
         self.docID = docID
@@ -42,6 +43,7 @@ public struct Subitem: Equatable {
         self.titleHTML = titleHTML
         self.title = title
         self.webURL = webURL
+        self.contentType = contentType
     }
     
 }
@@ -54,5 +56,6 @@ public func == (lhs: Subitem, rhs: Subitem) -> Bool {
         lhs.position == rhs.position &&
         lhs.titleHTML == rhs.titleHTML &&
         lhs.title == rhs.title &&
-        lhs.webURL == rhs.webURL
+        lhs.webURL == rhs.webURL &&
+        lhs.contentType == rhs.contentType
 }

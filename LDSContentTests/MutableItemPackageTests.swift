@@ -71,12 +71,12 @@ class MutableItemPacakgeTests: XCTestCase {
     }
     
     func testRange() {
-        XCTAssertNoThrow(try itemPackage.addRange(NSMakeRange(3, 10), forParagraphWithID: "p1", subitemID: 1))
+        XCTAssertNoThrow(try itemPackage.addParagraphMetadata(paragraphID: "p1", paragraphAID: "12345", subitemID: 1, verseNumber: nil, range: NSRange(location: 3, length: 10)))
         
-        let subitemContentRange = itemPackage.rangeOfParagraphWithID("p1", inSubitemWithID: 1)!
-        XCTAssertEqual(subitemContentRange.subitemID, 1)
-        XCTAssertEqual(subitemContentRange.paragraphID, "p1")
-        XCTAssertEqual(subitemContentRange.range, NSMakeRange(3, 10))
+        let paragraphMetadata = itemPackage.paragraphMetadataForParagraphID("p1", subitemID: 1)!
+        XCTAssertEqual(paragraphMetadata.subitemID, 1)
+        XCTAssertEqual(paragraphMetadata.paragraphID, "p1")
+        XCTAssertEqual(paragraphMetadata.range, NSRange(location: 3, length: 10))
     }
     
     func testRelatedContentItem() {
@@ -122,7 +122,7 @@ class MutableItemPacakgeTests: XCTestCase {
     }
     
     func testParagraphMetadata() {
-        XCTAssertNoThrow(try itemPackage.addParagraphID("p1", paragraphAID: "1", subitemID: 1, verseNumber: "1"))
+        XCTAssertNoThrow(try itemPackage.addParagraphMetadata(paragraphID: "p1", paragraphAID: "1", subitemID: 1, verseNumber: "1", range: NSRange(location: 1, length: 2)))
     }
     
     override func setUp() {

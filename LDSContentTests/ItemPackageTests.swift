@@ -73,20 +73,20 @@ class ItemPackageTests: XCTestCase {
     }
     
     func testSubitemContentRange() {
-        let subitemContentRange = itemPackage.rangeOfParagraphWithID("title1", inSubitemWithID: 1)
-        XCTAssertGreaterThan(subitemContentRange!.id, 0)
-        XCTAssertEqual(subitemContentRange!.subitemID, 1)
-        XCTAssertEqual(subitemContentRange!.paragraphID, "title1")
-        XCTAssertGreaterThan(subitemContentRange!.range.location, 0)
-        XCTAssertGreaterThan(subitemContentRange!.range.length, 0)
+        let paragraphMetadata = itemPackage.paragraphMetadataForParagraphID("title1", subitemID: 1)
+        XCTAssertGreaterThan(paragraphMetadata!.id, 0)
+        XCTAssertEqual(paragraphMetadata!.subitemID, 1)
+        XCTAssertEqual(paragraphMetadata!.paragraphID, "title1")
+        XCTAssertGreaterThan(paragraphMetadata!.range.location, 0)
+        XCTAssertGreaterThan(paragraphMetadata!.range.length, 0)
         
-        let subitemContentRanges = itemPackage.rangesOfParagraphWithIDs(["title1", "subtitle1"], inSubitemWithID: 1)
-        XCTAssertEqual(subitemContentRanges.count, 2)
-        for subitemContentRange in subitemContentRanges {
-            XCTAssertGreaterThan(subitemContentRange.id, 0)
-            XCTAssertEqual(subitemContentRange.subitemID, 1)
-            XCTAssertGreaterThan(subitemContentRange.range.location, 0)
-            XCTAssertGreaterThan(subitemContentRange.range.length, 0)
+        let paragraphMetadatas = itemPackage.paragraphMetadataForParagraphIDs(["title1", "subtitle1"], subitemID: 1)
+        XCTAssertEqual(paragraphMetadatas.count, 2)
+        for paragraphMetadata in paragraphMetadatas {
+            XCTAssertGreaterThan(paragraphMetadata.id, 0)
+            XCTAssertEqual(paragraphMetadata.subitemID, 1)
+            XCTAssertGreaterThan(paragraphMetadata.range.location, 0)
+            XCTAssertGreaterThan(paragraphMetadata.range.length, 0)
         }
     }
     
@@ -194,6 +194,7 @@ class ItemPackageTests: XCTestCase {
         
         let paragraphMetadata = itemPackage.paragraphMetadataForParagraphIDs(paragraphIDs, subitemID: subitem.id)
         XCTAssertEqual(paragraphMetadata.count, paragraphIDs.count)
+        
         
         let paragraphMetadata2 = itemPackage.paragraphMetadataForParagraphAIDs(paragraphMetadata.map { $0.paragraphAID }, subitemID: subitem.id)
         XCTAssertEqual(paragraphMetadata2, paragraphMetadata)

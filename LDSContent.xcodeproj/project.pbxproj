@@ -9,6 +9,11 @@
 /* Begin PBXBuildFile section */
 		938716FDE90EFD1253023B5A /* Pods_LDSContentTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C946B41AED58D93B8E378737 /* Pods_LDSContentTests.framework */; };
 		9437165697A2EB564F7A8DCC /* Pods_LDSContent.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6DF1FFB4FF8FA6511286B373 /* Pods_LDSContent.framework */; };
+		D43404201CCE97AC004D3B55 /* Author.swift in Sources */ = {isa = PBXBuildFile; fileRef = D434041B1CCE97AC004D3B55 /* Author.swift */; };
+		D43404211CCE97AC004D3B55 /* AuthorRole.swift in Sources */ = {isa = PBXBuildFile; fileRef = D434041C1CCE97AC004D3B55 /* AuthorRole.swift */; };
+		D43404221CCE97AC004D3B55 /* ContentType.swift in Sources */ = {isa = PBXBuildFile; fileRef = D434041D1CCE97AC004D3B55 /* ContentType.swift */; };
+		D43404231CCE97AC004D3B55 /* Role.swift in Sources */ = {isa = PBXBuildFile; fileRef = D434041E1CCE97AC004D3B55 /* Role.swift */; };
+		D43404241CCE97AC004D3B55 /* Topic.swift in Sources */ = {isa = PBXBuildFile; fileRef = D434041F1CCE97AC004D3B55 /* Topic.swift */; };
 		D90DF25E1C6D123F0033A89C /* Catalog.sql in Resources */ = {isa = PBXBuildFile; fileRef = D90DF25B1C6D123F0033A89C /* Catalog.sql */; };
 		D90DF2621C6D12690033A89C /* MutableCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90DF2611C6D12690033A89C /* MutableCatalog.swift */; };
 		D90DF2641C6D139B0033A89C /* Connection+Extras.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90DF2631C6D139B0033A89C /* Connection+Extras.swift */; };
@@ -84,6 +89,11 @@
 		6DF1FFB4FF8FA6511286B373 /* Pods_LDSContent.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LDSContent.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7DD4A93465853D4F639C5A19 /* Pods-LDSContentTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LDSContentTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-LDSContentTests/Pods-LDSContentTests.release.xcconfig"; sourceTree = "<group>"; };
 		C946B41AED58D93B8E378737 /* Pods_LDSContentTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LDSContentTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D434041B1CCE97AC004D3B55 /* Author.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Author.swift; sourceTree = "<group>"; };
+		D434041C1CCE97AC004D3B55 /* AuthorRole.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthorRole.swift; sourceTree = "<group>"; };
+		D434041D1CCE97AC004D3B55 /* ContentType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentType.swift; sourceTree = "<group>"; };
+		D434041E1CCE97AC004D3B55 /* Role.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Role.swift; sourceTree = "<group>"; };
+		D434041F1CCE97AC004D3B55 /* Topic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Topic.swift; sourceTree = "<group>"; };
 		D90DF25B1C6D123F0033A89C /* Catalog.sql */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Catalog.sql; sourceTree = "<group>"; };
 		D90DF2611C6D12690033A89C /* MutableCatalog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MutableCatalog.swift; sourceTree = "<group>"; };
 		D90DF2631C6D139B0033A89C /* Connection+Extras.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Connection+Extras.swift"; sourceTree = "<group>"; };
@@ -197,6 +207,11 @@
 		D9B32A301C70194400A0304D /* Item Package */ = {
 			isa = PBXGroup;
 			children = (
+				D434041B1CCE97AC004D3B55 /* Author.swift */,
+				D434041C1CCE97AC004D3B55 /* AuthorRole.swift */,
+				D434041D1CCE97AC004D3B55 /* ContentType.swift */,
+				D434041E1CCE97AC004D3B55 /* Role.swift */,
+				D434041F1CCE97AC004D3B55 /* Topic.swift */,
 				D9B32A311C70195300A0304D /* ItemPackage.swift */,
 				D9B32A391C722ECA00A0304D /* SubitemContent.swift */,
 				D9B32A431C7262A700A0304D /* SearchResult.swift */,
@@ -547,9 +562,12 @@
 				D9B32A321C70195300A0304D /* ItemPackage.swift in Sources */,
 				D9C012891C72C8890025D78A /* MutableItemPackage.swift in Sources */,
 				D9D3AF181C6AB96D00E2681A /* Catalog.swift in Sources */,
+				D43404221CCE97AC004D3B55 /* ContentType.swift in Sources */,
 				D93CAA201C6B79BD00C21A46 /* DownloadCatalogOperation.swift in Sources */,
 				D9D3AF091C6AB1E000E2681A /* SourceType.swift in Sources */,
+				D43404211CCE97AC004D3B55 /* AuthorRole.swift in Sources */,
 				D9B32A381C701EEA00A0304D /* DownloadItemPackageOperation.swift in Sources */,
+				D43404231CCE97AC004D3B55 /* Role.swift in Sources */,
 				D9D3AF0B1C6AB22600E2681A /* ItemCategory.swift in Sources */,
 				D9D3AF051C6AB07F00E2681A /* Language.swift in Sources */,
 				D9D3AF151C6AB74E00E2681A /* Stopword.swift in Sources */,
@@ -560,6 +578,7 @@
 				D93CAA261C6B7FD000C21A46 /* Session.swift in Sources */,
 				D9D3AF0D1C6AB31200E2681A /* LibraryCollection.swift in Sources */,
 				D93CAA281C6B9E8A00C21A46 /* FetchCatalogVersionOperation.swift in Sources */,
+				D43404241CCE97AC004D3B55 /* Topic.swift in Sources */,
 				D9C012841C72C14D0025D78A /* NavItem.swift in Sources */,
 				D93CAA2A1C6B9EE100C21A46 /* FetchCatalogVersionResult.swift in Sources */,
 				D90DF2621C6D12690033A89C /* MutableCatalog.swift in Sources */,
@@ -568,6 +587,7 @@
 				D93CAA221C6B7A5C00C21A46 /* Error.swift in Sources */,
 				D9C012821C72BF150025D78A /* NavSection.swift in Sources */,
 				D93CAA2C1C6BA06400C21A46 /* DownloadCatalogResult.swift in Sources */,
+				D43404201CCE97AC004D3B55 /* Author.swift in Sources */,
 				D9C0129B1C750DAE0025D78A /* ContentInventory.swift in Sources */,
 				D9D3AF011C6AA41C00E2681A /* Item.swift in Sources */,
 				D9DE514D1C76206A00ED3AE0 /* UpdateCatalogResult.swift in Sources */,

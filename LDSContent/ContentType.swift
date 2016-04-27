@@ -21,32 +21,31 @@
 //
 
 import Foundation
+import SQLite
 
-public struct ParagraphMetadata: Equatable {
+/// The type of content
+public enum ContentType: Int {
     
-    public var id: Int
-    public var subitemID: Int
-    public var paragraphID: String
-    public var paragraphAID: String
-    public var verseNumber: String?
-    public var range: NSRange
+    /// Default content type
+    case Default = 1
     
-    public init(id: Int, subitemID: Int, paragraphID: String, paragraphAID: String, verseNumber: String?, range: NSRange) {
-        self.id = id
-        self.subitemID = subitemID
-        self.paragraphID = paragraphID
-        self.paragraphAID = paragraphAID
-        self.verseNumber = verseNumber
-        self.range = range
-    }
+    /// LDS Music content type
+    case Music = 2
     
 }
 
-public func == (lhs: ParagraphMetadata, rhs: ParagraphMetadata) -> Bool {
-    return lhs.id == rhs.id &&
-        lhs.subitemID == rhs.subitemID &&
-        lhs.paragraphID == rhs.paragraphID &&
-        lhs.paragraphAID == rhs.paragraphAID &&
-        lhs.verseNumber == rhs.verseNumber &&
-        lhs.range == rhs.range
+extension ContentType: Value {
+    
+    public static var declaredDatatype: String {
+        return Int.declaredDatatype
+    }
+    
+    public static func fromDatatypeValue(intValue: Int) -> ContentType {
+        return ContentType(rawValue: intValue) ?? .Default
+    }
+    
+    public var datatypeValue: Int {
+        return rawValue
+    }
+    
 }

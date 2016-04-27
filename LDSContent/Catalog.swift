@@ -181,15 +181,15 @@ extension Catalog {
         static let title = Expression<String>("title")
         static let itemCoverRenditions = Expression<String?>("item_cover_renditions")
         static let itemCategoryID = Expression<Int>("item_category_id")
-        static let latestVersion = Expression<Int>("latest_version")
+        static let version = Expression<Int>("version")
         static let obsolete = Expression<Bool>("is_obsolete")
         
         static func fromRow(row: Row) -> Item {
-            return Item(id: row[id], externalID: row[externalID], languageID: row[languageID], sourceID: row[sourceID], platform: Platform(rawValue: row[platformID]) ?? .All, uri: row[uri], title: row[title], itemCoverRenditions: (row[itemCoverRenditions] ?? "").toImageRenditions() ?? [], itemCategoryID: row[itemCategoryID], latestVersion: row[latestVersion], obsolete: row[obsolete])
+            return Item(id: row[id], externalID: row[externalID], languageID: row[languageID], sourceID: row[sourceID], platform: Platform(rawValue: row[platformID]) ?? .All, uri: row[uri], title: row[title], itemCoverRenditions: (row[itemCoverRenditions] ?? "").toImageRenditions() ?? [], itemCategoryID: row[itemCategoryID], version: row[version], obsolete: row[obsolete])
         }
         
         static func fromNamespacedRow(row: Row) -> Item {
-            return Item(id: row[ItemTable.table[id]], externalID: row[ItemTable.table[externalID]], languageID: row[ItemTable.table[languageID]], sourceID: row[ItemTable.table[sourceID]], platform: Platform(rawValue: row[ItemTable.table[platformID]]) ?? .All, uri: row[ItemTable.table[uri]], title: row[ItemTable.table[title]], itemCoverRenditions: (row[ItemTable.table[itemCoverRenditions]] ?? "").toImageRenditions() ?? [], itemCategoryID: row[ItemTable.table[itemCategoryID]], latestVersion: row[ItemTable.table[latestVersion]], obsolete: row[ItemTable.table[obsolete]])
+            return Item(id: row[ItemTable.table[id]], externalID: row[ItemTable.table[externalID]], languageID: row[ItemTable.table[languageID]], sourceID: row[ItemTable.table[sourceID]], platform: Platform(rawValue: row[ItemTable.table[platformID]]) ?? .All, uri: row[ItemTable.table[uri]], title: row[ItemTable.table[title]], itemCoverRenditions: (row[ItemTable.table[itemCoverRenditions]] ?? "").toImageRenditions() ?? [], itemCategoryID: row[ItemTable.table[itemCategoryID]], version: row[ItemTable.table[version]], obsolete: row[ItemTable.table[obsolete]])
         }
         
     }
