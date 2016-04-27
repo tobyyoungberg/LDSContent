@@ -24,14 +24,14 @@ import Foundation
 
 public struct Language: Equatable {
     
-    public var id: Int
+    public var id: Int64
     public var ldsLanguageCode: String
     public var iso639_3Code: String
     public var bcp47Code: String?
-    public var rootLibraryCollectionID: Int
+    public var rootLibraryCollectionID: Int64
     public var rootLibraryCollectionExternalID: String
     
-    public init(id: Int, ldsLanguageCode: String, iso639_3Code: String, bcp47Code: String?, rootLibraryCollectionID: Int, rootLibraryCollectionExternalID: String) {
+    public init(id: Int64, ldsLanguageCode: String, iso639_3Code: String, bcp47Code: String?, rootLibraryCollectionID: Int64, rootLibraryCollectionExternalID: String) {
         self.id = id
         self.ldsLanguageCode = ldsLanguageCode
         self.iso639_3Code = iso639_3Code

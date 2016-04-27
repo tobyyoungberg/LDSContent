@@ -117,7 +117,7 @@ extension Catalog {
     class SourceTable {
         
         static let table = Table("source")
-        static let id = Expression<Int>("_id")
+        static let id = Expression<Int64>("_id")
         static let name = Expression<String>("name")
         static let typeID = Expression<Int>("type_id")
         
@@ -137,7 +137,7 @@ extension Catalog {
         }
     }
     
-    public func sourceWithID(id: Int) -> Source? {
+    public func sourceWithID(id: Int64) -> Source? {
         return db.pluck(SourceTable.table.filter(SourceTable.id == id)).map { SourceTable.fromRow($0) }
     }
     
@@ -152,7 +152,7 @@ extension Catalog {
     class ItemCategoryTable {
         
         static let table = Table("item_category")
-        static let id = Expression<Int>("_id")
+        static let id = Expression<Int64>("_id")
         static let name = Expression<String>("name")
         
         static func fromRow(row: Row) -> ItemCategory {
@@ -161,7 +161,7 @@ extension Catalog {
         
     }
     
-    public func itemCategoryWithID(id: Int) -> ItemCategory? {
+    public func itemCategoryWithID(id: Int64) -> ItemCategory? {
         return db.pluck(ItemCategoryTable.table.filter(ItemCategoryTable.id == id)).map { ItemCategoryTable.fromRow($0) }
     }
     
@@ -172,10 +172,10 @@ extension Catalog {
     class ItemTable {
         
         static let table = Table("item")
-        static let id = Expression<Int>("_id")
+        static let id = Expression<Int64>("_id")
         static let externalID = Expression<String>("external_id")
-        static let languageID = Expression<Int>("language_id")
-        static let sourceID = Expression<Int>("source_id")
+        static let languageID = Expression<Int64>("language_id")
+        static let sourceID = Expression<Int64>("source_id")
         static let platformID = Expression<Int>("platform_id")
         static let uri = Expression<String>("uri")
         static let title = Expression<String>("title")
@@ -203,7 +203,7 @@ extension Catalog {
         }
     }
     
-    public func itemsForLibraryCollectionWithID(id: Int) -> [Item] {
+    public func itemsForLibraryCollectionWithID(id: Int64) -> [Item] {
         do {
             return try db.prepare(ItemTable.table.join(LibraryItemTable.table, on: ItemTable.table[ItemTable.id] == LibraryItemTable.itemID).join(LibrarySectionTable.table, on: LibraryItemTable.librarySectionID == LibrarySectionTable.table[LibrarySectionTable.id]).filter(LibrarySectionTable.libraryCollectionID == id && validPlatformIDs.contains(ItemTable.platformID)).order(LibraryItemTable.position)).map { ItemTable.fromNamespacedRow($0) }
         } catch {
@@ -211,7 +211,7 @@ extension Catalog {
         }
     }
     
-    public func itemsWithURIsIn(uris: [String], languageID: Int) -> [Item] {
+    public func itemsWithURIsIn(uris: [String], languageID: Int64) -> [Item] {
         do {
             return try db.prepare(ItemTable.table.filter(uris.contains(ItemTable.uri) && ItemTable.languageID == languageID && validPlatformIDs.contains(ItemTable.platformID))).map { ItemTable.fromRow($0) }
         } catch {
@@ -219,7 +219,7 @@ extension Catalog {
         }
     }
     
-    public func itemsWithSourceID(sourceID: Int) -> [Item] {
+    public func itemsWithSourceID(sourceID: Int64) -> [Item] {
         do {
             return try db.prepare(ItemTable.table.filter(ItemTable.sourceID == sourceID && validPlatformIDs.contains(ItemTable.platformID))).map { ItemTable.fromRow($0) }
         } catch {
@@ -227,7 +227,7 @@ extension Catalog {
         }
     }
     
-    public func itemsWithIDsIn(ids: [Int]) -> [Item] {
+    public func itemsWithIDsIn(ids: [Int64]) -> [Item] {
         do {
             return try db.prepare(ItemTable.table.filter(ids.contains(ItemTable.id) && validPlatformIDs.contains(ItemTable.platformID))).map { ItemTable.fromRow($0) }
         } catch {
@@ -244,7 +244,7 @@ extension Catalog {
         }
     }
     
-    public func itemWithID(id: Int) -> Item? {
+    public func itemWithID(id: Int64) -> Item? {
         return db.pluck(ItemTable.table.filter(ItemTable.id == id && validPlatformIDs.contains(ItemTable.platformID))).map { ItemTable.fromRow($0) }
     }
     
@@ -253,11 +253,11 @@ extension Catalog {
         return db.pluck(ItemTable.table.filter(ItemTable.externalID == externalID && validPlatformIDs.contains(ItemTable.platformID))).map { ItemTable.fromRow($0) }
     }
     
-    public func itemWithURI(uri: String, languageID: Int) -> Item? {
+    public func itemWithURI(uri: String, languageID: Int64) -> Item? {
         return db.pluck(ItemTable.table.filter(ItemTable.uri == uri && ItemTable.languageID == languageID && validPlatformIDs.contains(ItemTable.platformID))).map { ItemTable.fromRow($0) }
     }
     
-    public func itemsWithTitlesThatContainString(string: String, languageID: Int, limit: Int) -> [Item] {
+    public func itemsWithTitlesThatContainString(string: String, languageID: Int64, limit: Int) -> [Item] {
         do {
             return try db.prepare(ItemTable.table.filter(noDiacritic(ItemTable.title).like("%\(string.withoutDiacritics().escaped())%", escape: "!") && ItemTable.languageID == languageID && ItemTable.obsolete == false && validPlatformIDs.contains(ItemTable.platformID)).limit(limit)).map { ItemTable.fromRow($0) }
         } catch {
@@ -265,7 +265,7 @@ extension Catalog {
         }
     }
     
-    public func itemThatContainsURI(uri: String, languageID: Int) -> Item? {
+    public func itemThatContainsURI(uri: String, languageID: Int64) -> Item? {
         var prefix = uri
         while !prefix.isEmpty && prefix != "/" {
             if let item = db.pluck(ItemTable.table.filter(ItemTable.uri == prefix && ItemTable.languageID == languageID && validPlatformIDs.contains(ItemTable.platformID))).map({ ItemTable.fromRow($0) }) {
@@ -283,11 +283,11 @@ extension Catalog {
     class LanguageTable {
         
         static let table = Table("language")
-        static let id = Expression<Int>("_id")
+        static let id = Expression<Int64>("_id")
         static let ldsLanguageCode = Expression<String>("lds_language_code")
         static let iso639_3Code = Expression<String>("iso639_3")
         static let bcp47Code = Expression<String?>("bcp47")
-        static let rootLibraryCollectionID = Expression<Int>("root_library_collection_id")
+        static let rootLibraryCollectionID = Expression<Int64>("root_library_collection_id")
         static let rootLibraryCollectionExternalID = Expression<String>("root_library_collection_external_id")
         
         static func fromRow(row: Row) -> Language {
@@ -304,7 +304,7 @@ extension Catalog {
         }
     }
     
-    public func languageWithID(id: Int) -> Language? {
+    public func languageWithID(id: Int64) -> Language? {
         return db.pluck(LanguageTable.table.filter(LanguageTable.id == id)).map { LanguageTable.fromRow($0) }
     }
     
@@ -320,7 +320,7 @@ extension Catalog {
         return db.pluck(LanguageTable.table.filter(LanguageTable.ldsLanguageCode == ldsLanguageCode)).map { LanguageTable.fromRow($0) }
     }
     
-    public func languageWithRootLibraryCollectionID(rootLibraryCollectionID: Int) -> Language? {
+    public func languageWithRootLibraryCollectionID(rootLibraryCollectionID: Int64) -> Language? {
         return db.pluck(LanguageTable.table.filter(LanguageTable.rootLibraryCollectionID == rootLibraryCollectionID)).map { LanguageTable.fromRow($0) }
     }
     
@@ -336,14 +336,14 @@ extension Catalog {
     class LanguageNameTable {
         
         static let table = Table("language_name")
-        static let id = Expression<Int>("_id")
-        static let languageID = Expression<Int>("language_id")
-        static let localizationLanguageID = Expression<Int>("localization_language_id")
+        static let id = Expression<Int64>("_id")
+        static let languageID = Expression<Int64>("language_id")
+        static let localizationLanguageID = Expression<Int64>("localization_language_id")
         static let name = Expression<String>("name")
         
     }
 
-    public func nameForLanguageWithID(languageID: Int, inLanguageWithID localizationLanguageID: Int) -> String {
+    public func nameForLanguageWithID(languageID: Int64, inLanguageWithID localizationLanguageID: Int64) -> String {
         return db.scalar(LanguageNameTable.table.select(LanguageNameTable.name).filter(LanguageNameTable.languageID == languageID && LanguageNameTable.localizationLanguageID == localizationLanguageID))
     }
     
@@ -354,9 +354,9 @@ extension Catalog {
     class LibrarySectionTable {
         
         static let table = Table("library_section")
-        static let id = Expression<Int>("_id")
+        static let id = Expression<Int64>("_id")
         static let externalID = Expression<String>("external_id")
-        static let libraryCollectionID = Expression<Int>("library_collection_id")
+        static let libraryCollectionID = Expression<Int64>("library_collection_id")
         static let libraryCollectionExternalID = Expression<String>("library_collection_external_id")
         static let position = Expression<Int>("position")
         static let title = Expression<String?>("title")
@@ -368,7 +368,7 @@ extension Catalog {
         
     }
     
-    public func librarySectionsForLibraryCollectionWithID(id: Int) -> [LibrarySection] {
+    public func librarySectionsForLibraryCollectionWithID(id: Int64) -> [LibrarySection] {
         do {
             return try db.prepare(LibrarySectionTable.table.filter(LibrarySectionTable.libraryCollectionID == id).order(LibrarySectionTable.position)).map { LibrarySectionTable.fromRow($0) }
         } catch {
@@ -385,7 +385,7 @@ extension Catalog {
         }
     }
     
-    public func librarySectionWithID(id: Int) -> LibrarySection? {
+    public func librarySectionWithID(id: Int64) -> LibrarySection? {
         return db.pluck(LibrarySectionTable.table.filter(LibrarySectionTable.id == id)).map { LibrarySectionTable.fromRow($0) }
     }
     
@@ -401,9 +401,9 @@ extension Catalog {
     class LibraryCollectionTable {
         
         static let table = Table("library_collection")
-        static let id = Expression<Int>("_id")
+        static let id = Expression<Int64>("_id")
         static let externalID = Expression<String>("external_id")
-        static let librarySectionID = Expression<Int?>("library_section_id")
+        static let librarySectionID = Expression<Int64?>("library_section_id")
         static let librarySectionExternalID = Expression<String?>("library_section_external_id")
         static let position = Expression<Int>("position")
         static let title = Expression<String>("title")
@@ -428,7 +428,7 @@ extension Catalog {
         }
     }
     
-    public func libraryCollectionsForLibrarySectionWithID(librarySectionID: Int) -> [LibraryCollection] {
+    public func libraryCollectionsForLibrarySectionWithID(librarySectionID: Int64) -> [LibraryCollection] {
         do {
             return try db.prepare(LibraryCollectionTable.table.filter(LibraryCollectionTable.librarySectionID == librarySectionID).order(LibraryCollectionTable.position)).map { LibraryCollectionTable.fromRow($0) }
         } catch {
@@ -445,7 +445,7 @@ extension Catalog {
         }
     }
     
-    public func libraryCollectionsForLibraryCollectionWithID(id: Int) -> [LibraryCollection] {
+    public func libraryCollectionsForLibraryCollectionWithID(id: Int64) -> [LibraryCollection] {
         do {
             return try db.prepare(LibraryCollectionTable.table.join(LibrarySectionTable.table, on: LibraryCollectionTable.librarySectionID == LibrarySectionTable.table[LibrarySectionTable.id]).filter(LibrarySectionTable.libraryCollectionID == id).order(LibraryCollectionTable.table[LibraryCollectionTable.position])).map { LibraryCollectionTable.fromNamespacedRow($0) }
         } catch {
@@ -453,7 +453,7 @@ extension Catalog {
         }
     }
     
-    public func libraryCollectionWithID(id: Int) -> LibraryCollection? {
+    public func libraryCollectionWithID(id: Int64) -> LibraryCollection? {
         return db.pluck(LibraryCollectionTable.table.filter(LibraryCollectionTable.id == id)).map { LibraryCollectionTable.fromRow($0) }
     }
     
@@ -469,14 +469,14 @@ extension Catalog {
     class LibraryItemTable {
         
         static let table = Table("library_item")
-        static let id = Expression<Int>("_id")
+        static let id = Expression<Int64>("_id")
         static let externalID = Expression<String>("external_id")
-        static let librarySectionID = Expression<Int?>("library_section_id")
+        static let librarySectionID = Expression<Int64?>("library_section_id")
         static let librarySectionExternalID = Expression<String?>("library_section_external_id")
         static let position = Expression<Int>("position")
         static let title = Expression<String>("title")
         static let obsolete = Expression<Bool>("is_obsolete")
-        static let itemID = Expression<Int>("item_id")
+        static let itemID = Expression<Int64>("item_id")
         static let itemExternalID = Expression<String>("item_external_id")
         
         static func fromRow(row: Row) -> LibraryItem {
@@ -489,7 +489,7 @@ extension Catalog {
         
     }
     
-    public func libraryItemsForLibrarySectionWithID(librarySectionID: Int) -> [LibraryItem] {
+    public func libraryItemsForLibrarySectionWithID(librarySectionID: Int64) -> [LibraryItem] {
         do {
             return try db.prepare(LibraryItemTable.table.filter(LibraryItemTable.librarySectionID == librarySectionID).order(LibraryItemTable.position)).map { LibraryItemTable.fromRow($0) }
         } catch {
@@ -506,7 +506,7 @@ extension Catalog {
         }
     }
     
-    public func libraryItemsForLibraryCollectionWithID(libraryCollectionID: Int) -> [LibraryItem] {
+    public func libraryItemsForLibraryCollectionWithID(libraryCollectionID: Int64) -> [LibraryItem] {
         do {
             return try db.prepare(LibraryItemTable.table.join(LibrarySectionTable.table, on: LibrarySectionTable.table[LibrarySectionTable.id] == LibraryItemTable.librarySectionID).filter(LibrarySectionTable.libraryCollectionID == libraryCollectionID).order(LibraryItemTable.position)).map { LibraryItemTable.fromNamespacedRow($0) }
         } catch {
@@ -523,7 +523,7 @@ extension Catalog {
         }
     }
     
-    public func libraryItemsWithItemID(itemID: Int) -> [LibraryItem] {
+    public func libraryItemsWithItemID(itemID: Int64) -> [LibraryItem] {
         do {
             return try db.prepare(LibraryItemTable.table.filter(LibraryItemTable.itemID == itemID)).map { LibraryItemTable.fromRow($0) }
         } catch {
@@ -540,7 +540,7 @@ extension Catalog {
         }
     }
     
-    public func libraryItemWithItemID(itemID: Int, inLibraryCollectionWithID libraryCollectionID: Int) -> LibraryItem? {
+    public func libraryItemWithItemID(itemID: Int64, inLibraryCollectionWithID libraryCollectionID: Int64) -> LibraryItem? {
         return db.pluck(LibraryItemTable.table.join(LibrarySectionTable.table, on: LibrarySectionTable.table[LibrarySectionTable.id] == LibraryItemTable.librarySectionID).filter(LibraryItemTable.itemID == itemID && LibrarySectionTable.libraryCollectionID == libraryCollectionID).order(LibraryItemTable.position)).map { LibraryItemTable.fromNamespacedRow($0) }
     }
     
@@ -549,7 +549,7 @@ extension Catalog {
         return db.pluck(LibraryItemTable.table.join(LibrarySectionTable.table, on: LibrarySectionTable.table[LibrarySectionTable.id] == LibraryItemTable.librarySectionID).filter(LibraryItemTable.itemExternalID == itemExternalID && LibrarySectionTable.libraryCollectionExternalID == libraryCollectionExternalID).order(LibraryItemTable.position)).map { LibraryItemTable.fromNamespacedRow($0) }
     }
     
-    public func libraryItemWithID(id: Int) -> LibraryItem? {
+    public func libraryItemWithID(id: Int64) -> LibraryItem? {
         return db.pluck(LibraryItemTable.table.filter(LibraryItemTable.id == id)).map { LibraryItemTable.fromRow($0) }
     }
     
@@ -562,7 +562,7 @@ extension Catalog {
 
 extension Catalog {
     
-    public func libraryNodesForLibrarySectionWithID(librarySectionID: Int) -> [LibraryNode] {
+    public func libraryNodesForLibrarySectionWithID(librarySectionID: Int64) -> [LibraryNode] {
         var libraryNodes = [LibraryNode]()
         libraryNodes += libraryCollectionsForLibrarySectionWithID(librarySectionID).map { $0 as LibraryNode }
         libraryNodes += libraryItemsForLibrarySectionWithID(librarySectionID).map { $0 as LibraryNode }
@@ -584,8 +584,8 @@ extension Catalog {
     class StopwordTable {
         
         static let table = Table("stopword")
-        static let id = Expression<Int>("_id")
-        static let languageID = Expression<Int>("language_id")
+        static let id = Expression<Int64>("_id")
+        static let languageID = Expression<Int64>("language_id")
         static let word = Expression<String>("word")
         
         static func fromRow(row: Row) -> Stopword {
@@ -594,7 +594,7 @@ extension Catalog {
         
     }
     
-    public func stopwordsWithLanguageID(languageID: Int) -> [Stopword] {
+    public func stopwordsWithLanguageID(languageID: Int64) -> [Stopword] {
         do {
             return try db.prepare(StopwordTable.table.filter(StopwordTable.languageID == languageID)).map { StopwordTable.fromRow($0) }
         } catch {
@@ -609,27 +609,27 @@ extension Catalog {
     class SubitemMetadataTable {
         
         static let table = Table("subitem_metadata")
-        static let id = Expression<Int>("_id")
-        static let itemID = Expression<Int>("item_id")
-        static let subitemID = Expression<Int>("subitem_id")
+        static let id = Expression<Int64>("_id")
+        static let itemID = Expression<Int64>("item_id")
+        static let subitemID = Expression<Int64>("subitem_id")
         static let docID = Expression<String>("doc_id")
         static let docVersion = Expression<Int>("doc_version")
         
     }
     
-    public func itemAndSubitemIDForDocID(docID: String) -> (itemID: Int, subitemID: Int)? {
+    public func itemAndSubitemIDForDocID(docID: String) -> (itemID: Int64, subitemID: Int64)? {
         return db.pluck(SubitemMetadataTable.table.select(SubitemMetadataTable.itemID, SubitemMetadataTable.subitemID).filter(SubitemMetadataTable.docID == docID)).map { row in
             return (itemID: row[SubitemMetadataTable.itemID], subitemID: row[SubitemMetadataTable.subitemID])
         }
     }
     
-    public func subitemIDForSubitemWithDocID(docID: String, itemID: Int) -> Int? {
+    public func subitemIDForSubitemWithDocID(docID: String, itemID: Int64) -> Int64? {
         return db.pluck(SubitemMetadataTable.table.select(SubitemMetadataTable.subitemID).filter(SubitemMetadataTable.docID == docID && SubitemMetadataTable.itemID == itemID)).map { row in
             return row[SubitemMetadataTable.subitemID]
         }
     }
     
-    public func docIDForSubitemWithID(subitemID: Int, itemID: Int) -> String? {
+    public func docIDForSubitemWithID(subitemID: Int64, itemID: Int64) -> String? {
         return db.pluck(SubitemMetadataTable.table.select(SubitemMetadataTable.docID).filter(SubitemMetadataTable.subitemID == subitemID && SubitemMetadataTable.itemID == itemID)).map { row in
             return row[SubitemMetadataTable.docID]
         }

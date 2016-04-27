@@ -24,7 +24,7 @@ import Foundation
 
 public struct Subitem: Equatable {
     
-    public var id: Int
+    public var id: Int64
     public var uri: String
     public var docID: String
     public var docVersion: Int
@@ -34,7 +34,7 @@ public struct Subitem: Equatable {
     public var webURL: NSURL?
     public var contentType: ContentType
     
-    public init(id: Int, uri: String, docID: String, docVersion: Int, position: Int, titleHTML: String, title: String, webURL: NSURL?, contentType: ContentType) {
+    public init(id: Int64, uri: String, docID: String, docVersion: Int, position: Int, titleHTML: String, title: String, webURL: NSURL?, contentType: ContentType) {
         self.id = id
         self.uri = uri
         self.docID = docID

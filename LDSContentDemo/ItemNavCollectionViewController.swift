@@ -28,10 +28,10 @@ import SVProgressHUD
 class ItemNavCollectionViewController: UIViewController {
     
     let contentController: ContentController
-    let itemID: Int
+    let itemID: Int64
     let itemNavCollection: NavCollection
     
-    init(contentController: ContentController, itemID: Int, itemNavCollection: NavCollection) {
+    init(contentController: ContentController, itemID: Int64, itemNavCollection: NavCollection) {
         self.contentController = contentController
         self.itemID = itemID
         self.itemNavCollection = itemNavCollection

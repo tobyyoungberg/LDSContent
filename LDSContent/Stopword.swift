@@ -24,11 +24,11 @@ import Foundation
 
 public struct Stopword: Equatable {
     
-    public var id: Int?
-    public var languageID: Int
+    public var id: Int64?
+    public var languageID: Int64
     public var word: String
     
-    public init(id: Int?, languageID: Int, word: String) {
+    public init(id: Int64?, languageID: Int64, word: String) {
         self.id = id
         self.languageID = languageID
         self.word = word

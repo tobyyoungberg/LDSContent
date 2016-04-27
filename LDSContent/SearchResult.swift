@@ -24,14 +24,14 @@ import Foundation
 
 public struct SearchResult: Equatable {
 
-    public var subitemID: Int
+    public var subitemID: Int64
     public var uri: String
     public var title: String
     public var matchRanges: [NSRange]
     public var iso639_3Code: String
     public var snippet: String
     
-    public init(subitemID: Int, uri: String, title: String, matchRanges: [NSRange], iso639_3Code: String, snippet: String) {
+    public init(subitemID: Int64, uri: String, title: String, matchRanges: [NSRange], iso639_3Code: String, snippet: String) {
         self.subitemID = subitemID
         self.uri = uri
         self.title = title

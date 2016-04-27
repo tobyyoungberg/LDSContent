@@ -24,10 +24,10 @@ import Foundation
 
 public struct Item: Equatable {
     
-    public var id: Int
+    public var id: Int64
     public var externalID: String
-    public var languageID: Int
-    public var sourceID: Int
+    public var languageID: Int64
+    public var sourceID: Int64
     public var platform: Platform
     public var uri: String
     public var title: String
@@ -36,7 +36,7 @@ public struct Item: Equatable {
     public var version: Int
     public var obsolete: Bool
     
-    public init(id: Int, externalID: String, languageID: Int, sourceID: Int, platform: Platform, uri: String, title: String, itemCoverRenditions: [ImageRendition], itemCategoryID: Int, version: Int, obsolete: Bool) {
+    public init(id: Int64, externalID: String, languageID: Int64, sourceID: Int64, platform: Platform, uri: String, title: String, itemCoverRenditions: [ImageRendition], itemCategoryID: Int, version: Int, obsolete: Bool) {
         self.id = id
         self.externalID = externalID
         self.languageID = languageID

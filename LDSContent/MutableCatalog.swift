@@ -137,7 +137,7 @@ extension MutableCatalog {
         ))
     }
     
-    public func setName(name: String, forLanguageWithID languageID: Int, inLanguageWithID localizationLanguageID: Int) throws {
+    public func setName(name: String, forLanguageWithID languageID: Int64, inLanguageWithID localizationLanguageID: Int64) throws {
         try db.run(LanguageNameTable.table.insert(
             LanguageNameTable.languageID <- languageID,
             LanguageNameTable.localizationLanguageID <- localizationLanguageID,
@@ -191,7 +191,7 @@ extension MutableCatalog {
         ))
     }
     
-    public func addSubitemID(subitemID: Int, itemID: Int, docID: String, docVersion: Int) throws {
+    public func addSubitemID(subitemID: Int64, itemID: Int64, docID: String, docVersion: Int) throws {
         try db.run(SubitemMetadataTable.table.insert(
             SubitemMetadataTable.subitemID <- subitemID,
             SubitemMetadataTable.itemID <- itemID,

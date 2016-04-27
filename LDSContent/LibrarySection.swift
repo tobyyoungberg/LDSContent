@@ -24,15 +24,15 @@ import Foundation
 
 public struct LibrarySection: Equatable {
     
-    public var id: Int
+    public var id: Int64
     public var externalID: String
-    public var libraryCollectionID: Int
+    public var libraryCollectionID: Int64
     public var libraryCollectionExternalID: String
     public var position: Int
     public var title: String?
     public var indexTitle: String?
     
-    public init(id: Int, externalID: String, libraryCollectionID: Int, libraryCollectionExternalID: String, position: Int, title: String?, indexTitle: String?) {
+    public init(id: Int64, externalID: String, libraryCollectionID: Int64, libraryCollectionExternalID: String, position: Int, title: String?, indexTitle: String?) {
         self.id = id
         self.externalID = externalID
         self.libraryCollectionID = libraryCollectionID

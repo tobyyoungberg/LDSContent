@@ -54,7 +54,7 @@ class ItemPackageTests: XCTestCase {
     }
     
     func testSubitemContent() {
-        let subitemID = 1
+        let subitemID = Int64(1)
         let subitemContent = itemPackage.subitemContentWithSubitemID(subitemID)
         XCTAssertGreaterThan(subitemContent!.id, 0)
         XCTAssertEqual(subitemContent!.subitemID, subitemID)

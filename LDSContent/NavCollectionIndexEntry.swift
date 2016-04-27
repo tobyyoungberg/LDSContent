@@ -24,14 +24,14 @@ import Foundation
 
 public struct NavCollectionIndexEntry: Equatable {
     
-    public var id: Int
-    public var navCollectionID: Int
+    public var id: Int64
+    public var navCollectionID: Int64
     public var position: Int
     public var title: String
-    public var refNavCollectionID: Int?
-    public var refNavItemID: Int?
+    public var refNavCollectionID: Int64?
+    public var refNavItemID: Int64?
     
-    public init(id: Int, navCollectionID: Int, position: Int, title: String, refNavCollectionID: Int?, refNavItemID: Int?) {
+    public init(id: Int64, navCollectionID: Int64, position: Int, title: String, refNavCollectionID: Int64?, refNavItemID: Int64?) {
         self.id = id
         self.navCollectionID = navCollectionID
         self.position = position

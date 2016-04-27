@@ -102,7 +102,7 @@ public class ContentController {
     }
     
     /// The currently installed item package for the designated item.
-    public func itemPackageForItemWithID(itemID: Int) -> ItemPackage? {
+    public func itemPackageForItemWithID(itemID: Int64) -> ItemPackage? {
         if let installedVersion = contentInventory.installedVersionOfItemWithID(itemID) {
             return try? ItemPackage(path: location.URLByAppendingPathComponent("Item/\(itemID)/\(installedVersion.schemaVersion).\(installedVersion.itemPackageVersion)/package.sqlite").path)
         }

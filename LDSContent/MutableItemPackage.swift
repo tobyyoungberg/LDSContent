@@ -51,7 +51,7 @@ public class MutableItemPackage: ItemPackage {
             return super.schemaVersion
         }
         set {
-            setInt(newValue, forMetadataKey: "schemaVersion")
+            setInt(Int64(newValue), forMetadataKey: "schemaVersion")
         }
     }
     
@@ -60,7 +60,7 @@ public class MutableItemPackage: ItemPackage {
             return super.itemPackageVersion
         }
         set {
-            setInt(newValue, forMetadataKey: "itemPackageVersion")
+            setInt(Int64(newValue), forMetadataKey: "itemPackageVersion")
         }
     }
     
@@ -82,7 +82,7 @@ public class MutableItemPackage: ItemPackage {
         }
     }
     
-    public override var itemID: Int? {
+    public override var itemID: Int64? {
         get {
             return super.itemID
         }
@@ -108,7 +108,7 @@ public class MutableItemPackage: ItemPackage {
 
 extension MutableItemPackage {
     
-    func setInt(integerValue: Int?, forMetadataKey key: String) {
+    func setInt(integerValue: Int64?, forMetadataKey key: String) {
         do {
             if let integerValue = integerValue {
                 try db.run(MetadataTable.table.insert(or: .Replace, MetadataTable.key <- key, MetadataTable.integerValue <- integerValue))
@@ -144,19 +144,19 @@ extension MutableItemPackage {
             SubitemTable.contentType <- contentType
         ))
         
-        return Subitem(id: Int(id), uri: uri, docID: docID, docVersion: docVersion, position: position, titleHTML: titleHTML, title: title, webURL: webURL, contentType: contentType)
+        return Subitem(id: id, uri: uri, docID: docID, docVersion: docVersion, position: position, titleHTML: titleHTML, title: title, webURL: webURL, contentType: contentType)
     }
     
-    public func addSubitemContentWithSubitemID(subitemID: Int, contentHTML: NSData) throws -> SubitemContent {
+    public func addSubitemContentWithSubitemID(subitemID: Int64, contentHTML: NSData) throws -> SubitemContent {
         let id = try db.run(SubitemContentVirtualTable.table.insert(
             SubitemContentVirtualTable.subitemID <- subitemID,
             SubitemContentVirtualTable.contentHTML <- contentHTML
         ))
         
-        return SubitemContent(id: Int(id), subitemID: subitemID, contentHTML: contentHTML)
+        return SubitemContent(id: id, subitemID: subitemID, contentHTML: contentHTML)
     }
 
-    public func addRelatedContentItemWithSubitemID(subitemID: Int, refID: String, labelHTML: String, originID: String, contentHTML: String, wordOffset: Int, byteLocation: Int) throws -> RelatedContentItem {
+    public func addRelatedContentItemWithSubitemID(subitemID: Int64, refID: String, labelHTML: String, originID: String, contentHTML: String, wordOffset: Int, byteLocation: Int) throws -> RelatedContentItem {
         let id = try db.run(RelatedContentItemTable.table.insert(
             RelatedContentItemTable.subitemID <- subitemID,
             RelatedContentItemTable.refID <- refID,
@@ -167,10 +167,10 @@ extension MutableItemPackage {
             RelatedContentItemTable.byteLocation <- byteLocation
         ))
         
-        return RelatedContentItem(id: Int(id), subitemID: subitemID, refID: refID, labelHTML: labelHTML, originID: originID, contentHTML: contentHTML, wordOffset: wordOffset, byteLocation: byteLocation)
+        return RelatedContentItem(id: id, subitemID: subitemID, refID: refID, labelHTML: labelHTML, originID: originID, contentHTML: contentHTML, wordOffset: wordOffset, byteLocation: byteLocation)
     }
     
-    public func addRelatedAudioItemWithSubitemID(subitemID: Int, mediaURL: NSURL, fileSize: Int, duration: Int) throws -> RelatedAudioItem {
+    public func addRelatedAudioItemWithSubitemID(subitemID: Int64, mediaURL: NSURL, fileSize: Int, duration: Int) throws -> RelatedAudioItem {
         let id = try db.run(RelatedAudioItemTable.table.insert(
             RelatedAudioItemTable.subitemID <- subitemID,
             RelatedAudioItemTable.mediaURL <- mediaURL.absoluteString,
@@ -178,10 +178,10 @@ extension MutableItemPackage {
             RelatedAudioItemTable.duration <- duration
         ))
         
-        return RelatedAudioItem(id: Int(id), subitemID: subitemID, mediaURL: mediaURL, fileSize: fileSize, duration: duration)
+        return RelatedAudioItem(id: id, subitemID: subitemID, mediaURL: mediaURL, fileSize: fileSize, duration: duration)
     }
     
-    public func addNavCollectionWithNavSectionID(navSectionID: Int?, position: Int, imageRenditions: [ImageRendition], titleHTML: String, subtitle: String?, uri: String) throws -> NavCollection {
+    public func addNavCollectionWithNavSectionID(navSectionID: Int64?, position: Int, imageRenditions: [ImageRendition], titleHTML: String, subtitle: String?, uri: String) throws -> NavCollection {
         let id = try db.run(NavCollectionTable.table.insert(
             NavCollectionTable.navSectionID <- navSectionID,
             NavCollectionTable.position <- position,
@@ -191,10 +191,10 @@ extension MutableItemPackage {
             NavCollectionTable.uri <- uri
         ))
         
-        return NavCollection(id: Int(id), navSectionID: navSectionID, position: position, imageRenditions: imageRenditions, titleHTML: titleHTML, subtitle: subtitle, uri: uri)
+        return NavCollection(id: id, navSectionID: navSectionID, position: position, imageRenditions: imageRenditions, titleHTML: titleHTML, subtitle: subtitle, uri: uri)
     }
 
-    public func addNavCollectionIndexEntryWithNavCollectionID(navCollectionID: Int, position: Int, title: String, refNavCollectionID: Int?, refNavItemID: Int?) throws -> NavCollectionIndexEntry {
+    public func addNavCollectionIndexEntryWithNavCollectionID(navCollectionID: Int64, position: Int, title: String, refNavCollectionID: Int64?, refNavItemID: Int64?) throws -> NavCollectionIndexEntry {
         let id = try db.run(NavCollectionIndexEntryTable.table.insert(
             NavCollectionIndexEntryTable.navCollectionID <- navCollectionID,
             NavCollectionIndexEntryTable.position <- position,
@@ -203,10 +203,10 @@ extension MutableItemPackage {
             NavCollectionIndexEntryTable.refNavItemID <- refNavItemID
         ))
         
-        return NavCollectionIndexEntry(id: Int(id), navCollectionID: navCollectionID, position: position, title: title, refNavCollectionID: refNavCollectionID, refNavItemID: refNavItemID)
+        return NavCollectionIndexEntry(id: id, navCollectionID: navCollectionID, position: position, title: title, refNavCollectionID: refNavCollectionID, refNavItemID: refNavItemID)
     }
     
-    public func addNavSectionWithNavCollectionID(navCollectionID: Int, position: Int, title: String?, indentLevel: Int) throws -> NavSection {
+    public func addNavSectionWithNavCollectionID(navCollectionID: Int64, position: Int, title: String?, indentLevel: Int) throws -> NavSection {
         let id = try db.run(NavSectionTable.table.insert(
             NavSectionTable.navCollectionID <- navCollectionID,
             NavSectionTable.position <- position,
@@ -214,10 +214,10 @@ extension MutableItemPackage {
             NavSectionTable.title <- title
         ))
         
-        return NavSection(id: Int(id), navCollectionID: navCollectionID, position: position, indentLevel: indentLevel, title: title)
+        return NavSection(id: id, navCollectionID: navCollectionID, position: position, indentLevel: indentLevel, title: title)
     }
     
-    public func addNavItemWithNavSectionID(navSectionID: Int, position: Int, imageRenditions: [ImageRendition], titleHTML: String, subtitle: String?, preview: String?, uri: String, subitemID: Int) throws -> NavItem {
+    public func addNavItemWithNavSectionID(navSectionID: Int64, position: Int, imageRenditions: [ImageRendition], titleHTML: String, subtitle: String?, preview: String?, uri: String, subitemID: Int64) throws -> NavItem {
         let id = try db.run(NavItemTable.table.insert(
             NavItemTable.navSectionID <- navSectionID,
             NavItemTable.position <- position,
@@ -229,10 +229,10 @@ extension MutableItemPackage {
             NavItemTable.subitemID <- subitemID
         ))
         
-        return NavItem(id: Int(id), navSectionID: navSectionID, position: position, imageRenditions: imageRenditions, titleHTML: titleHTML, subtitle: subtitle, preview: preview, uri: uri, subitemID: subitemID)
+        return NavItem(id: id, navSectionID: navSectionID, position: position, imageRenditions: imageRenditions, titleHTML: titleHTML, subtitle: subtitle, preview: preview, uri: uri, subitemID: subitemID)
     }
     
-    public func addParagraphMetadata(paragraphID paragraphID: String, paragraphAID: String, subitemID: Int, verseNumber: String?, range: NSRange) throws {
+    public func addParagraphMetadata(paragraphID paragraphID: String, paragraphAID: String, subitemID: Int64, verseNumber: String?, range: NSRange) throws {
         try db.run(ParagraphMetadataTable.table.insert(
             ParagraphMetadataTable.subitemID <- subitemID,
             ParagraphMetadataTable.paragraphID <- paragraphID,

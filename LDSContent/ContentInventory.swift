@@ -148,19 +148,19 @@ extension ContentInventory {
     class InstalledItemTable {
         
         static let table = Table("installed_item")
-        static let itemID = Expression<Int>("item_id")
+        static let itemID = Expression<Int64>("item_id")
         static let schemaVersion = Expression<Int>("schema_version")
         static let itemPackageVersion = Expression<Int>("item_package_version")
         
     }
     
-    func installedVersionOfItemWithID(itemID: Int) -> (schemaVersion: Int, itemPackageVersion: Int)? {
+    func installedVersionOfItemWithID(itemID: Int64) -> (schemaVersion: Int, itemPackageVersion: Int)? {
         return db.pluck(InstalledItemTable.table.filter(InstalledItemTable.itemID == itemID)).map { row in
             return (schemaVersion: row[InstalledItemTable.schemaVersion], itemPackageVersion: row[InstalledItemTable.itemPackageVersion])
         }
     }
     
-    func setSchemaVersion(schemaVersion: Int, itemPackageVersion: Int, forItemWithID itemID: Int) throws {
+    func setSchemaVersion(schemaVersion: Int, itemPackageVersion: Int, forItemWithID itemID: Int64) throws {
         try db.run(InstalledItemTable.table.insert(or: .Replace,
             InstalledItemTable.itemID <- itemID,
             InstalledItemTable.schemaVersion <- schemaVersion,

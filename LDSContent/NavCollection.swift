@@ -24,15 +24,15 @@ import Foundation
 
 public struct NavCollection: NavNode, Equatable {
     
-    public var id: Int
-    public var navSectionID: Int?
+    public var id: Int64
+    public var navSectionID: Int64?
     public var position: Int
     public var imageRenditions: [ImageRendition]
     public var titleHTML: String
     public var subtitle: String?
     public var uri: String
     
-    public init(id: Int, navSectionID: Int?, position: Int, imageRenditions: [ImageRendition], titleHTML: String, subtitle: String?, uri: String) {
+    public init(id: Int64, navSectionID: Int64?, position: Int, imageRenditions: [ImageRendition], titleHTML: String, subtitle: String?, uri: String) {
         self.id = id
         self.navSectionID = navSectionID
         self.position = position

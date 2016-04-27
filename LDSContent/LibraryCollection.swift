@@ -24,16 +24,16 @@ import Foundation
 
 public struct LibraryCollection: LibraryNode, Equatable {
     
-    public var id: Int
+    public var id: Int64
     public var externalID: String
-    public var librarySectionID: Int?
+    public var librarySectionID: Int64?
     public var librarySectionExternalID: String?
     public var position: Int
     public var title: String
     public var coverRenditions: [ImageRendition]
     public var type: LibraryCollectionType
     
-    public init(id: Int, externalID: String, librarySectionID: Int?, librarySectionExternalID: String?, position: Int, title: String, coverRenditions: [ImageRendition], type: LibraryCollectionType) {
+    public init(id: Int64, externalID: String, librarySectionID: Int64?, librarySectionExternalID: String?, position: Int, title: String, coverRenditions: [ImageRendition], type: LibraryCollectionType) {
         self.id = id
         self.externalID = externalID
         self.librarySectionID = librarySectionID

@@ -24,17 +24,17 @@ import Foundation
 
 public struct LibraryItem: LibraryNode, Equatable, Hashable {
     
-    public var id: Int
+    public var id: Int64
     public var externalID: String
-    public var librarySectionID: Int?
+    public var librarySectionID: Int64?
     public var librarySectionExternalID: String?
     public var position: Int
     public var title: String
     public var obsolete: Bool
-    public var itemID: Int
+    public var itemID: Int64
     public var itemExternalID: String
     
-    public init(id: Int, externalID: String, librarySectionID: Int?, librarySectionExternalID: String?, position: Int, title: String, obsolete: Bool, itemID: Int, itemExternalID: String) {
+    public init(id: Int64, externalID: String, librarySectionID: Int64?, librarySectionExternalID: String?, position: Int, title: String, obsolete: Bool, itemID: Int64, itemExternalID: String) {
         self.id = id
         self.externalID = externalID
         self.librarySectionID = librarySectionID
@@ -47,7 +47,7 @@ public struct LibraryItem: LibraryNode, Equatable, Hashable {
     }
     
     public var hashValue: Int {
-        return id
+        return Int(id)
     }
     
 }

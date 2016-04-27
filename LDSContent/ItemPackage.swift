@@ -57,11 +57,11 @@ public class ItemPackage {
     }
     
     public var schemaVersion: Int {
-        return self.intForMetadataKey("schemaVersion") ?? 0
+        return Int(self.intForMetadataKey("schemaVersion") ?? 0)
     }
     
     public var itemPackageVersion: Int {
-        return self.intForMetadataKey("itemPackageVersion") ?? 0
+        return Int(self.intForMetadataKey("itemPackageVersion") ?? 0)
     }
     
     public var iso639_3Code: String? {
@@ -72,7 +72,7 @@ public class ItemPackage {
         return self.stringForMetadataKey("uri")
     }
     
-    public var itemID: Int? {
+    public var itemID: Int64? {
         return self.intForMetadataKey("item_id")
     }
     
@@ -88,15 +88,15 @@ extension ItemPackage {
         
         static let table = Table("metadata")
         static let key = Expression<String>("key")
-        static let integerValue = Expression<Int>("value")
+        static let integerValue = Expression<Int64>("value")
         static let stringValue = Expression<String>("value")
         
     }
     
-    func intForMetadataKey(key: String) -> Int? {
+    func intForMetadataKey(key: String) -> Int64? {
         return db.pluck(MetadataTable.table.filter(MetadataTable.key == key).select(MetadataTable.stringValue)).flatMap { row in
             let string = row[MetadataTable.stringValue]
-            return Int(string)
+            return Int64(string)
         }
     }
     
@@ -113,8 +113,8 @@ extension ItemPackage {
     class SubitemContentView {
         
         static let table = View("subitem_content")
-        static let id = Expression<Int>("_id")
-        static let subitemID = Expression<Int>("subitem_id")
+        static let id = Expression<Int64>("_id")
+        static let subitemID = Expression<Int64>("subitem_id")
         static let contentHTML = Expression<NSData>("content_html")
         
         static func fromRow(row: Row) -> SubitemContent {
@@ -123,7 +123,7 @@ extension ItemPackage {
         
     }
     
-    public func subitemContentWithSubitemID(subitemID: Int) -> SubitemContent? {
+    public func subitemContentWithSubitemID(subitemID: Int64) -> SubitemContent? {
         return db.pluck(SubitemContentView.table.filter(SubitemContentView.subitemID == subitemID)).map { SubitemContentView.fromRow($0) }
     }
     
@@ -134,12 +134,12 @@ extension ItemPackage {
     class SubitemContentVirtualTable {
         
         static let table = VirtualTable("subitem_content_fts")
-        static let id = Expression<Int>("_id")
-        static let subitemID = Expression<Int>("subitem_id")
+        static let id = Expression<Int64>("_id")
+        static let subitemID = Expression<Int64>("subitem_id")
         static let contentHTML = Expression<NSData>("content_html")
         
         static func fromRow(row: [Binding?], iso639_3Code: String, keywordSearch: Bool) -> SearchResult {
-            return SearchResult(subitemID: Int(row[2] as! Int64), uri: row[4] as! String, title: row[3] as! String, matchRanges: matchRangesFromOffsets(row[0] as! String, keywordSearch: keywordSearch), iso639_3Code: iso639_3Code, snippet: row[1] as! String)
+            return SearchResult(subitemID: Int64(row[2] as! Int64), uri: row[4] as! String, title: row[3] as! String, matchRanges: matchRangesFromOffsets(row[0] as! String, keywordSearch: keywordSearch), iso639_3Code: iso639_3Code, snippet: row[1] as! String)
         }
         
         static func matchRangesFromOffsets(offsets: String, keywordSearch: Bool) -> [NSRange] {
@@ -202,7 +202,7 @@ extension ItemPackage {
     class SubitemTable {
         
         static let table = Table("subitem")
-        static let id = Expression<Int>("_id")
+        static let id = Expression<Int64>("_id")
         static let uri = Expression<String>("uri")
         static let docID = Expression<String>("doc_id")
         static let docVersion = Expression<Int>("doc_version")
@@ -226,7 +226,7 @@ extension ItemPackage {
         return db.pluck(SubitemTable.table.filter(SubitemTable.docID == docID)).map { SubitemTable.fromRow($0) }
     }
     
-    public func subitemWithID(id: Int) -> Subitem? {
+    public func subitemWithID(id: Int64) -> Subitem? {
         return db.pluck(SubitemTable.table.filter(SubitemTable.id == id)).map { SubitemTable.fromRow($0) }
     }
     
@@ -273,8 +273,8 @@ extension ItemPackage {
     class RelatedContentItemTable {
         
         static let table = Table("related_content_item")
-        static let id = Expression<Int>("_id")
-        static let subitemID = Expression<Int>("subitem_id")
+        static let id = Expression<Int64>("_id")
+        static let subitemID = Expression<Int64>("subitem_id")
         static let refID = Expression<String>("ref_id")
         static let labelHTML = Expression<String>("label_html")
         static let originID = Expression<String>("origin_id")
@@ -288,7 +288,7 @@ extension ItemPackage {
         
     }
     
-    public func relatedContentItemsForSubitemWithID(subitemID: Int) -> [RelatedContentItem] {
+    public func relatedContentItemsForSubitemWithID(subitemID: Int64) -> [RelatedContentItem] {
         do {
             return try db.prepare(RelatedContentItemTable.table.filter(RelatedContentItemTable.subitemID == subitemID).order(RelatedContentItemTable.byteLocation)).map { RelatedContentItemTable.fromRow($0) }
         } catch {
@@ -303,8 +303,8 @@ extension ItemPackage {
     class RelatedAudioItemTable {
         
         static let table = Table("related_audio_item")
-        static let id = Expression<Int>("_id")
-        static let subitemID = Expression<Int>("subitem_id")
+        static let id = Expression<Int64>("_id")
+        static let subitemID = Expression<Int64>("subitem_id")
         static let mediaURL = Expression<String>("media_url")
         static let fileSize = Expression<Int>("file_size")
         static let duration = Expression<Int>("duration")
@@ -319,7 +319,7 @@ extension ItemPackage {
         
     }
     
-    public func relatedAudioItemsForSubitemWithID(subitemID: Int) -> [RelatedAudioItem] {
+    public func relatedAudioItemsForSubitemWithID(subitemID: Int64) -> [RelatedAudioItem] {
         do {
             return try db.prepare(RelatedAudioItemTable.table.filter(RelatedAudioItemTable.subitemID == subitemID)).map { RelatedAudioItemTable.fromRow($0) }
         } catch {
@@ -346,8 +346,8 @@ extension ItemPackage {
     class NavCollectionTable {
         
         static let table = Table("nav_collection")
-        static let id = Expression<Int>("_id")
-        static let navSectionID = Expression<Int?>("nav_section_id")
+        static let id = Expression<Int64>("_id")
+        static let navSectionID = Expression<Int64?>("nav_section_id")
         static let position = Expression<Int>("position")
         static let imageRenditions = Expression<String?>("image_renditions")
         static let titleHTML = Expression<String>("title_html")
@@ -364,7 +364,7 @@ extension ItemPackage {
         return db.pluck(NavCollectionTable.table.filter(NavCollectionTable.navSectionID == nil)).map { NavCollectionTable.fromRow($0) }
     }
     
-    public func navCollectionWithID(id: Int) -> NavCollection? {
+    public func navCollectionWithID(id: Int64) -> NavCollection? {
         return db.pluck(NavCollectionTable.table.filter(NavCollectionTable.id == id)).map { NavCollectionTable.fromRow($0) }
     }
     
@@ -372,7 +372,7 @@ extension ItemPackage {
         return db.pluck(NavCollectionTable.table.filter(NavCollectionTable.uri == uri)).map { NavCollectionTable.fromRow($0) }
     }
     
-    public func navCollectionsForNavSectionWithID(navSectionID: Int) -> [NavCollection] {
+    public func navCollectionsForNavSectionWithID(navSectionID: Int64) -> [NavCollection] {
         do {
             return try db.prepare(NavCollectionTable.table.filter(NavCollectionTable.navSectionID == navSectionID).order(NavCollectionTable.position)).map { NavCollectionTable.fromRow($0) }
         } catch {
@@ -387,12 +387,12 @@ extension ItemPackage {
     class NavCollectionIndexEntryTable {
         
         static let table = Table("nav_collection_index_entry")
-        static let id = Expression<Int>("_id")
-        static let navCollectionID = Expression<Int>("nav_collection_id")
+        static let id = Expression<Int64>("_id")
+        static let navCollectionID = Expression<Int64>("nav_collection_id")
         static let position = Expression<Int>("position")
         static let title = Expression<String>("title")
-        static let refNavCollectionID = Expression<Int?>("ref_nav_collection_id")
-        static let refNavItemID = Expression<Int?>("ref_nav_item_id")
+        static let refNavCollectionID = Expression<Int64?>("ref_nav_collection_id")
+        static let refNavItemID = Expression<Int64?>("ref_nav_item_id")
         
         static func fromRow(row: Row) -> NavCollectionIndexEntry {
             return NavCollectionIndexEntry(id: row[id], navCollectionID: row[navCollectionID], position: row[position], title: row[title], refNavCollectionID: row[refNavCollectionID], refNavItemID: row[refNavItemID])
@@ -400,11 +400,11 @@ extension ItemPackage {
         
     }
     
-    public func navCollectionIndexEntryWithID(id: Int) -> NavCollectionIndexEntry? {
+    public func navCollectionIndexEntryWithID(id: Int64) -> NavCollectionIndexEntry? {
         return db.pluck(NavCollectionIndexEntryTable.table.filter(NavCollectionIndexEntryTable.id == id)).map { NavCollectionIndexEntryTable.fromRow($0) }
     }
     
-    public func navCollectionIndexEntriesForNavCollectionWithID(navCollectionID: Int) -> [NavCollectionIndexEntry] {
+    public func navCollectionIndexEntriesForNavCollectionWithID(navCollectionID: Int64) -> [NavCollectionIndexEntry] {
         do {
             return try db.prepare(NavCollectionIndexEntryTable.table.filter(NavCollectionIndexEntryTable.navCollectionID == navCollectionID).order(NavCollectionIndexEntryTable.position)).map { NavCollectionIndexEntryTable.fromRow($0) }
         } catch {
@@ -419,8 +419,8 @@ extension ItemPackage {
     class NavSectionTable {
         
         static let table = Table("nav_section")
-        static let id = Expression<Int>("_id")
-        static let navCollectionID = Expression<Int>("nav_collection_id")
+        static let id = Expression<Int64>("_id")
+        static let navCollectionID = Expression<Int64>("nav_collection_id")
         static let position = Expression<Int>("position")
         static let indentLevel = Expression<Int>("indent_level")
         static let title = Expression<String?>("title")
@@ -431,11 +431,11 @@ extension ItemPackage {
         
     }
     
-    public func navSectionWithID(id: Int) -> NavSection? {
+    public func navSectionWithID(id: Int64) -> NavSection? {
         return db.pluck(NavSectionTable.table.filter(NavSectionTable.id == id)).map { NavSectionTable.fromRow($0) }
     }
     
-    public func navSectionsForNavCollectionWithID(navCollectionID: Int) -> [NavSection] {
+    public func navSectionsForNavCollectionWithID(navCollectionID: Int64) -> [NavSection] {
         do {
             return try db.prepare(NavSectionTable.table.filter(NavSectionTable.navCollectionID == navCollectionID).order(NavSectionTable.position)).map { NavSectionTable.fromRow($0) }
         } catch {
@@ -450,15 +450,15 @@ extension ItemPackage {
     class NavItemTable {
         
         static let table = Table("nav_item")
-        static let id = Expression<Int>("_id")
-        static let navSectionID = Expression<Int>("nav_section_id")
+        static let id = Expression<Int64>("_id")
+        static let navSectionID = Expression<Int64>("nav_section_id")
         static let position = Expression<Int>("position")
         static let imageRenditions = Expression<String?>("image_renditions")
         static let titleHTML = Expression<String>("title_html")
         static let subtitle = Expression<String?>("subtitle")
         static let preview = Expression<String?>("preview")
         static let uri = Expression<String>("uri")
-        static let subitemID = Expression<Int>("subitem_id")
+        static let subitemID = Expression<Int64>("subitem_id")
         
         static func fromRow(row: Row) -> NavItem {
             return NavItem(id: row[id], navSectionID: row[navSectionID], position: row[position], imageRenditions: (row[imageRenditions] ?? "").toImageRenditions() ?? [], titleHTML: row[titleHTML], subtitle: row[subtitle], preview: row[preview], uri: row[uri], subitemID: row[subitemID])
@@ -470,7 +470,7 @@ extension ItemPackage {
         return db.pluck(NavItemTable.table.filter(NavItemTable.uri == uri)).map { NavItemTable.fromRow($0) }
     }
     
-    public func navItemsForNavSectionWithID(navSectionID: Int) -> [NavItem] {
+    public func navItemsForNavSectionWithID(navSectionID: Int64) -> [NavItem] {
         do {
             return try db.prepare(NavItemTable.table.filter(NavItemTable.navSectionID == navSectionID).order(NavItemTable.position)).map { NavItemTable.fromRow($0) }
         } catch {
@@ -482,7 +482,7 @@ extension ItemPackage {
 
 extension ItemPackage {
     
-    public func navNodesForNavSectionWithID(navSectionID: Int) -> [NavNode] {
+    public func navNodesForNavSectionWithID(navSectionID: Int64) -> [NavNode] {
         var navNodes = [NavNode]()
         navNodes += navCollectionsForNavSectionWithID(navSectionID).map { $0 as NavNode }
         navNodes += navItemsForNavSectionWithID(navSectionID).map { $0 as NavNode }
@@ -496,8 +496,8 @@ extension ItemPackage {
     class ParagraphMetadataTable {
         
         static let table = Table("paragraph_metadata")
-        static let id = Expression<Int>("_id")
-        static let subitemID = Expression<Int>("subitem_id")
+        static let id = Expression<Int64>("_id")
+        static let subitemID = Expression<Int64>("subitem_id")
         static let paragraphID = Expression<String>("paragraph_id")
         static let paragraphAID = Expression<String>("paragraph_aid")
         static let verseNumber = Expression<String?>("verse_number")
@@ -514,7 +514,7 @@ extension ItemPackage {
         
     }
     
-    public func paragraphMetadataForParagraphIDs(paragraphIDs: [String], subitemID: Int) -> [ParagraphMetadata] {
+    public func paragraphMetadataForParagraphIDs(paragraphIDs: [String], subitemID: Int64) -> [ParagraphMetadata] {
         do {
             return try db.prepare(ParagraphMetadataTable.table.filter(paragraphIDs.contains(ParagraphMetadataTable.paragraphID) && ParagraphMetadataTable.subitemID == subitemID)).map { ParagraphMetadataTable.fromRow($0) }
         } catch {
@@ -522,7 +522,7 @@ extension ItemPackage {
         }
     }
     
-    public func paragraphMetadataForParagraphAIDs(paragraphAIDs: [String], subitemID: Int) -> [ParagraphMetadata] {
+    public func paragraphMetadataForParagraphAIDs(paragraphAIDs: [String], subitemID: Int64) -> [ParagraphMetadata] {
         do {
             return try db.prepare(ParagraphMetadataTable.table.filter(paragraphAIDs.contains(ParagraphMetadataTable.paragraphAID) && ParagraphMetadataTable.subitemID == subitemID)).map { ParagraphMetadataTable.fromRow($0) }
         } catch {
@@ -538,7 +538,7 @@ extension ItemPackage {
         }
     }
     
-    public func paragraphMetadataForParagraphID(paragraphID: String, subitemID: Int) -> ParagraphMetadata? {
+    public func paragraphMetadataForParagraphID(paragraphID: String, subitemID: Int64) -> ParagraphMetadata? {
         return db.pluck(ParagraphMetadataTable.table.filter(ParagraphMetadataTable.subitemID == subitemID && ParagraphMetadataTable.paragraphID == paragraphID)).map { ParagraphMetadataTable.fromRow($0) }
     }
     
@@ -557,7 +557,7 @@ extension ItemPackage {
         }
     }
     
-    public func authorsOfSubitemWithID(subitemID: Int) -> [Author] {
+    public func authorsOfSubitemWithID(subitemID: Int64) -> [Author] {
         do {
             return try db.prepare(AuthorTable.table.filter(SubitemAuthorTable.subitemID == subitemID && AuthorTable.id == SubitemAuthorTable.authorID).order(AuthorTable.familyName).order(AuthorTable.givenName)).map { AuthorTable.fromRow($0) }
         } catch {
@@ -611,7 +611,7 @@ extension ItemPackage {
     class SubitemAuthorTable {
         static let table = Table("subitem_author")
         static let id = Expression<Int64>("_id")
-        static let subitemID = Expression<Int>("subitem_id")
+        static let subitemID = Expression<Int64>("subitem_id")
         static let authorID = Expression<Int64>("author_id")
     }
     
@@ -640,7 +640,7 @@ extension ItemPackage {
     class SubitemTopicTable {
         static let table = Table("subitem_topic")
         static let id = Expression<Int64>("_id")
-        static let subitemID = Expression<Int>("subitem_id")
+        static let subitemID = Expression<Int64>("subitem_id")
         static let topicID = Expression<Int64>("topic_id")
     }
     

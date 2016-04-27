@@ -24,11 +24,11 @@ import Foundation
 
 public struct SubitemContent: Equatable {
     
-    public var id: Int
-    public var subitemID: Int
+    public var id: Int64
+    public var subitemID: Int64
     public var contentHTML: NSData
     
-    public init(id: Int, subitemID: Int, contentHTML: NSData) {
+    public init(id: Int64, subitemID: Int64, contentHTML: NSData) {
         self.id = id
         self.subitemID = subitemID
         self.contentHTML = contentHTML

@@ -26,7 +26,7 @@ public protocol LibraryNode {
     
     var title: String { get }
     var position: Int { get }
-    var librarySectionID: Int? { get }
+    var librarySectionID: Int64? { get }
     var librarySectionExternalID: String? { get }
     
 }

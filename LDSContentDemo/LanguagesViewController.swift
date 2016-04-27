@@ -82,7 +82,7 @@ class LanguagesViewController: UIViewController {
         
         let languages = catalog.languages()
         
-        let nameByLanguageID = [Int: String](languages.map { language in
+        let nameByLanguageID = [Int64: String](languages.map { language in
             return (language.id, catalog.nameForLanguageWithID(language.id, inLanguageWithID: uiLanguage.id))
         })
         

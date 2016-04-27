@@ -24,8 +24,8 @@ import Foundation
 
 public struct RelatedContentItem: Equatable {
     
-    public var id: Int
-    public var subitemID: Int
+    public var id: Int64
+    public var subitemID: Int64
     public var refID: String
     public var labelHTML: String
     public var originID: String
@@ -33,7 +33,7 @@ public struct RelatedContentItem: Equatable {
     public var wordOffset: Int
     public var byteLocation: Int
     
-    public init(id: Int, subitemID: Int, refID: String, labelHTML: String, originID: String, contentHTML: String, wordOffset: Int, byteLocation: Int) {
+    public init(id: Int64, subitemID: Int64, refID: String, labelHTML: String, originID: String, contentHTML: String, wordOffset: Int, byteLocation: Int) {
         self.id = id
         self.subitemID = subitemID
         self.refID = refID
