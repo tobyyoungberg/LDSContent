@@ -32,11 +32,11 @@ public struct Item: Equatable {
     public var uri: String
     public var title: String
     public var itemCoverRenditions: [ImageRendition]
-    public var itemCategoryID: Int
+    public var itemCategoryID: Int64
     public var version: Int
     public var obsolete: Bool
     
-    public init(id: Int64, externalID: String, languageID: Int64, sourceID: Int64, platform: Platform, uri: String, title: String, itemCoverRenditions: [ImageRendition], itemCategoryID: Int, version: Int, obsolete: Bool) {
+    public init(id: Int64, externalID: String, languageID: Int64, sourceID: Int64, platform: Platform, uri: String, title: String, itemCoverRenditions: [ImageRendition], itemCategoryID: Int64, version: Int, obsolete: Bool) {
         self.id = id
         self.externalID = externalID
         self.languageID = languageID

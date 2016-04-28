@@ -180,7 +180,7 @@ extension Catalog {
         static let uri = Expression<String>("uri")
         static let title = Expression<String>("title")
         static let itemCoverRenditions = Expression<String?>("item_cover_renditions")
-        static let itemCategoryID = Expression<Int>("item_category_id")
+        static let itemCategoryID = Expression<Int64>("item_category_id")
         static let version = Expression<Int>("version")
         static let latestVersion = Expression<Int>("latest_version")
         static let obsolete = Expression<Bool>("is_obsolete")
