@@ -566,7 +566,7 @@ extension ItemPackage {
     }
     
     public func authorWithGivenName(givenName: String, familyName: String) -> Author? {
-        return db.pluck(AuthorTable.table.filter(AuthorTable.givenName.lowercaseString == givenName.lowercaseString && AuthorTable.familyName.lowercaseString == familyName.lowercaseString)).map { AuthorTable.fromRow($0) }
+        return db.pluck(AuthorTable.table.filter(AuthorTable.givenName == givenName && AuthorTable.familyName == familyName)).map { AuthorTable.fromRow($0) }
     }
     
 }
@@ -585,7 +585,7 @@ extension ItemPackage {
     }
     
     public func roleWithName(name: String) -> Role? {
-        return db.pluck(RoleTable.table.filter(RoleTable.name.lowercaseString == name.lowercaseString)).map { RoleTable.fromRow($0) }
+        return db.pluck(RoleTable.table.filter(RoleTable.name == name)).map { RoleTable.fromRow($0) }
     }
     
 }
@@ -630,7 +630,7 @@ extension ItemPackage {
     }
     
     public func topicWithName(name: String) -> Topic? {
-        return db.pluck(TopicTable.table.filter(TopicTable.name.lowercaseString == name.lowercaseString)).map { TopicTable.fromRow($0) }
+        return db.pluck(TopicTable.table.filter(TopicTable.name == name)).map { TopicTable.fromRow($0) }
     }
     
 }

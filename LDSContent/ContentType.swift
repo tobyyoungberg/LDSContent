@@ -24,7 +24,7 @@ import Foundation
 import SQLite
 
 /// The type of content
-public enum ContentType: Int {
+public enum ContentType: Int64 {
     
     /// Default content type
     case Default = 1
@@ -37,14 +37,14 @@ public enum ContentType: Int {
 extension ContentType: Value {
     
     public static var declaredDatatype: String {
-        return Int.declaredDatatype
+        return Int64.declaredDatatype
     }
     
-    public static func fromDatatypeValue(intValue: Int) -> ContentType {
+    public static func fromDatatypeValue(intValue: Int64) -> ContentType {
         return ContentType(rawValue: intValue) ?? .Default
     }
     
-    public var datatypeValue: Int {
+    public var datatypeValue: Int64 {
         return rawValue
     }
     
