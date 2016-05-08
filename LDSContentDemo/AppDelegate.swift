@@ -62,7 +62,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let showUI = (contentController.catalog == nil)
         if showUI {
-            SVProgressHUD.showWithStatus("Installing catalog", maskType: .None)
+            SVProgressHUD.setDefaultMaskType(.Clear)
+            SVProgressHUD.showWithStatus("Installing catalog")
         }
         
         contentController.updateCatalog { result in
@@ -75,12 +76,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 NSLog("Failed to update catalog: %@", "\(errors)")
             }
             
-            dispatch_async(dispatch_get_main_queue()) {
-                switch result {
-                case .Success, .AlreadyCurrent:
-                    SVProgressHUD.showSuccessWithStatus("Installed")
-                case .Error:
-                    SVProgressHUD.showErrorWithStatus("Failed")
+            if showUI {
+                dispatch_async(dispatch_get_main_queue()) {
+                    switch result {
+                    case .Success, .AlreadyCurrent:
+                        SVProgressHUD.setDefaultMaskType(.None)
+                        SVProgressHUD.showSuccessWithStatus("Installed")
+                    case .Error:
+                        SVProgressHUD.setDefaultMaskType(.None)
+                        SVProgressHUD.showErrorWithStatus("Failed")
+                    }
                 }
             }
         }
