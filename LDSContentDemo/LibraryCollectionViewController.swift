@@ -165,10 +165,7 @@ extension LibraryCollectionViewController: UITableViewDataSource {
         let libraryNode = sections[indexPath.section].libraryNodes[indexPath.row]
         switch libraryNode {
         case let libraryItem as LibraryItem:
-            if let _ = contentController.itemPackageForItemWithID(libraryItem.itemID) {
-                return true
-            }
-            return false
+            return contentController.itemPackageForItemWithID(libraryItem.itemID) != nil
         default:
             return false
         }
