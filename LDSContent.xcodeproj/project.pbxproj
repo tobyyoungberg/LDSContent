@@ -30,6 +30,7 @@
 		D959AE841C8DDF4000B94425 /* Schema.json in Resources */ = {isa = PBXBuildFile; fileRef = D959AE831C8DDF4000B94425 /* Schema.json */; };
 		D95B2BC71C6D504B00D7230D /* XCTAsserts.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95B2BC61C6D504B00D7230D /* XCTAsserts.swift */; };
 		D95B2BD01C6E413100D7230D /* Platform.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95B2BCF1C6E413100D7230D /* Platform.swift */; };
+		D99075661CDFEBCB004B046B /* UninstallItemPackageResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = D99075651CDFEBCB004B046B /* UninstallItemPackageResult.swift */; };
 		D9B32A321C70195300A0304D /* ItemPackage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B32A311C70195300A0304D /* ItemPackage.swift */; };
 		D9B32A341C701E3200A0304D /* ItemPackageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B32A331C701E3200A0304D /* ItemPackageTests.swift */; };
 		D9B32A361C701E9E00A0304D /* DownloadItemPackageResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B32A351C701E9E00A0304D /* DownloadItemPackageResult.swift */; };
@@ -111,6 +112,7 @@
 		D959AE831C8DDF4000B94425 /* Schema.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = Schema.json; sourceTree = "<group>"; };
 		D95B2BC61C6D504B00D7230D /* XCTAsserts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XCTAsserts.swift; sourceTree = "<group>"; };
 		D95B2BCF1C6E413100D7230D /* Platform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Platform.swift; sourceTree = "<group>"; };
+		D99075651CDFEBCB004B046B /* UninstallItemPackageResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UninstallItemPackageResult.swift; sourceTree = "<group>"; };
 		D9B32A311C70195300A0304D /* ItemPackage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ItemPackage.swift; sourceTree = "<group>"; };
 		D9B32A331C701E3200A0304D /* ItemPackageTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ItemPackageTests.swift; sourceTree = "<group>"; };
 		D9B32A351C701E9E00A0304D /* DownloadItemPackageResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadItemPackageResult.swift; sourceTree = "<group>"; };
@@ -254,6 +256,7 @@
 				D9C012961C74009B0025D78A /* ContentController.swift */,
 				D9DE514C1C76206A00ED3AE0 /* UpdateCatalogResult.swift */,
 				D9DE514E1C78CB7800ED3AE0 /* InstallItemPackageResult.swift */,
+				D99075651CDFEBCB004B046B /* UninstallItemPackageResult.swift */,
 				D9C0129A1C750DAE0025D78A /* ContentInventory.swift */,
 			);
 			name = "Persistent Content";
@@ -590,6 +593,7 @@
 				D43404201CCE97AC004D3B55 /* Author.swift in Sources */,
 				D9C0129B1C750DAE0025D78A /* ContentInventory.swift in Sources */,
 				D9D3AF011C6AA41C00E2681A /* Item.swift in Sources */,
+				D99075661CDFEBCB004B046B /* UninstallItemPackageResult.swift in Sources */,
 				D9DE514D1C76206A00ED3AE0 /* UpdateCatalogResult.swift in Sources */,
 				D9BBF3301C6C040E00F7D9E6 /* LibraryNode.swift in Sources */,
 				D9C012861C72C4DD0025D78A /* NavNode.swift in Sources */,

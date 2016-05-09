@@ -167,5 +167,9 @@ extension ContentInventory {
             InstalledItemTable.itemPackageVersion <- itemPackageVersion
         ))
     }
+    
+    func removeVersionForItemWithID(itemID: Int64) throws {
+        try db.run(InstalledItemTable.table.filter(InstalledItemTable.itemID == itemID).delete())
+    }
 
 }

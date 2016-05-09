@@ -81,6 +81,7 @@ class ItemNavCollectionViewController: UIViewController {
     
     var itemPackage: ItemPackage?
     var sections = [(itemNavSection: NavSection, itemNavNodes: [NavNode])]()
+    var sectionIndexes = [(title: String, indexPath: NSIndexPath)]()
     
     func reloadData() {
         guard let itemPackage = itemPackage else { return }
@@ -88,6 +89,34 @@ class ItemNavCollectionViewController: UIViewController {
         let itemNavSections = itemPackage.navSectionsForNavCollectionWithID(itemNavCollection.id)
         sections = itemNavSections.map { itemNavSection in
             return (itemNavSection: itemNavSection, itemNavNodes: itemPackage.navNodesForNavSectionWithID(itemNavSection.id))
+        }
+        
+        var previousIndexPath: NSIndexPath?
+        sectionIndexes = itemPackage.navCollectionIndexEntriesForNavCollectionWithID(itemNavCollection.id).flatMap { indexEntry in
+            var indexPath: NSIndexPath?
+            for (sectionIndex, section) in sections.enumerate() {
+                for (rowIndex, itemNavNode) in section.itemNavNodes.enumerate() {
+                    switch itemNavNode {
+                    case let itemNavCollection as NavCollection:
+                        if itemNavCollection.id == indexEntry.refNavCollectionID {
+                            indexPath = NSIndexPath(forRow: rowIndex, inSection: sectionIndex)
+                        }
+                    case let itemNavItem as NavItem:
+                        if itemNavItem.id == indexEntry.refNavItemID {
+                            indexPath = NSIndexPath(forRow: rowIndex, inSection: sectionIndex)
+                        }
+                    default:
+                        break
+                    }
+                }
+            }
+            
+            if let indexPath = indexPath ?? previousIndexPath {
+                previousIndexPath = indexPath
+                return (title: indexEntry.title, indexPath: indexPath)
+            } else {
+                return nil
+            }
         }
     }
     
@@ -143,6 +172,16 @@ extension ItemNavCollectionViewController: UITableViewDataSource {
         }
         
         return cell
+    }
+    
+    func sectionIndexTitlesForTableView(tableView: UITableView) -> [String]? {
+        return sectionIndexes.map { $0.title }
+    }
+    
+    func tableView(tableView: UITableView, sectionForSectionIndexTitle title: String, atIndex index: Int) -> Int {
+        let sectionIndex = sectionIndexes[index]
+        tableView.scrollToRowAtIndexPath(sectionIndex.indexPath, atScrollPosition: .Top, animated: false)
+        return NSNotFound
     }
     
 }

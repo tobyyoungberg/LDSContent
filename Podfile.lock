@@ -6,7 +6,7 @@ PODS:
   - SQLite.swift (0.10.1)
   - SSZipArchive (1.1)
   - SVProgressHUD (2.0.3)
-  - Swiftification (5.3.0)
+  - Swiftification (5.3.2)
 
 DEPENDENCIES:
   - FTS3HTMLTokenizer (~> 2.0)
@@ -23,6 +23,6 @@ SPEC CHECKSUMS:
   SQLite.swift: 6a6e4b034efc317ce4e203b6af2d3024fee2b570
   SSZipArchive: de3d215ab73f87db627f81f2ce24f1731e3886c3
   SVProgressHUD: b0830714205bea1317ea1a2ebc71e5633af334d4
-  Swiftification: be032aa7435a457d4ddf2110589741c3c636d2b8
+  Swiftification: c17533de2d3fdc147c41a084ceeb38f779016f8c
 
 COCOAPODS: 0.39.0

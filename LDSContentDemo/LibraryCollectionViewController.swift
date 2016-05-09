@@ -60,7 +60,7 @@ class LibraryCollectionViewController: UIViewController {
         
         automaticallyAdjustsScrollViewInsets = true
         
-        tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: LibraryCollectionViewController.CellIdentifier)
+        tableView.registerClass(LibraryItemTableViewCell.self, forCellReuseIdentifier: LibraryCollectionViewController.CellIdentifier)
         tableView.estimatedRowHeight = 44
         
         view.addSubview(tableView)
@@ -73,6 +73,8 @@ class LibraryCollectionViewController: UIViewController {
         view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[tableView]|", options: [], metrics: nil, views: views))
         
         contentController.catalogUpdateObservers.add(self, operationQueue: .mainQueue(), self.dynamicType.catalogDidUpdate)
+        contentController.itemPackageUpdateObservers.add(self, operationQueue: .mainQueue(), self.dynamicType.itemPackageDidUpdate)
+        contentController.itemPackageUninstallObservers.add(self, operationQueue: .mainQueue(), self.dynamicType.itemPackageDidUninstall)
         catalog = contentController.catalog
         reloadData()
     }
@@ -92,6 +94,14 @@ class LibraryCollectionViewController: UIViewController {
     func catalogDidUpdate(catalog: Catalog) {
         self.catalog = catalog
         reloadData()
+    }
+    
+    func itemPackageDidUpdate(itemPackage: ItemPackage) {
+        tableView.reloadData()
+    }
+    
+    func itemPackageDidUninstall(item: Item) {
+        tableView.reloadData()
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -130,10 +140,65 @@ extension LibraryCollectionViewController: UITableViewDataSource {
         let cell = tableView.dequeueReusableCellWithIdentifier(LibraryCollectionViewController.CellIdentifier, forIndexPath: indexPath)
         
         let libraryNode = sections[indexPath.section].libraryNodes[indexPath.row]
-        cell.textLabel?.text = libraryNode.title
-        cell.accessoryType = .DisclosureIndicator
+        switch libraryNode {
+        case let libraryCollection as LibraryCollection:
+            cell.textLabel?.text = libraryCollection.title
+            cell.accessoryType = .DisclosureIndicator
+        case let libraryItem as LibraryItem:
+            if let itemPackage = contentController.itemPackageForItemWithID(libraryItem.itemID) {
+                cell.textLabel?.text = libraryItem.title
+                cell.detailTextLabel?.text = "v\(itemPackage.schemaVersion).\(itemPackage.itemPackageVersion)"
+                cell.accessoryType = .DisclosureIndicator
+            } else {
+                cell.textLabel?.text = libraryNode.title
+                cell.detailTextLabel?.text = nil
+                cell.accessoryType = .None
+            }
+        default:
+            break
+        }
         
         return cell
+    }
+    
+    func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        let libraryNode = sections[indexPath.section].libraryNodes[indexPath.row]
+        switch libraryNode {
+        case let libraryItem as LibraryItem:
+            return contentController.itemPackageForItemWithID(libraryItem.itemID) != nil
+        default:
+            return false
+        }
+    }
+    
+    func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
+        if editingStyle == .Delete {
+            let libraryNode = sections[indexPath.section].libraryNodes[indexPath.row]
+            switch libraryNode {
+            case _ as LibraryCollection:
+                break
+            case let libraryItem as LibraryItem:
+                if let item = catalog?.itemWithID(libraryItem.itemID) {
+                    SVProgressHUD.setDefaultMaskType(.Clear)
+                    SVProgressHUD.showWithStatus("Uninstalling item")
+                    
+                    self.contentController.uninstallItemPackageForItem(item) { result in
+                        switch result {
+                        case .Success:
+                            SVProgressHUD.setDefaultMaskType(.None)
+                            SVProgressHUD.showSuccessWithStatus("Uninstalled")
+                        case let .Error(errors):
+                            NSLog("Failed to uninstall item package: %@", "\(errors)")
+                            
+                            SVProgressHUD.setDefaultMaskType(.None)
+                            SVProgressHUD.showErrorWithStatus("Failed")
+                        }
+                    }
+                }
+            default:
+                break
+            }
+        }
     }
     
 }
@@ -160,15 +225,18 @@ extension LibraryCollectionViewController: UITableViewDelegate {
                 }
             } else {
                 if let item = catalog?.itemWithID(libraryItem.itemID) {
-                    SVProgressHUD.showWithStatus("Installing item", maskType: .None)
+                    SVProgressHUD.setDefaultMaskType(.Clear)
+                    SVProgressHUD.showWithStatus("Installing item")
                     
                     contentController.installItemPackageForItem(item) { result in
                         switch result {
                         case .Success, .AlreadyInstalled:
+                            SVProgressHUD.setDefaultMaskType(.None)
                             SVProgressHUD.showSuccessWithStatus("Installed")
                         case let .Error(errors):
                             NSLog("Failed to install item package: %@", "\(errors)")
                             
+                            SVProgressHUD.setDefaultMaskType(.None)
                             SVProgressHUD.showErrorWithStatus("Failed")
                         }
                     }
@@ -179,6 +247,10 @@ extension LibraryCollectionViewController: UITableViewDelegate {
         default:
             tableView.deselectRowAtIndexPath(indexPath, animated: false)
         }
+    }
+    
+    func tableView(tableView: UITableView, titleForDeleteConfirmationButtonForRowAtIndexPath indexPath: NSIndexPath) -> String? {
+        return "Uninstall"
     }
     
 }

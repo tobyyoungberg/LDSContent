@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		7477D290B0727AE65A926F9A /* Pods_LDSContentDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2AD34A3DEEB3056A37C37042 /* Pods_LDSContentDemo.framework */; };
 		D942593C1C7B928300F44084 /* ItemNavCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D942593B1C7B928300F44084 /* ItemNavCollectionViewController.swift */; };
+		D99075641CDFE8AB004B046B /* LibraryItemTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D99075631CDFE8AB004B046B /* LibraryItemTableViewCell.swift */; };
 		D9A56A301C6C2B100094621F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9A56A2F1C6C2B100094621F /* AppDelegate.swift */; };
 		D9A56A321C6C2B100094621F /* LanguagesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9A56A311C6C2B100094621F /* LanguagesViewController.swift */; };
 		D9A56A371C6C2B100094621F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D9A56A361C6C2B100094621F /* Assets.xcassets */; };
@@ -23,6 +24,7 @@
 		71551F4630E29E764BBB53EB /* Pods-LDSContentDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LDSContentDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-LDSContentDemo/Pods-LDSContentDemo.release.xcconfig"; sourceTree = "<group>"; };
 		CAA43F5A935FE7E3B58841A1 /* Pods-LDSContentDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LDSContentDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-LDSContentDemo/Pods-LDSContentDemo.debug.xcconfig"; sourceTree = "<group>"; };
 		D942593B1C7B928300F44084 /* ItemNavCollectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ItemNavCollectionViewController.swift; sourceTree = "<group>"; };
+		D99075631CDFE8AB004B046B /* LibraryItemTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibraryItemTableViewCell.swift; sourceTree = "<group>"; };
 		D9A56A2C1C6C2B100094621F /* LDSContentDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LDSContentDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D9A56A2F1C6C2B100094621F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D9A56A311C6C2B100094621F /* LanguagesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguagesViewController.swift; sourceTree = "<group>"; };
@@ -89,6 +91,7 @@
 				D9A56A2F1C6C2B100094621F /* AppDelegate.swift */,
 				D9A56A311C6C2B100094621F /* LanguagesViewController.swift */,
 				D9A56A451C6D0C550094621F /* LibraryCollectionViewController.swift */,
+				D99075631CDFE8AB004B046B /* LibraryItemTableViewCell.swift */,
 				D942593B1C7B928300F44084 /* ItemNavCollectionViewController.swift */,
 				D9C012981C74E33D0025D78A /* NSFileManager+URLs.swift */,
 			);
@@ -237,6 +240,7 @@
 			files = (
 				D942593C1C7B928300F44084 /* ItemNavCollectionViewController.swift in Sources */,
 				D9C012991C74E33D0025D78A /* NSFileManager+URLs.swift in Sources */,
+				D99075641CDFE8AB004B046B /* LibraryItemTableViewCell.swift in Sources */,
 				D9A56A321C6C2B100094621F /* LanguagesViewController.swift in Sources */,
 				D9A56A461C6D0C550094621F /* LibraryCollectionViewController.swift in Sources */,
 				D9A56A301C6C2B100094621F /* AppDelegate.swift in Sources */,

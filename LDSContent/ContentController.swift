@@ -33,6 +33,7 @@ public class ContentController {
     
     public let catalogUpdateObservers = ObserverSet<Catalog>()
     public let itemPackageUpdateObservers = ObserverSet<ItemPackage>()
+    public let itemPackageUninstallObservers = ObserverSet<Item>()
     
     /// Constructs a controller for content at `location`.
     public init(location: NSURL) throws {
@@ -149,6 +150,28 @@ public class ContentController {
                     completion(.Error(errors: errors))
                 }
             }
+        }
+    }
+    
+    /// Uninstalls a specific version of an item.
+    public func uninstallItemPackageForItem(item: Item, completion: (UninstallItemPackageResult) -> Void) {
+        let itemDirectoryURL = location.URLByAppendingPathComponent("Item/\(item.id)")
+        let versionDirectoryURL = itemDirectoryURL.URLByAppendingPathComponent("\(Catalog.SchemaVersion).\(item.version)")
+        
+        if let installedVersion = contentInventory.installedVersionOfItemWithID(item.id) where installedVersion.schemaVersion == Catalog.SchemaVersion && installedVersion.itemPackageVersion == item.version {
+            do {
+                try NSFileManager.defaultManager().removeItemAtURL(versionDirectoryURL)
+                
+                try self.contentInventory.removeVersionForItemWithID(item.id)
+                
+                self.itemPackageUninstallObservers.notify(item)
+                
+                completion(.Success)
+            } catch let error as NSError {
+                completion(.Error(errors: [error]))
+            }
+        } else {
+            completion(.Success)
         }
     }
     
