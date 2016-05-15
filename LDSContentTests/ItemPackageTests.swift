@@ -70,6 +70,10 @@ class ItemPackageTests: XCTestCase {
         
         let string = String(data: subitemContent.contentHTML.subdataWithRange(searchResult.matchRanges.first!), encoding: NSUTF8StringEncoding)
         XCTAssertEqual(string, "Alma")
+        
+        let subitemID = searchResult.subitemID
+        let subitemSearchResults = itemPackage.searchResultsForString("alma", subitemID: subitemID)
+        XCTAssertEqual(subitemSearchResults, searchResults.filter { $0.subitemID == subitemID })
     }
     
     func testSubitemContentRange() {
@@ -252,7 +256,7 @@ extension ItemPackageTests {
                 
                 dispatch_semaphore_signal(semaphore)
             }
-            if dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, Int64(30 * NSEC_PER_SEC))) != 0 {
+            if dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, Int64(60 * NSEC_PER_SEC))) != 0 {
                 NSLog("Timed out updating catalog")
             }
         }
@@ -277,7 +281,7 @@ extension ItemPackageTests {
                 
                 dispatch_semaphore_signal(semaphore)
             }
-            if dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, Int64(30 * NSEC_PER_SEC))) != 0 {
+            if dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, Int64(60 * NSEC_PER_SEC))) != 0 {
                 NSLog("Timed out installing item package")
             }
         }

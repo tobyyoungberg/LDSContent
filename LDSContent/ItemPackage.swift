@@ -182,12 +182,21 @@ extension ItemPackage {
         
     }
 
-    public func searchResultsForString(searchString: String) -> [SearchResult] {
+    public func searchResultsForString(searchString: String, subitemID: Int64? = nil) -> [SearchResult] {
         let iso639_3Code = self.iso639_3Code!
         let keywordSearch = (searchString.rangeOfString("^\\\".*\\\"$", options: .RegularExpressionSearch) != nil)
         
         do {
-            return try db.prepare("SELECT offsets(subitem_content_fts) AS offsets, snippet(subitem_content_fts, '<em class=\"searchMatch\">', '</em>', '…', -1, 35) AS snippet, subitem_content_fts.subitem_id, subitem.title, subitem.uri FROM subitem_content_fts LEFT JOIN subitem ON subitem._id = subitem_content_fts.subitem_id WHERE subitem_content_fts.content_html MATCH ? ORDER BY subitem_content_fts.subitem_id", searchString).map { row in
+            var subStatement = ""
+            var bindings: [String: Binding?] = ["@searchString": searchString]
+            if let subitemID = subitemID {
+                subStatement = "AND subitem._id = @subitemID"
+                bindings["@subitemID"] = subitemID
+            }
+            
+            let statement = "SELECT offsets(subitem_content_fts) AS offsets, snippet(subitem_content_fts, '<em class=\"searchMatch\">', '</em>', '…', -1, 35) AS snippet, subitem_content_fts.subitem_id, subitem.title, subitem.uri FROM subitem_content_fts LEFT JOIN subitem ON subitem._id = subitem_content_fts.subitem_id WHERE subitem_content_fts.content_html MATCH @searchString \(subStatement) ORDER BY subitem_content_fts.subitem_id"
+            
+            return try db.prepare(statement, bindings).map { row in
                 return SubitemContentVirtualTable.fromRow(row, iso639_3Code: iso639_3Code, keywordSearch: keywordSearch)
             }
         } catch {
