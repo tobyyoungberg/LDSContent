@@ -44,7 +44,7 @@ class FetchCatalogVersionOperation: Operation {
     }
     
     override func execute() {
-        guard let baseURL = NSURL(string: "https://edge.ldscdn.org/mobile/GospelStudy/beta/") else {
+        guard let baseURL = NSURL(string: "https://edge.ldscdn.org/mobile/gospelstudy/beta/") else {
             finishWithError(Error.errorWithCode(.Unknown, failureReason: "Malformed URL"))
             return
         }

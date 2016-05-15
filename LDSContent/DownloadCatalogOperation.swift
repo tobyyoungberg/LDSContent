@@ -75,7 +75,7 @@ class DownloadCatalogOperation: Operation {
     }
     
     func downloadCatalog(catalogVersion catalogVersion: Int, completion: (DownloadResult) -> Void) {
-        guard let baseURL = NSURL(string: "https://edge.ldscdn.org/mobile/GospelStudy/beta/") else {
+        guard let baseURL = NSURL(string: "https://edge.ldscdn.org/mobile/gospelstudy/beta/") else {
             completion(.Error(error: Error.errorWithCode(.Unknown, failureReason: "Malformed URL")))
             return
         }
