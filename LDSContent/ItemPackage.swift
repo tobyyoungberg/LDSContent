@@ -204,7 +204,7 @@ extension ItemPackage {
 
     public func searchResultsForString(searchString: String, subitemID: Int64? = nil) -> [SearchResult] {
         let iso639_3Code = self.iso639_3Code!
-        let keywordSearch = (searchString.rangeOfString("^\\\".*\\\"$", options: .RegularExpressionSearch) != nil)
+        let keywordSearch = (searchString.rangeOfString("^\\\".*\\\"$", options: .RegularExpressionSearch) == nil)
         
         do {
             var subStatement = ""
