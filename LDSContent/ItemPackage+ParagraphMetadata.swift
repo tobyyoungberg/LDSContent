@@ -54,6 +54,14 @@ extension ItemPackage {
         }
     }
     
+    public func paragraphMetadataForSubitemID(subitemID: Int64) -> [ParagraphMetadata] {
+        do {
+            return try db.prepare(ParagraphMetadataTable.table.filter(ParagraphMetadataTable.subitemID == subitemID).order(ParagraphMetadataTable.startIndex)).map { ParagraphMetadataTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
     public func paragraphMetadataForParagraphAIDs(paragraphAIDs: [String], subitemID: Int64) -> [ParagraphMetadata] {
         do {
             return try db.prepare(ParagraphMetadataTable.table.filter(paragraphAIDs.contains(ParagraphMetadataTable.paragraphAID) && ParagraphMetadataTable.subitemID == subitemID)).map { ParagraphMetadataTable.fromRow($0) }
