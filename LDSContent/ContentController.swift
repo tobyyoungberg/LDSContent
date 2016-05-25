@@ -56,13 +56,16 @@ public class ContentController {
     
     /// The currently installed catalog.
     public var catalog: Catalog? {
-//        print(contentInventory)
-//        print("version: \(contentInventory.catalogVersion)")
-//        guard let catalogVerson = contentInventory.catalogVersion else { return nil }
+        guard let path = catalogPath else { return nil }
         
-        // TODO: Change back
-        return try? Catalog(path: location.URLByAppendingPathComponent("MergedCatalog.sqlite").path)
-        //return try? Catalog(path: location.URLByAppendingPathComponent("Catalog/\(catalogVerson)/Catalog.sqlite").path)
+        return try? Catalog(path: path)
+    }
+    
+    // TODO: This should be temporary
+    public var catalogPath: String? {
+        guard let catalogVerson = contentInventory.catalogVersion else { return nil }
+        
+        return location.URLByAppendingPathComponent("Catalog/\(catalogVerson)/Catalog.sqlite").path
     }
     
     /// Checks the server for the latest catalog version and installs it if newer than the currently
