@@ -30,9 +30,9 @@ public class ItemPackage {
     let db: Connection
     public let path: NSURL
     
-    public init(path: NSURL) throws {
+    public init(path: NSURL, readonly: Bool = true) throws {
         do {
-            db = try Connection(path.path ?? "")
+            db = try Connection(path.path ?? "", readonly: readonly)
             self.path = path.URLByDeletingLastPathComponent ?? path
         } catch {
             throw error
