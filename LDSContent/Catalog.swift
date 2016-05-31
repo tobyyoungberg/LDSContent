@@ -43,9 +43,10 @@ public class Catalog {
     
     let validPlatformIDs = [Platform.All.rawValue, Platform.iOS.rawValue]
     
-    public init(path: String? = nil) throws {
+    public init(path: String? = nil, readonly: Bool = true) throws {
         do {
-            db = try Connection(path ?? "")   
+            db = try Connection(path ?? "", readonly: readonly)
+            db.busyTimeout = 5
         } catch {
             throw error
         }
@@ -54,6 +55,11 @@ public class Catalog {
             try db.execute("PRAGMA synchronous = OFF")
             try db.execute("PRAGMA journal_mode = OFF")
             try db.execute("PRAGMA temp_store = MEMORY")
+            
+            if readonly {
+                // Only disable foreign keys when using as a readonly database for better performance
+                try db.execute("PRAGMA foreign_keys = OFF")
+            }
             
             noDiacritic = try db.createFunction("noDiacritic", deterministic: true) { (string: String) -> String in
                 return string.withoutDiacritics()
