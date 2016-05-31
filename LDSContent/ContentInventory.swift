@@ -32,6 +32,7 @@ class ContentInventory {
     init(path: String? = nil) throws {
         do {
             db = try Connection(path ?? "")
+            db.busyTimeout = 5
         } catch {
             throw error
         }

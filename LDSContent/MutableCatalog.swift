@@ -25,8 +25,8 @@ import SQLite
 
 public class MutableCatalog: Catalog {
     
-    public override init(path: String? = nil) throws {
-        try super.init(path: path)
+    public init(path: String? = nil) throws {
+        try super.init(path: path, readonly: false)
         
         try createDatabaseTables()
     }

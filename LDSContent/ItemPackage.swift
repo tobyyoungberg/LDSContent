@@ -33,6 +33,7 @@ public class ItemPackage {
     public init(path: NSURL, readonly: Bool = true) throws {
         do {
             db = try Connection(path.path ?? "", readonly: readonly)
+            db.busyTimeout = 5
             self.path = path.URLByDeletingLastPathComponent ?? path
         } catch {
             throw error
@@ -41,7 +42,11 @@ public class ItemPackage {
         try db.execute("PRAGMA synchronous = OFF")
         try db.execute("PRAGMA journal_mode = OFF")
         try db.execute("PRAGMA temp_store = MEMORY")
-        try db.execute("PRAGMA foreign_keys = OFF")
+        
+        if readonly {
+            // Only disable foreign keys when using as a readonly database for better performance
+            try db.execute("PRAGMA foreign_keys = OFF")
+        }
         
         registerTokenizer(db.handle, UnsafeMutablePointer<Int8>(("HTMLTokenizer" as NSString).UTF8String))
     }
