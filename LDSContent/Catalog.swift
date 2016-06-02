@@ -361,7 +361,7 @@ extension Catalog {
     public func nameForLanguageWithID(languageID: Int64, inLanguageWithID localizationLanguageID: Int64) -> String? {
         // TODO: Switch back to use `db.scalar` when it doesn't crash
         do {
-            let rows = try db.prepare(LanguageNameTable.table.select(LanguageNameTable.name).filter(LanguageNameTable.languageID == languageID && LanguageNameTable.localizationLanguageID == localizationLanguageID))
+            let rows = try db.prepare(LanguageNameTable.table.select(LanguageNameTable.name).filter(LanguageNameTable.languageID == languageID && LanguageNameTable.localizationLanguageID == localizationLanguageID).limit(1))
             return Array(rows).first?[LanguageNameTable.name]
         } catch {
             return nil
