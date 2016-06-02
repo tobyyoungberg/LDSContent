@@ -358,8 +358,14 @@ extension Catalog {
         
     }
 
-    public func nameForLanguageWithID(languageID: Int64, inLanguageWithID localizationLanguageID: Int64) -> String {
-        return db.scalar(LanguageNameTable.table.select(LanguageNameTable.name).filter(LanguageNameTable.languageID == languageID && LanguageNameTable.localizationLanguageID == localizationLanguageID))
+    public func nameForLanguageWithID(languageID: Int64, inLanguageWithID localizationLanguageID: Int64) -> String? {
+        // TODO: Switch back to use `db.scalar` when it doesn't crash
+        do {
+            let rows = try db.prepare(LanguageNameTable.table.select(LanguageNameTable.name).filter(LanguageNameTable.languageID == languageID && LanguageNameTable.localizationLanguageID == localizationLanguageID))
+            return Array(rows).first?[LanguageNameTable.name]
+        } catch {
+            return nil
+        }
     }
     
 }
