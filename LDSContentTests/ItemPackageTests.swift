@@ -244,7 +244,7 @@ extension ItemPackageTests {
         var catalog = ItemPackageTests.contentController.catalog
         if catalog == nil {
             let semaphore = dispatch_semaphore_create(0)
-            ItemPackageTests.contentController.updateCatalog { result in
+            ItemPackageTests.contentController.updateCatalog(progress: { _ in }, completion: { result in
                 switch result {
                 case let .Success(newCatalog):
                     catalog = newCatalog
@@ -255,7 +255,7 @@ extension ItemPackageTests {
                 }
                 
                 dispatch_semaphore_signal(semaphore)
-            }
+            })
             if dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, Int64(60 * NSEC_PER_SEC))) != 0 {
                 NSLog("Timed out updating catalog")
             }
@@ -269,7 +269,7 @@ extension ItemPackageTests {
         var itemPackage = ItemPackageTests.contentController.itemPackageForItemWithID(item.id)
         if itemPackage == nil {
             let semaphore = dispatch_semaphore_create(0)
-            ItemPackageTests.contentController.installItemPackageForItem(item) { result in
+            ItemPackageTests.contentController.installItemPackageForItem(item, progress: { _ in }, completion: { result in
                 switch result {
                 case let .Success(newItemPackage):
                     itemPackage = newItemPackage
@@ -280,7 +280,7 @@ extension ItemPackageTests {
                 }
                 
                 dispatch_semaphore_signal(semaphore)
-            }
+            })
             if dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, Int64(60 * NSEC_PER_SEC))) != 0 {
                 NSLog("Timed out installing item package")
             }

@@ -32,7 +32,7 @@ class DownloadCatalogTests: XCTestCase {
         session.fetchCatalogVersion { result in
             switch result {
             case let .Success(availableCatalogVersion):
-                session.downloadCatalog(catalogVersion: availableCatalogVersion) { result in
+                session.downloadCatalog(catalogVersion: availableCatalogVersion, progress: { _ in }, completion: { result in
                     switch result {
                     case let .Success(location):
                         do {
@@ -45,7 +45,7 @@ class DownloadCatalogTests: XCTestCase {
                         XCTFail("Failed with errors \(errors)")
                     }
                     expectation.fulfill()
-                }
+                })
             case let .Error(errors):
                 XCTFail("Failed to fetch version with errors \(errors)")
             }
@@ -60,7 +60,7 @@ class DownloadCatalogTests: XCTestCase {
         let catalogVersion = 250
         
         let expectation = expectationWithDescription("Download latest catalog")
-        session.downloadCatalog(catalogVersion: catalogVersion) { result in
+        session.downloadCatalog(catalogVersion: catalogVersion, progress: { _ in }, completion: { result in
             switch result {
             case let .Success(location):
                 do {
@@ -73,7 +73,7 @@ class DownloadCatalogTests: XCTestCase {
                 XCTFail("Failed with errors \(errors)")
             }
             expectation.fulfill()
-        }
+        })
         waitForExpectationsWithTimeout(30, handler: nil)
     }
     
