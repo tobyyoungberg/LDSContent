@@ -182,17 +182,16 @@ extension LibraryCollectionViewController: UITableViewDataSource {
                     SVProgressHUD.setDefaultMaskType(.Clear)
                     SVProgressHUD.showWithStatus("Uninstalling item")
                     
-                    self.contentController.uninstallItemPackageForItem(item) { result in
-                        switch result {
-                        case .Success:
-                            SVProgressHUD.setDefaultMaskType(.None)
-                            SVProgressHUD.showSuccessWithStatus("Uninstalled")
-                        case let .Error(errors):
-                            NSLog("Failed to uninstall item package: %@", "\(errors)")
-                            
-                            SVProgressHUD.setDefaultMaskType(.None)
-                            SVProgressHUD.showErrorWithStatus("Failed")
-                        }
+                    do {
+                        try self.contentController.uninstallItemPackageForItem(item)
+
+                        SVProgressHUD.setDefaultMaskType(.None)
+                        SVProgressHUD.showSuccessWithStatus("Uninstalled")
+                    } catch let error as NSError {
+                        NSLog("Failed to uninstall item package: %@", error)
+
+                        SVProgressHUD.setDefaultMaskType(.None)
+                        SVProgressHUD.showErrorWithStatus("Failed")
                     }
                 }
             default:

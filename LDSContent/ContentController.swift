@@ -25,7 +25,6 @@ import Swiftification
 
 /// Manages, installs, and updates catalogs and item packages.
 public class ContentController {
-    
     public let location: NSURL
     
     let contentInventory: ContentInventory
@@ -154,25 +153,16 @@ public class ContentController {
     }
     
     /// Uninstalls a specific version of an item.
-    public func uninstallItemPackageForItem(item: Item, completion: (UninstallItemPackageResult) -> Void) {
+    public func uninstallItemPackageForItem(item: Item) throws {
         let itemDirectoryURL = location.URLByAppendingPathComponent("Item/\(item.id)")
         let versionDirectoryURL = itemDirectoryURL.URLByAppendingPathComponent("\(Catalog.SchemaVersion).\(item.version)")
         
         if let installedVersion = contentInventory.installedVersionOfItemWithID(item.id) where installedVersion.schemaVersion == Catalog.SchemaVersion && installedVersion.itemPackageVersion == item.version {
-            do {
-                try NSFileManager.defaultManager().removeItemAtURL(versionDirectoryURL)
-                
-                try self.contentInventory.removeVersionForItemWithID(item.id)
-                
-                self.itemPackageUninstallObservers.notify(item)
-                
-                completion(.Success)
-            } catch let error as NSError {
-                completion(.Error(errors: [error]))
-            }
-        } else {
-            completion(.Success)
+            try NSFileManager.defaultManager().removeItemAtURL(versionDirectoryURL)
+
+            try self.contentInventory.removeVersionForItemWithID(item.id)
+
+            self.itemPackageUninstallObservers.notify(item)
         }
     }
-    
 }
