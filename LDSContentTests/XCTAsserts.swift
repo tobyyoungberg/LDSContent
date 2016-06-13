@@ -22,13 +22,6 @@
 
 import XCTest
 
-func XCTAssertThrows<T>(@autoclosure expression: () throws -> T, _ message: String = "", file: StaticString = #file, line: UInt = #line) {
-    do {
-        try expression()
-        XCTFail("No error to catch! - \(message)", file: file, line: line)
-    } catch {}
-}
-
 func XCTAssertNoThrow<T>(@autoclosure expression: () throws -> T, _ message: String = "", file: StaticString = #file, line: UInt = #line) {
     do {
         try expression()
