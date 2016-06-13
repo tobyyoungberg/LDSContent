@@ -213,4 +213,12 @@ public class ContentController {
         return contentInventory.installedVersionOfItemWithID(itemID)
     }
     
+    public func isUpdatingOrInstalling() -> Bool {
+        return session.operationQueue.operationCount > 0
+    }
+    
+    public func waitWithCompletion(completion: () -> Void) {
+        session.waitWithCompletion(completion)
+    }
+    
 }

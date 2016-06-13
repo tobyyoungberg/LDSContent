@@ -46,6 +46,12 @@ class Session: NSObject {
         operationQueue.addOperation(operation)
     }
     
+    func waitWithCompletion(completion: () -> Void) {
+        let operation = Operation()
+        operation.addObserver(BlockObserver(finishHandler: { _, _ in completion() }))
+        operationQueue.addOperation(operation)
+    }
+    
 }
 
 extension Session: NSURLSessionDelegate {

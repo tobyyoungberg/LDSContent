@@ -40,7 +40,7 @@ class DownloadItemPackageOperation: Operation {
         
         super.init()
         
-        addObserver(BlockObserver(startHandler: nil, produceHandler: nil, finishHandler: { operation, errors in
+        addObserver(BlockObserver(finishHandler: { operation, errors in
             if errors.isEmpty {
                 completion(.Success(location: self.tempDirectoryURL))
             } else {
