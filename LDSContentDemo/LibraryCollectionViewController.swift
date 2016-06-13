@@ -225,9 +225,17 @@ extension LibraryCollectionViewController: UITableViewDelegate {
             } else {
                 if let item = catalog?.itemWithID(libraryItem.itemID) {
                     SVProgressHUD.setDefaultMaskType(.Clear)
-                    SVProgressHUD.showWithStatus("Installing item")
+                    SVProgressHUD.showProgress(0, status:"Installing item")
                     
-                    contentController.installItemPackageForItem(item) { result in
+                    var previousAmount: Float = 0
+                    contentController.installItemPackageForItem(item, progress: { amount in
+                        guard previousAmount < amount - 0.1 else { return }
+                        previousAmount = amount
+                            
+                        dispatch_async(dispatch_get_main_queue()) {
+                            SVProgressHUD.showProgress(amount, status: "Installing item")
+                        }
+                    }, completion: { result in
                         switch result {
                         case .Success, .AlreadyInstalled:
                             SVProgressHUD.setDefaultMaskType(.None)
@@ -238,7 +246,7 @@ extension LibraryCollectionViewController: UITableViewDelegate {
                             SVProgressHUD.setDefaultMaskType(.None)
                             SVProgressHUD.showErrorWithStatus("Failed")
                         }
-                    }
+                    })
                 }
                 
                 tableView.deselectRowAtIndexPath(indexPath, animated: false)

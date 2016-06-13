@@ -25,16 +25,16 @@ import PSOperations
 import SSZipArchive
 
 class DownloadCatalogOperation: Operation {
-    
     let session: Session
-    
     let catalogVersion: Int
+    let progress: (amount: Float) -> Void
     let tempDirectoryURL: NSURL
     
-    init(session: Session, catalogVersion: Int, completion: (DownloadCatalogResult) -> Void) {
+    init(session: Session, catalogVersion: Int, progress: (amount: Float) -> Void, completion: (DownloadCatalogResult) -> Void) {
         self.session = session
-        self.tempDirectoryURL = NSURL(fileURLWithPath: NSTemporaryDirectory()).URLByAppendingPathComponent(NSProcessInfo.processInfo().globallyUniqueString)
         self.catalogVersion = catalogVersion
+        self.progress = progress
+        self.tempDirectoryURL = NSURL(fileURLWithPath: NSTemporaryDirectory()).URLByAppendingPathComponent(NSProcessInfo.processInfo().globallyUniqueString)
         
         super.init()
         
@@ -52,7 +52,7 @@ class DownloadCatalogOperation: Operation {
     }
     
     override func execute() {
-        downloadCatalog(catalogVersion: catalogVersion) { result in
+        downloadCatalog(catalogVersion: catalogVersion, progress: progress) { result in
             switch result {
             case let .Success(location):
                 self.extractCatalog(location: location) { result in
@@ -74,7 +74,7 @@ class DownloadCatalogOperation: Operation {
         case Error(error: NSError)
     }
     
-    func downloadCatalog(catalogVersion catalogVersion: Int, completion: (DownloadResult) -> Void) {
+    func downloadCatalog(catalogVersion catalogVersion: Int, progress: (amount: Float) -> Void, completion: (DownloadResult) -> Void) {
         guard let baseURL = NSURL(string: "https://edge.ldscdn.org/mobile/gospelstudy/beta/") else {
             completion(.Error(error: Error.errorWithCode(.Unknown, failureReason: "Malformed URL")))
             return
@@ -82,20 +82,17 @@ class DownloadCatalogOperation: Operation {
         
         let compressedCatalogURL = baseURL.URLByAppendingPathComponent("v3/catalogs/\(catalogVersion).zip")
         let request = NSMutableURLRequest(URL: compressedCatalogURL)
-        
-        let task = session.urlSession.downloadTaskWithRequest(request) { location, response, error in
-            if let error = error {
+        let task = session.urlSession.downloadTaskWithRequest(request)
+        session.registerCallbacks(progress: progress, completion: { result in
+            self.session.deregisterCallbacksForTaskIdentifier(task.taskIdentifier)
+            
+            switch result {
+            case let .Error(error: error):
                 completion(.Error(error: error))
-                return
+            case let .Success(location: location):
+                completion(.Success(location: location))
             }
-            
-            guard let location = location else {
-                completion(.Error(error: Error.errorWithCode(.Unknown, failureReason: "Missing location")))
-                return
-            }
-            
-            completion(.Success(location: location))
-        }
+        }, forTaskIdentifier: task.taskIdentifier)
         task.resume()
     }
     

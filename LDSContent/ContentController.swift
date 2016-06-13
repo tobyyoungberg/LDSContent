@@ -54,7 +54,7 @@ public class ContentController {
     
     /// Checks the server for the latest catalog version and installs it if newer than the currently
     /// installed catalog (or if there is no catalog installed).
-    public func updateCatalog(completion: (UpdateCatalogResult) -> Void) {
+    public func updateCatalog(progress progress: (amount: Float) -> Void, completion: (UpdateCatalogResult) -> Void) {
         session.fetchCatalogVersion { result in
             switch result {
             case let .Success(availableCatalogVersion):
@@ -69,7 +69,7 @@ public class ContentController {
                         completion(.Error(errors: [error]))
                     }
                 } else {
-                    self.session.downloadCatalog(catalogVersion: availableCatalogVersion) { result in
+                    self.session.downloadCatalog(catalogVersion: availableCatalogVersion, progress: progress) { result in
                         switch result {
                         case let .Success(location):
                             do {
@@ -111,7 +111,7 @@ public class ContentController {
     }
     
     /// Downloads and installs a specific version of an item, if not installed already.
-    public func installItemPackageForItem(item: Item, completion: (InstallItemPackageResult) -> Void) {
+    public func installItemPackageForItem(item: Item, progress: (amount: Float) -> Void, completion: (InstallItemPackageResult) -> Void) {
         let itemDirectoryURL = location.URLByAppendingPathComponent("Item/\(item.id)")
         let versionDirectoryURL = itemDirectoryURL.URLByAppendingPathComponent("\(Catalog.SchemaVersion).\(item.version)")
         let itemPackageURL = versionDirectoryURL.URLByAppendingPathComponent("package.sqlite")
@@ -124,7 +124,7 @@ public class ContentController {
                 completion(.Error(errors: [error]))
             }
         } else {
-            session.downloadItemPackage(externalID: item.externalID, version: item.version) { result in
+            session.downloadItemPackage(externalID: item.externalID, version: item.version, progress: progress) { result in
                 switch result {
                 case let .Success(location):
                     do {
