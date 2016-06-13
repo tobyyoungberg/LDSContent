@@ -126,17 +126,6 @@ public class ContentController {
         return nil
     }
     
-    // TODO: Remove when content is fully integrated into GL
-    public func oldSchoolItemPackageForItemWithExternalID(externalID: String, schemaVersion: Int, packageVersion: Int) -> ItemPackage? {
-        return oldSchoolPackageDirectoryPathForItemWithExternalID(externalID, schemaVersion: schemaVersion, packageVersion: packageVersion).flatMap { try? ItemPackage(path: $0.URLByAppendingPathComponent("package.sqlite")) }
-    }
-    
-    public func oldSchoolPackageDirectoryPathForItemWithExternalID(externalID: String, schemaVersion: Int, packageVersion: Int) -> NSURL? {
-        guard let item = catalog?.itemWithExternalID(externalID)/*, (schemaVersion, packageVersion) = contentInventory.installedVersionOfItemWithID(item.id)*/ else { return nil }
-        
-        return NSFileManager.defaultManager().URLsForDirectory(.LibraryDirectory, inDomains: .UserDomainMask).last?.URLByAppendingPathComponent("Private Documents").URLByAppendingPathComponent("ItemPackages").URLByAppendingPathComponent("\(item.externalID)_v\(schemaVersion).\(packageVersion)")
-    }
-    
     /// Downloads and installs a specific version of an item, if not installed already.
     public func installItemPackageForItem(item: Item, completion: (InstallItemPackageResult) -> Void) {
         let itemDirectoryURL = location.URLByAppendingPathComponent("Item/\(item.id)")
