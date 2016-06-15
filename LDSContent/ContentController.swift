@@ -32,7 +32,7 @@ public class ContentController {
     let session = Session()
     
     public let catalogUpdateObservers = ObserverSet<Catalog>()
-    public let itemPackageUpdateObservers = ObserverSet<ItemPackage>()
+    public let itemPackageInstallObservers = ObserverSet<Item>()
     public let itemPackageUninstallObservers = ObserverSet<Item>()
     
     public static var sharedController: ContentController?
@@ -155,7 +155,7 @@ public class ContentController {
                         
                         try self.contentInventory.setSchemaVersion(Catalog.SchemaVersion, itemPackageVersion: item.version, forItemWithID: item.id)
                         
-                        self.itemPackageUpdateObservers.notify(itemPackage)
+                        self.itemPackageInstallObservers.notify(item)
                         
                         completion(.Success(itemPackage: itemPackage))
                     } catch let error as NSError {
