@@ -24,6 +24,10 @@ import Foundation
 import PSOperations
 
 class Session: NSObject {
+    enum DownloadResult {
+        case Success(location: NSURL)
+        case Error(error: NSError)
+    }
     
     lazy var urlSession: NSURLSession = {
         return NSURLSession(configuration: NSURLSessionConfiguration.ephemeralSessionConfiguration(), delegate: self, delegateQueue: nil)
@@ -31,33 +35,63 @@ class Session: NSObject {
     
     let operationQueue = OperationQueue()
     
+    private var progressByTaskIdentifier: [Int: (amount: Float) -> Void] = [:]
+    private var completionByTaskIdentifier: [Int: (result: DownloadResult) -> Void] = [:]
+    
     func fetchCatalogVersion(completion completion: (FetchCatalogVersionResult) -> Void) {
         let operation = FetchCatalogVersionOperation(session: self, completion: completion)
         operationQueue.addOperation(operation)
     }
     
-    func downloadCatalog(catalogVersion catalogVersion: Int, completion: (DownloadCatalogResult) -> Void) {
-        let operation = DownloadCatalogOperation(session: self, catalogVersion: catalogVersion, completion: completion)
+    func downloadCatalog(catalogVersion catalogVersion: Int, progress: (amount: Float) -> Void, completion: (DownloadCatalogResult) -> Void) {
+        let operation = DownloadCatalogOperation(session: self, catalogVersion: catalogVersion, progress: progress, completion: completion)
         operationQueue.addOperation(operation)
     }
     
-    func downloadItemPackage(externalID externalID: String, version: Int, completion: (DownloadItemPackageResult) -> Void) {
-        let operation = DownloadItemPackageOperation(session: self, externalID: externalID, version: version, completion: completion)
+    func downloadItemPackage(externalID externalID: String, version: Int, progress: (amount: Float) -> Void, completion: (DownloadItemPackageResult) -> Void) {
+        let operation = DownloadItemPackageOperation(session: self, externalID: externalID, version: version, progress: progress, completion: completion)
         operationQueue.addOperation(operation)
     }
     
+    func registerCallbacks(progress progress: (amount: Float) -> Void, completion: (result: DownloadResult) -> Void, forTaskIdentifier taskIdentifier: Int) {
+        progressByTaskIdentifier[taskIdentifier] = progress
+        completionByTaskIdentifier[taskIdentifier] = completion
+    }
+    
+    func deregisterCallbacksForTaskIdentifier(taskIdentifier: Int) {
+        progressByTaskIdentifier[taskIdentifier] = nil
+        completionByTaskIdentifier[taskIdentifier] = nil
+    }
+
     func waitWithCompletion(completion: () -> Void) {
         let operation = Operation()
         operation.addObserver(BlockObserver(finishHandler: { _, _ in completion() }))
         operationQueue.addOperation(operation)
     }
-    
 }
 
 extension Session: NSURLSessionDelegate {
-    
     func URLSession(session: NSURLSession, didReceiveChallenge challenge: NSURLAuthenticationChallenge, completionHandler: (NSURLSessionAuthChallengeDisposition, NSURLCredential?) -> Void) {
         completionHandler(.UseCredential, challenge.protectionSpace.serverTrust.flatMap { NSURLCredential(forTrust: $0) })
     }
     
+    func URLSession(session: NSURLSession, task: NSURLSessionTask, didCompleteWithError error: NSError?) {
+        if let completion = completionByTaskIdentifier[task.taskIdentifier] {
+            completion(result: .Error(error: error ?? Error.errorWithCode(.Unknown, failureReason: "Failed to download")))
+        }
+    }
+}
+
+extension Session: NSURLSessionDownloadDelegate {
+    func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
+        if let progress = progressByTaskIdentifier[downloadTask.taskIdentifier] {
+            progress(amount: Float(totalBytesWritten) / Float(totalBytesExpectedToWrite))
+        }
+    }
+    
+    func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didFinishDownloadingToURL location: NSURL) {
+        if let completion = completionByTaskIdentifier[downloadTask.taskIdentifier] {
+            completion(result: .Success(location: location))
+        }
+    }
 }
