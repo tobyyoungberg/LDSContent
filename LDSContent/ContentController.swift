@@ -45,9 +45,7 @@ public class ContentController {
         self.location = location
         
         do {
-            // TODO: Change back
-            contentInventory = try ContentInventory(path: location.URLByAppendingPathComponent("ItemInventory.sqlite").path)
-            //contentInventory = try ContentInventory(path: location.URLByAppendingPathComponent("Inventory.sqlite").path)
+            contentInventory = try ContentInventory(path: location.URLByAppendingPathComponent("Inventory.sqlite").path)
         } catch {
             throw error
         }
