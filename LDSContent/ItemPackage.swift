@@ -28,13 +28,13 @@ import FTS3HTMLTokenizer
 public class ItemPackage {
     
     let db: Connection
-    public let path: NSURL
+    public let url: NSURL
     
-    public init(path: NSURL, readonly: Bool = true) throws {
+    public init(url: NSURL, readonly: Bool = true) throws {
         do {
-            db = try Connection(path.path ?? "", readonly: readonly)
+            db = try Connection(url.path ?? "", readonly: readonly)
             db.busyTimeout = 5
-            self.path = path.URLByDeletingLastPathComponent ?? path
+            self.url = url.URLByDeletingLastPathComponent ?? url
         } catch {
             throw error
         }
@@ -89,10 +89,10 @@ public class ItemPackage {
     }
     
     public func itemHeadHTML() -> String {
-        guard let packageDirectory = path.path else { return "" }
+        guard let packageDirectory = url.path else { return "" }
 
         do {
-            return try NSFileManager.defaultManager().contentsOfDirectoryAtURL(path, includingPropertiesForKeys: nil, options: .SkipsPackageDescendants).flatMap { fileURL -> String? in
+            return try NSFileManager.defaultManager().contentsOfDirectoryAtURL(url, includingPropertiesForKeys: nil, options: .SkipsPackageDescendants).flatMap { fileURL -> String? in
                 guard fileURL.pathExtension == "css", let filePath = fileURL.path else { return nil }
                 return "<link rel=\"stylesheet\" href=\"\(filePath)\"/>"
             }.joinWithSeparator("\n")
@@ -102,7 +102,7 @@ public class ItemPackage {
     }
     
     public func scriptureGotoURL() -> NSURL {
-        return path.URLByAppendingPathComponent("scriptureGoto.plist")
+        return url.URLByAppendingPathComponent("scriptureGoto.plist")
     }
     
 }

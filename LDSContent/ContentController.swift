@@ -34,12 +34,6 @@ public class ContentController {
     public let itemPackageInstallObservers = ObserverSet<Item>()
     public let itemPackageUninstallObservers = ObserverSet<Item>()
     
-    public static var sharedController: ContentController?
-    
-    public static func setSharedController(location: NSURL) {
-        sharedController = try? ContentController(location: location)
-    }
-    
     /// Constructs a controller for content at `location`.
     public init(location: NSURL) throws {
         self.location = location
@@ -117,7 +111,7 @@ public class ContentController {
     /// The currently installed item package for the designated item.
     public func itemPackageForItemWithID(itemID: Int64) -> ItemPackage? {
         if let installedVersion = contentInventory.installedVersionOfItemWithID(itemID) {
-            return try? ItemPackage(path: location.URLByAppendingPathComponent("Item/\(itemID)/\(installedVersion.schemaVersion).\(installedVersion.itemPackageVersion)/package.sqlite"))
+            return try? ItemPackage(url: location.URLByAppendingPathComponent("Item/\(itemID)/\(installedVersion.schemaVersion).\(installedVersion.itemPackageVersion)/package.sqlite"))
         }
         
         return nil
@@ -131,7 +125,7 @@ public class ContentController {
         
         if let installedVersion = contentInventory.installedVersionOfItemWithID(item.id) where installedVersion.schemaVersion == Catalog.SchemaVersion && installedVersion.itemPackageVersion == item.version {
             do {
-                let itemPackage = try ItemPackage(path: itemPackageURL)
+                let itemPackage = try ItemPackage(url: itemPackageURL)
                 completion(.AlreadyInstalled(itemPackage: itemPackage))
             } catch let error as NSError {
                 completion(.Error(errors: [error]))
@@ -148,7 +142,7 @@ public class ContentController {
                     } catch {}
                     
                     do {
-                        let itemPackage = try ItemPackage(path: itemPackageURL)
+                        let itemPackage = try ItemPackage(url: itemPackageURL)
                         
                         try self.contentInventory.setSchemaVersion(Catalog.SchemaVersion, itemPackageVersion: item.version, forItemWithID: item.id)
                         
