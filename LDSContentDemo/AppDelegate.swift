@@ -63,10 +63,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let showUI = (contentController.catalog == nil)
         if showUI {
             SVProgressHUD.setDefaultMaskType(.Clear)
-            SVProgressHUD.showWithStatus("Installing catalog")
+            SVProgressHUD.showProgress(0, status: "Installing catalog")
         }
         
-        contentController.updateCatalog { result in
+        var previousAmount: Float = 0
+        contentController.updateCatalog(progress: { amount in
+            guard previousAmount < amount - 0.1 else { return }
+            previousAmount = amount
+            
+            dispatch_async(dispatch_get_main_queue()) {
+                SVProgressHUD.showProgress(amount, status: "Installing catalog")
+            }
+        }, completion: { result in
             switch result {
             case let .Success(catalog):
                 NSLog("Updated catalog to v%li.%li", catalog.schemaVersion, catalog.catalogVersion)
@@ -88,7 +96,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     }
                 }
             }
-        }
+        })
     }
     
 }

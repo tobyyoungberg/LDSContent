@@ -314,7 +314,7 @@ extension CatalogTests {
         var catalog = CatalogTests.contentController.catalog
         if catalog == nil {
             let semaphore = dispatch_semaphore_create(0)
-            CatalogTests.contentController.updateCatalog { result in
+            CatalogTests.contentController.updateCatalog(progress: { _ in }, completion: { result in
                 switch result {
                 case let .Success(newCatalog):
                     catalog = newCatalog
@@ -325,7 +325,7 @@ extension CatalogTests {
                 }
                 
                 dispatch_semaphore_signal(semaphore)
-            }
+            })
             if dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, Int64(30 * NSEC_PER_SEC))) != 0 {
                 NSLog("Timed out updating catalog")
             }
