@@ -24,27 +24,15 @@ import Foundation
 
 public struct Subitem: Equatable {
     
-    public var id: Int64
-    public var uri: String
-    public var docID: String
-    public var docVersion: Int
-    public var position: Int
-    public var titleHTML: String
-    public var title: String
-    public var webURL: NSURL?
-    public var contentType: ContentType
-    
-    public init(id: Int64, uri: String, docID: String, docVersion: Int, position: Int, titleHTML: String, title: String, webURL: NSURL?, contentType: ContentType) {
-        self.id = id
-        self.uri = uri
-        self.docID = docID
-        self.docVersion = docVersion
-        self.position = position
-        self.titleHTML = titleHTML
-        self.title = title
-        self.webURL = webURL
-        self.contentType = contentType
-    }
+    public let id: Int64
+    public let uri: String
+    public let docID: String
+    public let docVersion: Int
+    public let position: Int
+    public let titleHTML: String
+    public let title: String
+    public let webURL: NSURL?
+    public let contentType: ContentType
     
 }
 

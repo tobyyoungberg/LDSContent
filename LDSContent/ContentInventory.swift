@@ -32,6 +32,7 @@ class ContentInventory {
     init(path: String? = nil) throws {
         do {
             db = try Connection(path ?? "")
+            db.busyTimeout = 5
         } catch {
             throw error
         }
@@ -154,10 +155,22 @@ extension ContentInventory {
         
     }
     
+    func installedItemIDs() -> [Int64] {
+        do {
+            return try db.prepare(InstalledItemTable.table.select(InstalledItemTable.itemID)).map { $0[InstalledItemTable.itemID] }
+        } catch {
+            return []
+        }
+    }
+    
     func installedVersionOfItemWithID(itemID: Int64) -> (schemaVersion: Int, itemPackageVersion: Int)? {
         return db.pluck(InstalledItemTable.table.filter(InstalledItemTable.itemID == itemID)).map { row in
             return (schemaVersion: row[InstalledItemTable.schemaVersion], itemPackageVersion: row[InstalledItemTable.itemPackageVersion])
         }
+    }
+    
+    func isItemWithIDInstalled(itemID itemID: Int64) -> Bool {
+        return db.scalar(InstalledItemTable.table.filter(InstalledItemTable.itemID == itemID).count) != 0
     }
     
     func setSchemaVersion(schemaVersion: Int, itemPackageVersion: Int, forItemWithID itemID: Int64) throws {

@@ -31,7 +31,7 @@ public class ContentController {
     let session = Session()
     
     public let catalogUpdateObservers = ObserverSet<Catalog>()
-    public let itemPackageUpdateObservers = ObserverSet<ItemPackage>()
+    public let itemPackageInstallObservers = ObserverSet<Item>()
     public let itemPackageUninstallObservers = ObserverSet<Item>()
     
     /// Constructs a controller for content at `location`.
@@ -47,9 +47,16 @@ public class ContentController {
     
     /// The currently installed catalog.
     public var catalog: Catalog? {
+        guard let path = catalogPath else { return nil }
+        
+        return try? Catalog(path: path)
+    }
+    
+    // TODO: This should be temporary
+    public var catalogPath: String? {
         guard let catalogVerson = contentInventory.catalogVersion else { return nil }
         
-        return try? Catalog(path: location.URLByAppendingPathComponent("Catalog/\(catalogVerson)/Catalog.sqlite").path)
+        return location.URLByAppendingPathComponent("Catalog/\(catalogVerson)/Catalog.sqlite").path
     }
     
     /// Checks the server for the latest catalog version and installs it if newer than the currently
@@ -104,7 +111,7 @@ public class ContentController {
     /// The currently installed item package for the designated item.
     public func itemPackageForItemWithID(itemID: Int64) -> ItemPackage? {
         if let installedVersion = contentInventory.installedVersionOfItemWithID(itemID) {
-            return try? ItemPackage(path: location.URLByAppendingPathComponent("Item/\(itemID)/\(installedVersion.schemaVersion).\(installedVersion.itemPackageVersion)/package.sqlite").path)
+            return try? ItemPackage(url: location.URLByAppendingPathComponent("Item/\(itemID)/\(installedVersion.schemaVersion).\(installedVersion.itemPackageVersion)/package.sqlite"))
         }
         
         return nil
@@ -118,7 +125,7 @@ public class ContentController {
         
         if let installedVersion = contentInventory.installedVersionOfItemWithID(item.id) where installedVersion.schemaVersion == Catalog.SchemaVersion && installedVersion.itemPackageVersion == item.version {
             do {
-                let itemPackage = try ItemPackage(path: itemPackageURL.path)
+                let itemPackage = try ItemPackage(url: itemPackageURL)
                 completion(.AlreadyInstalled(itemPackage: itemPackage))
             } catch let error as NSError {
                 completion(.Error(errors: [error]))
@@ -135,11 +142,11 @@ public class ContentController {
                     } catch {}
                     
                     do {
-                        let itemPackage = try ItemPackage(path: itemPackageURL.path)
+                        let itemPackage = try ItemPackage(url: itemPackageURL)
                         
                         try self.contentInventory.setSchemaVersion(Catalog.SchemaVersion, itemPackageVersion: item.version, forItemWithID: item.id)
                         
-                        self.itemPackageUpdateObservers.notify(itemPackage)
+                        self.itemPackageInstallObservers.notify(item)
                         
                         completion(.Success(itemPackage: itemPackage))
                     } catch let error as NSError {
@@ -165,4 +172,24 @@ public class ContentController {
             self.itemPackageUninstallObservers.notify(item)
         }
     }
+    public func isItemWithIDInstalled(itemID: Int64) -> Bool {
+        return contentInventory.isItemWithIDInstalled(itemID: itemID)
+    }
+    
+    public func installedItemIDs() -> [Int64] {
+        return contentInventory.installedItemIDs()
+    }
+    
+    public func installedVersionOfItemWithID(itemID: Int64) -> (schemaVersion: Int, itemPackageVersion: Int)? {
+        return contentInventory.installedVersionOfItemWithID(itemID)
+    }
+    
+    public func isUpdatingOrInstalling() -> Bool {
+        return session.operationQueue.operationCount > 0
+    }
+    
+    public func waitWithCompletion(completion: () -> Void) {
+        session.waitWithCompletion(completion)
+    }
+    
 }

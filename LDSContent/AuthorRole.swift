@@ -24,17 +24,10 @@ import Foundation
 
 public struct AuthorRole: Equatable {
     
-    public var id: Int64
-    public var authorID: Int64
-    public var roleID: Int64
-    public var position: Int
-    
-    public init(id: Int64, authorID: Int64, roleID: Int64, position: Int) {
-        self.id = id
-        self.authorID = authorID
-        self.roleID = roleID
-        self.position = position
-    }
+    public let id: Int64
+    public let authorID: Int64
+    public let roleID: Int64
+    public let position: Int
     
 }
 

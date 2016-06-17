@@ -73,7 +73,7 @@ class LibraryCollectionViewController: UIViewController {
         view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[tableView]|", options: [], metrics: nil, views: views))
         
         contentController.catalogUpdateObservers.add(self, operationQueue: .mainQueue(), self.dynamicType.catalogDidUpdate)
-        contentController.itemPackageUpdateObservers.add(self, operationQueue: .mainQueue(), self.dynamicType.itemPackageDidUpdate)
+        contentController.itemPackageInstallObservers.add(self, operationQueue: .mainQueue(), self.dynamicType.itemPackageDidUpdate)
         contentController.itemPackageUninstallObservers.add(self, operationQueue: .mainQueue(), self.dynamicType.itemPackageDidUninstall)
         catalog = contentController.catalog
         reloadData()
@@ -96,7 +96,7 @@ class LibraryCollectionViewController: UIViewController {
         reloadData()
     }
     
-    func itemPackageDidUpdate(itemPackage: ItemPackage) {
+    func itemPackageDidUpdate(item: Item) {
         tableView.reloadData()
     }
     

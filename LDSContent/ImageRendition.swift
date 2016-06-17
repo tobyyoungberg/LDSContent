@@ -24,13 +24,8 @@ import Foundation
 
 public struct ImageRendition: Equatable {
     
-    public var size: CGSize
-    public var url: NSURL
-    
-    public init(size: CGSize, url: NSURL) {
-        self.size = size
-        self.url = url
-    }
+    public let size: CGSize
+    public let url: NSURL
     
 }
 

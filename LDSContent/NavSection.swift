@@ -24,19 +24,11 @@ import Foundation
 
 public struct NavSection: Equatable {
     
-    public var id: Int64
-    public var navCollectionID: Int64
-    public var position: Int
-    public var indentLevel: Int
-    public var title: String?
-    
-    public init(id: Int64, navCollectionID: Int64, position: Int, indentLevel: Int, title: String?) {
-        self.id = id
-        self.navCollectionID = navCollectionID
-        self.position = position
-        self.indentLevel = indentLevel
-        self.title = title
-    }
+    public let id: Int64
+    public let navCollectionID: Int64
+    public let position: Int
+    public let indentLevel: Int
+    public let title: String?
     
 }
 

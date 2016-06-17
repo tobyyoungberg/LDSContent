@@ -24,15 +24,9 @@ import Foundation
 
 public struct Author: Equatable {
     
-    public var id: Int64
-    public var givenName: String
-    public var familyName: String
-    
-    public init(id: Int64, givenName: String, familyName: String) {
-        self.id = id
-        self.givenName = givenName
-        self.familyName = familyName
-    }
+    public let id: Int64
+    public let givenName: String
+    public let familyName: String
     
 }
 

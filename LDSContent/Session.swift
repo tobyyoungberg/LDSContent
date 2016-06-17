@@ -62,6 +62,12 @@ class Session: NSObject {
         progressByTaskIdentifier[taskIdentifier] = nil
         completionByTaskIdentifier[taskIdentifier] = nil
     }
+
+    func waitWithCompletion(completion: () -> Void) {
+        let operation = Operation()
+        operation.addObserver(BlockObserver(finishHandler: { _, _ in completion() }))
+        operationQueue.addOperation(operation)
+    }
 }
 
 extension Session: NSURLSessionDelegate {

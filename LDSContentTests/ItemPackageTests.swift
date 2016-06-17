@@ -114,9 +114,6 @@ class ItemPackageTests: XCTestCase {
         
         let subitems2 = itemPackage.subitemsWithURIs(["/scriptures/bofm/alma/5", "/scriptures/bofm/enos/1"])
         XCTAssertEqual(subitems2.count, 2)
-        
-        let subitems3 = itemPackage.subitemsWithURIPrefixedByURI("/scriptures/bofm")
-        XCTAssertEqual(subitems3, subitems)
     }
     
     func testRelatedContentItem() {
@@ -132,12 +129,6 @@ class ItemPackageTests: XCTestCase {
         
         let relatedAudioItems = itemPackage.relatedAudioItemsForSubitemWithID(subitem.id)
         XCTAssertGreaterThan(relatedAudioItems.count, 0)
-        
-        let uriPrefix = "/scriptures/bofm/1-ne"
-        XCTAssertTrue(itemPackage.hasRelatedAudioItemsForSubitemsPrefixedByURI(uriPrefix))
-        
-        let relatedAudioItems2 = itemPackage.relatedAudioItemsForSubitemsPrefixedByURI(uriPrefix)
-        XCTAssertGreaterThan(relatedAudioItems2.count, relatedAudioItems.count)
     }
     
     func testNavCollection() {

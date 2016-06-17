@@ -43,9 +43,10 @@ public class Catalog {
     
     let validPlatformIDs = [Platform.All.rawValue, Platform.iOS.rawValue]
     
-    public init(path: String? = nil) throws {
+    public init(path: String? = nil, readonly: Bool = true) throws {
         do {
-            db = try Connection(path ?? "")   
+            db = try Connection(path ?? "", readonly: readonly)
+            db.busyTimeout = 5
         } catch {
             throw error
         }
@@ -54,6 +55,11 @@ public class Catalog {
             try db.execute("PRAGMA synchronous = OFF")
             try db.execute("PRAGMA journal_mode = OFF")
             try db.execute("PRAGMA temp_store = MEMORY")
+            
+            if readonly {
+                // Only disable foreign keys when using as a readonly database for better performance
+                try db.execute("PRAGMA foreign_keys = OFF")
+            }
             
             noDiacritic = try db.createFunction("noDiacritic", deterministic: true) { (string: String) -> String in
                 return string.withoutDiacritics()
@@ -235,6 +241,14 @@ extension Catalog {
         }
     }
     
+    public func itemsWithIDsIn(ids: [Int64], languageID: Int64) -> [Item] {
+        do {
+            return try db.prepare(ItemTable.table.filter(ids.contains(ItemTable.id) && validPlatformIDs.contains(ItemTable.platformID) && ItemTable.languageID == languageID)).map { ItemTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
     @available(*, deprecated=1.0.0, message="Use `itemsWithIDsIn(_:)` instead")
     public func itemsWithExternalIDsIn(externalIDs: [String]) -> [Item] {
         do {
@@ -259,7 +273,7 @@ extension Catalog {
     
     public func itemsWithTitlesThatContainString(string: String, languageID: Int64, limit: Int) -> [Item] {
         do {
-            return try db.prepare(ItemTable.table.filter(noDiacritic(ItemTable.title).like("%\(string.withoutDiacritics().escaped())%", escape: "!") && ItemTable.languageID == languageID && ItemTable.obsolete == false && validPlatformIDs.contains(ItemTable.platformID)).limit(limit)).map { ItemTable.fromRow($0) }
+            return try db.prepare(ItemTable.table.filter(noDiacritic(ItemTable.title).like("%\(string.withoutDiacritics().escaped())%", escape: "!") && ItemTable.languageID == languageID && validPlatformIDs.contains(ItemTable.platformID)).limit(limit)).map { ItemTable.fromRow($0) }
         } catch {
             return []
         }
@@ -275,7 +289,8 @@ extension Catalog {
         }
         return nil
     }
-
+    
+    
 }
 
 extension Catalog {
@@ -343,8 +358,14 @@ extension Catalog {
         
     }
 
-    public func nameForLanguageWithID(languageID: Int64, inLanguageWithID localizationLanguageID: Int64) -> String {
-        return db.scalar(LanguageNameTable.table.select(LanguageNameTable.name).filter(LanguageNameTable.languageID == languageID && LanguageNameTable.localizationLanguageID == localizationLanguageID))
+    public func nameForLanguageWithID(languageID: Int64, inLanguageWithID localizationLanguageID: Int64) -> String? {
+        // TODO: Switch back to use `db.scalar` when it doesn't crash
+        do {
+            let rows = try db.prepare(LanguageNameTable.table.select(LanguageNameTable.name).filter(LanguageNameTable.languageID == languageID && LanguageNameTable.localizationLanguageID == localizationLanguageID).limit(1))
+            return Array(rows).first?[LanguageNameTable.name]
+        } catch {
+            return nil
+        }
     }
     
 }
@@ -604,45 +625,4 @@ extension Catalog {
     
 }
 
-extension Catalog {
-    
-    class SubitemMetadataTable {
-        
-        static let table = Table("subitem_metadata")
-        static let id = Expression<Int64>("_id")
-        static let itemID = Expression<Int64>("item_id")
-        static let subitemID = Expression<Int64>("subitem_id")
-        static let docID = Expression<String>("doc_id")
-        static let docVersion = Expression<Int>("doc_version")
-        
-    }
-    
-    public func itemAndSubitemIDForDocID(docID: String) -> (itemID: Int64, subitemID: Int64)? {
-        return db.pluck(SubitemMetadataTable.table.select(SubitemMetadataTable.itemID, SubitemMetadataTable.subitemID).filter(SubitemMetadataTable.docID == docID)).map { row in
-            return (itemID: row[SubitemMetadataTable.itemID], subitemID: row[SubitemMetadataTable.subitemID])
-        }
-    }
-    
-    public func subitemIDForSubitemWithDocID(docID: String, itemID: Int64) -> Int64? {
-        return db.pluck(SubitemMetadataTable.table.select(SubitemMetadataTable.subitemID).filter(SubitemMetadataTable.docID == docID && SubitemMetadataTable.itemID == itemID)).map { row in
-            return row[SubitemMetadataTable.subitemID]
-        }
-    }
-    
-    public func docIDForSubitemWithID(subitemID: Int64, itemID: Int64) -> String? {
-        return db.pluck(SubitemMetadataTable.table.select(SubitemMetadataTable.docID).filter(SubitemMetadataTable.subitemID == subitemID && SubitemMetadataTable.itemID == itemID)).map { row in
-            return row[SubitemMetadataTable.docID]
-        }
-    }
-    
-    public func versionsForDocIDs(docIDs: [String]) -> [String: Int] {
-        do {
-            return [String: Int](try db.prepare(SubitemMetadataTable.table.select(SubitemMetadataTable.docID, SubitemMetadataTable.docVersion).filter(docIDs.contains(SubitemMetadataTable.docID))).map { row in
-                return (row[SubitemMetadataTable.docID], row[SubitemMetadataTable.docVersion])
-            })
-        } catch {
-            return [:]
-        }
-    }
-    
-}
+

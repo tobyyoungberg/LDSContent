@@ -24,21 +24,12 @@ import Foundation
 
 public struct ParagraphMetadata: Equatable {
     
-    public var id: Int64
-    public var subitemID: Int64
-    public var paragraphID: String
-    public var paragraphAID: String
-    public var verseNumber: String?
-    public var range: NSRange
-    
-    public init(id: Int64, subitemID: Int64, paragraphID: String, paragraphAID: String, verseNumber: String?, range: NSRange) {
-        self.id = id
-        self.subitemID = subitemID
-        self.paragraphID = paragraphID
-        self.paragraphAID = paragraphAID
-        self.verseNumber = verseNumber
-        self.range = range
-    }
+    public let id: Int64
+    public let subitemID: Int64
+    public let paragraphID: String
+    public let paragraphAID: String
+    public let verseNumber: String?
+    public let range: NSRange
     
 }
 

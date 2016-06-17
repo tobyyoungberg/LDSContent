@@ -74,7 +74,7 @@ class ItemNavCollectionViewController: UIViewController {
         view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("|[tableView]|", options: [], metrics: nil, views: views))
         view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[tableView]|", options: [], metrics: nil, views: views))
         
-        contentController.itemPackageUpdateObservers.add(self, operationQueue: .mainQueue(), self.dynamicType.itemPackageDidUpdate)
+        contentController.itemPackageInstallObservers.add(self, operationQueue: .mainQueue(), self.dynamicType.itemPackageDidUpdate)
         itemPackage = contentController.itemPackageForItemWithID(itemID)
         reloadData()
     }
@@ -120,10 +120,10 @@ class ItemNavCollectionViewController: UIViewController {
         }
     }
     
-    func itemPackageDidUpdate(itemPackage: ItemPackage) {
-        guard itemPackage.itemID == itemID else { return }
+    func itemPackageDidUpdate(item: Item) {
+        guard item.id == itemID else { return }
         
-        self.itemPackage = itemPackage
+        self.itemPackage = contentController.itemPackageForItemWithID(item.id)
         reloadData()
     }
     

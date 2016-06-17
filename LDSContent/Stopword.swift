@@ -24,15 +24,9 @@ import Foundation
 
 public struct Stopword: Equatable {
     
-    public var id: Int64?
-    public var languageID: Int64
-    public var word: String
-    
-    public init(id: Int64?, languageID: Int64, word: String) {
-        self.id = id
-        self.languageID = languageID
-        self.word = word
-    }
+    public let id: Int64?
+    public let languageID: Int64
+    public let word: String
 
 }
 

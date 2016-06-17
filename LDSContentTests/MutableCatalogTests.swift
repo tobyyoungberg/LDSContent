@@ -21,7 +21,7 @@
 //
 
 import XCTest
-import LDSContent
+@testable import LDSContent
 
 class MutableCatalogTests: XCTestCase {
     
@@ -42,7 +42,7 @@ class MutableCatalogTests: XCTestCase {
     }
     
     func testSource() {
-        var source = Source(id: 1, name: "source", type: .Default)
+        let source = Source(id: 1, name: "source", type: .Default)
         
         XCTAssertNoThrow(try catalog.addOrUpdateSource(source))
         XCTAssertEqual(catalog.sources(), [source])
@@ -55,10 +55,10 @@ class MutableCatalogTests: XCTestCase {
         XCTAssertNoThrow(try catalog.addOrUpdateSource(source2))
         XCTAssertEqual(catalog.sources(), [source, source2])
         
-        source.name = "changed"
+        let source3 = Source(id: source.id, name: "changed", type: source.type)
         
-        XCTAssertNoThrow(try catalog.addOrUpdateSource(source))
-        XCTAssertEqual(catalog.sources(), [source, source2])
+        XCTAssertNoThrow(try catalog.addOrUpdateSource(source3))
+        XCTAssertEqual(catalog.sources(), [source3, source2])
     }
     
     func testItemCategory() {
