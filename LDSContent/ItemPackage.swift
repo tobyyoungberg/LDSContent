@@ -89,8 +89,6 @@ public class ItemPackage {
     }
     
     public func itemHeadHTML() -> String {
-        guard let packageDirectory = url.path else { return "" }
-
         do {
             return try NSFileManager.defaultManager().contentsOfDirectoryAtURL(url, includingPropertiesForKeys: nil, options: .SkipsPackageDescendants).flatMap { fileURL -> String? in
                 guard fileURL.pathExtension == "css", let filePath = fileURL.path else { return nil }

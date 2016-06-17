@@ -24,13 +24,8 @@ import Foundation
 
 public struct ItemCategory: Equatable {
     
-    public var id: Int64
-    public var name: String
-    
-    public init(id: Int64, name: String) {
-        self.id = id
-        self.name = name
-    }
+    public let id: Int64
+    public let name: String
     
 }
 

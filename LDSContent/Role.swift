@@ -24,15 +24,9 @@ import Foundation
 
 public struct Role: Equatable {
     
-    public var id: Int64
-    public var name: String
-    public var position: Int
-    
-    public init(id: Int64, name: String, position: Int) {
-        self.id = id
-        self.name = name
-        self.position = position
-    }
+    public let id: Int64
+    public let name: String
+    public let position: Int
     
 }
 

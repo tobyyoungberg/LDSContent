@@ -24,17 +24,10 @@ import Foundation
 
 public struct SubitemContentRange: Equatable {
     
-    public var id: Int64
-    public var subitemID: Int64
-    public var paragraphID: String
-    public var range: NSRange
-    
-    public init(id: Int64, subitemID: Int64, paragraphID: String, range: NSRange) {
-        self.id = id
-        self.subitemID = subitemID
-        self.paragraphID = paragraphID
-        self.range = range
-    }
+    public let id: Int64
+    public let subitemID: Int64
+    public let paragraphID: String
+    public let range: NSRange
     
 }
 

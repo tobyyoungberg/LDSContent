@@ -21,7 +21,7 @@
 //
 
 import XCTest
-import LDSContent
+@testable import LDSContent
 
 class MutableItemPacakgeTests: XCTestCase {
     
@@ -125,13 +125,13 @@ class MutableItemPacakgeTests: XCTestCase {
         XCTAssertNoThrow(try itemPackage.addParagraphMetadata(paragraphID: "p1", paragraphAID: "1", subitemID: 1, verseNumber: "1", range: NSRange(location: 1, length: 2)))
     }
     
-    let tempPackagePath = NSURL.fileURLWithPath(NSTemporaryDirectory()).URLByAppendingPathComponent("temp.sqlite")
+    let tempPackageURL = NSURL.fileURLWithPath(NSTemporaryDirectory()).URLByAppendingPathComponent("temp.sqlite")
     
     override func setUp() {
         super.setUp()
         
         do {
-            itemPackage = try MutableItemPackage(path: tempPackagePath, iso639_1Code: "en", iso639_3Code: "eng")
+            itemPackage = try MutableItemPackage(url: tempPackageURL, iso639_1Code: "en", iso639_3Code: "eng")
         } catch {
             itemPackage = nil
         }
@@ -140,7 +140,7 @@ class MutableItemPacakgeTests: XCTestCase {
     override func tearDown() {
         super.tearDown()
         
-        let _ = try? NSFileManager.defaultManager().removeItemAtURL(tempPackagePath)
+        let _ = try? NSFileManager.defaultManager().removeItemAtURL(tempPackageURL)
     }
     
 }

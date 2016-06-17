@@ -24,14 +24,14 @@ import Foundation
 
 public struct LibraryCollection: LibraryNode, Equatable {
     
-    public var id: Int64
-    public var externalID: String
-    public var librarySectionID: Int64?
-    public var librarySectionExternalID: String?
-    public var position: Int
-    public var title: String
-    public var coverRenditions: [ImageRendition]
-    public var type: LibraryCollectionType
+    public let id: Int64
+    public let externalID: String
+    public let librarySectionID: Int64?
+    public let librarySectionExternalID: String?
+    public let position: Int
+    public let title: String
+    public let coverRenditions: [ImageRendition]
+    public let type: LibraryCollectionType
 
 }
 

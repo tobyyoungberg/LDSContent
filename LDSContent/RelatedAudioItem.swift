@@ -24,19 +24,11 @@ import Foundation
 
 public struct RelatedAudioItem: Equatable {
     
-    public var id: Int64
-    public var subitemID: Int64
-    public var mediaURL: NSURL
-    public var fileSize: Int
-    public var duration: Int
-    
-    public init(id: Int64, subitemID: Int64, mediaURL: NSURL, fileSize: Int, duration: Int) {
-        self.id = id
-        self.subitemID = subitemID
-        self.mediaURL = mediaURL
-        self.fileSize = fileSize
-        self.duration = duration
-    }
+    public let id: Int64
+    public let subitemID: Int64
+    public let mediaURL: NSURL
+    public let fileSize: Int
+    public let duration: Int
     
 }
 

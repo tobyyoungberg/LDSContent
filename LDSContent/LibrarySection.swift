@@ -24,13 +24,13 @@ import Foundation
 
 public struct LibrarySection: Equatable {
     
-    public var id: Int64
-    public var externalID: String
-    public var libraryCollectionID: Int64
-    public var libraryCollectionExternalID: String
-    public var position: Int
-    public var title: String?
-    public var indexTitle: String?
+    public let id: Int64
+    public let externalID: String
+    public let libraryCollectionID: Int64
+    public let libraryCollectionExternalID: String
+    public let position: Int
+    public let title: String?
+    public let indexTitle: String?
 
 }
 

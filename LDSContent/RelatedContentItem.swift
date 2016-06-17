@@ -24,14 +24,14 @@ import Foundation
 
 public struct RelatedContentItem: Equatable {
     
-    public var id: Int64
-    public var subitemID: Int64
-    public var refID: String
-    public var labelHTML: String
-    public var originID: String
-    public var contentHTML: String
-    public var wordOffset: Int
-    public var byteLocation: Int
+    public let id: Int64
+    public let subitemID: Int64
+    public let refID: String
+    public let labelHTML: String
+    public let originID: String
+    public let contentHTML: String
+    public let wordOffset: Int
+    public let byteLocation: Int
     
 }
 

@@ -24,27 +24,15 @@ import Foundation
 
 public struct NavItem: NavNode, Equatable {
     
-    public var id: Int64
-    public var navSectionID: Int64
-    public var position: Int
-    public var imageRenditions: [ImageRendition]
-    public var titleHTML: String
-    public var subtitle: String?
-    public var preview: String?
-    public var uri: String
-    public var subitemID: Int64
-    
-    public init(id: Int64, navSectionID: Int64, position: Int, imageRenditions: [ImageRendition], titleHTML: String, subtitle: String?, preview: String?, uri: String, subitemID: Int64) {
-        self.id = id
-        self.navSectionID = navSectionID
-        self.position = position
-        self.imageRenditions = imageRenditions
-        self.titleHTML = titleHTML
-        self.subtitle = subtitle
-        self.preview = preview
-        self.uri = uri
-        self.subitemID = subitemID
-    }
+    public let id: Int64
+    public let navSectionID: Int64
+    public let position: Int
+    public let imageRenditions: [ImageRendition]
+    public let titleHTML: String
+    public let subtitle: String?
+    public let preview: String?
+    public let uri: String
+    public let subitemID: Int64
     
 }
 

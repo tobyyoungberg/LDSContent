@@ -24,27 +24,15 @@ import Foundation
 
 public struct LibraryItem: LibraryNode, Equatable, Hashable {
     
-    public var id: Int64
-    public var externalID: String
-    public var librarySectionID: Int64?
-    public var librarySectionExternalID: String?
-    public var position: Int
-    public var title: String
-    public var obsolete: Bool
-    public var itemID: Int64
-    public var itemExternalID: String
-    
-    public init(id: Int64, externalID: String, librarySectionID: Int64?, librarySectionExternalID: String?, position: Int, title: String, obsolete: Bool, itemID: Int64, itemExternalID: String) {
-        self.id = id
-        self.externalID = externalID
-        self.librarySectionID = librarySectionID
-        self.librarySectionExternalID = librarySectionExternalID
-        self.position = position
-        self.title = title
-        self.obsolete = obsolete
-        self.itemID = itemID
-        self.itemExternalID = itemExternalID
-    }
+    public let id: Int64
+    public let externalID: String
+    public let librarySectionID: Int64?
+    public let librarySectionExternalID: String?
+    public let position: Int
+    public let title: String
+    public let obsolete: Bool
+    public let itemID: Int64
+    public let itemExternalID: String
     
     public var hashValue: Int {
         return Int(id)
