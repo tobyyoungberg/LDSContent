@@ -57,7 +57,7 @@ class MutableCatalogTests: XCTestCase {
         
         let source3 = Source(id: source.id, name: "changed", type: source.type)
         
-        XCTAssertNoThrow(try catalog.addOrUpdateSource(source))
+        XCTAssertNoThrow(try catalog.addOrUpdateSource(source3))
         XCTAssertEqual(catalog.sources(), [source3, source2])
     }
     
