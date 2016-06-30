@@ -1,28 +1,29 @@
 PODS:
-  - FTS3HTMLTokenizer (2.0.0):
-    - snowball
-  - PSOperations (2.2.0)
-  - snowball (2014.11.09)
+  - FTS3HTMLTokenizer (2.1.0)
+  - Operations (2.10.1):
+    - Operations/Standard (= 2.10.1)
+  - Operations/Standard (2.10.1)
   - SQLite.swift (0.10.1)
-  - SSZipArchive (1.1)
+  - SSZipArchive (1.2)
   - SVProgressHUD (2.0.3)
-  - Swiftification (5.3.2)
+  - Swiftification (5.8.0)
 
 DEPENDENCIES:
   - FTS3HTMLTokenizer (~> 2.0)
-  - PSOperations
+  - Operations
   - SQLite.swift
   - SSZipArchive
   - SVProgressHUD
   - Swiftification
 
 SPEC CHECKSUMS:
-  FTS3HTMLTokenizer: 399c839644d5a30e331459ec284f83d57982ea58
-  PSOperations: 9abf8b5f513ca2934d0a20634d3e7a77b0449dfe
-  snowball: 5b3459998ce383e974960f1ec5ddba8fd3e50bfb
+  FTS3HTMLTokenizer: f92cd01959d6b4dc00de0b81c46d6b4d3758fd3e
+  Operations: b787ef012ec50752f6247b7f0efb7746fb8934ae
   SQLite.swift: 6a6e4b034efc317ce4e203b6af2d3024fee2b570
-  SSZipArchive: de3d215ab73f87db627f81f2ce24f1731e3886c3
+  SSZipArchive: 251093c65f98d6ea282c50bc404bfa631d9fd721
   SVProgressHUD: b0830714205bea1317ea1a2ebc71e5633af334d4
-  Swiftification: c17533de2d3fdc147c41a084ceeb38f779016f8c
+  Swiftification: 740dc7131f4db6846019f8c17a055bbae43551e8
 
-COCOAPODS: 0.39.0
+PODFILE CHECKSUM: f4d879262fe62747655171282c65fcf91854b416
+
+COCOAPODS: 1.0.1

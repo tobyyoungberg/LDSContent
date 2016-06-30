@@ -1,1 +1,0 @@
-../../../snowball/runtime/header.h

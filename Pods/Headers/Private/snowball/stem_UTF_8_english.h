@@ -1,1 +1,0 @@
-../../../snowball/src_c/stem_UTF_8_english.h

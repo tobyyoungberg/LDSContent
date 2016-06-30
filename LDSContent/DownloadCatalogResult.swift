@@ -24,5 +24,5 @@ import Foundation
 
 public enum DownloadCatalogResult {
     case Success(location: NSURL)
-    case Error(errors: [NSError])
+    case Error(errors: [ErrorType])
 }

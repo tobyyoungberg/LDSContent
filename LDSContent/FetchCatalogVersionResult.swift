@@ -24,5 +24,5 @@ import Foundation
 
 public enum FetchCatalogVersionResult {
     case Success(catalogVersion: Int)
-    case Error(errors: [NSError])
+    case Error(errors: [ErrorType])
 }

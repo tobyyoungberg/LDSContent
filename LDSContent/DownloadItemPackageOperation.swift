@@ -21,7 +21,7 @@
 //
 
 import Foundation
-import PSOperations
+import Operations
 import SSZipArchive
 
 class DownloadItemPackageOperation: Operation {
@@ -40,7 +40,7 @@ class DownloadItemPackageOperation: Operation {
         
         super.init()
         
-        addObserver(BlockObserver(finishHandler: { operation, errors in
+        addObserver(BlockObserver(didFinish: { operation, errors in
             if errors.isEmpty {
                 completion(.Success(location: self.tempDirectoryURL))
             } else {
@@ -62,11 +62,11 @@ class DownloadItemPackageOperation: Operation {
                     case .Success:
                         self.finish()
                     case let .Error(error):
-                        self.finishWithError(error)
+                        self.finish(error)
                     }
                 }
             case let .Error(error):
-                self.finishWithError(error)
+                self.finish(error)
             }
         }
     }

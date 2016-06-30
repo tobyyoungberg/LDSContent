@@ -25,5 +25,5 @@ import Foundation
 public enum UpdateCatalogResult {
     case Success(catalog: Catalog)
     case AlreadyCurrent(catalog: Catalog)
-    case Error(errors: [NSError])
+    case Error(errors: [ErrorType])
 }

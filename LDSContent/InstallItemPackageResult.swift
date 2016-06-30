@@ -25,5 +25,5 @@ import Foundation
 public enum InstallItemPackageResult {
     case Success(itemPackage: ItemPackage)
     case AlreadyInstalled(itemPackage: ItemPackage)
-    case Error(errors: [NSError])
+    case Error(errors: [ErrorType])
 }

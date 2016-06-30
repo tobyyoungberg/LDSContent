@@ -21,7 +21,7 @@
 //
 
 import Foundation
-import PSOperations
+import Operations
 
 class FetchCatalogVersionOperation: Operation {
     
@@ -34,7 +34,7 @@ class FetchCatalogVersionOperation: Operation {
         
         super.init()
         
-        addObserver(BlockObserver(finishHandler: { operation, errors in
+        addObserver(BlockObserver(didFinish: { operation, errors in
             if errors.isEmpty, let catalogVersion = self.catalogVersion {
                 completion(.Success(catalogVersion: catalogVersion))
             } else {
@@ -45,7 +45,7 @@ class FetchCatalogVersionOperation: Operation {
     
     override func execute() {
         guard let baseURL = NSURL(string: "https://edge.ldscdn.org/mobile/gospelstudy/beta/") else {
-            finishWithError(Error.errorWithCode(.Unknown, failureReason: "Malformed URL"))
+            finish(Error.errorWithCode(.Unknown, failureReason: "Malformed URL"))
             return
         }
         
@@ -54,12 +54,12 @@ class FetchCatalogVersionOperation: Operation {
         
         let task = session.urlSession.dataTaskWithRequest(request) { data, response, error in
             if let error = error {
-                self.finishWithError(error)
+                self.finish(error)
                 return
             }
             
             guard let data = data else {
-                self.finishWithError(Error.errorWithCode(.Unknown, failureReason: "Missing response data"))
+                self.finish(Error.errorWithCode(.Unknown, failureReason: "Missing response data"))
                 return
             }
             
@@ -67,12 +67,12 @@ class FetchCatalogVersionOperation: Operation {
             do {
                 jsonObject = try NSJSONSerialization.JSONObjectWithData(data, options: [])
             } catch let error as NSError {
-                self.finishWithError(error)
+                self.finish(error)
                 return
             }
             
             guard let jsonDictionary = jsonObject as? [String: AnyObject], catalogVersion = jsonDictionary["catalogVersion"] as? Int else {
-                self.finishWithError(Error.errorWithCode(.Unknown, failureReason: "Unexpected JSON response"))
+                self.finish(Error.errorWithCode(.Unknown, failureReason: "Unexpected JSON response"))
                 return
             }
             

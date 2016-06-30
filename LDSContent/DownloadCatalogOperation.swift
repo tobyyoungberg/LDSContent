@@ -21,7 +21,7 @@
 //
 
 import Foundation
-import PSOperations
+import Operations
 import SSZipArchive
 
 class DownloadCatalogOperation: Operation {
@@ -38,7 +38,7 @@ class DownloadCatalogOperation: Operation {
         
         super.init()
         
-        addObserver(BlockObserver(finishHandler: { operation, errors in
+        addObserver(BlockObserver(didFinish: { operation, errors in
             if errors.isEmpty {
                 completion(.Success(location: self.tempDirectoryURL.URLByAppendingPathComponent("Catalog.sqlite")))
             } else {
@@ -60,11 +60,11 @@ class DownloadCatalogOperation: Operation {
                     case .Success:
                         self.finish()
                     case let .Error(error):
-                        self.finishWithError(error)
+                        self.finish(error)
                     }
                 }
             case let .Error(error):
-                self.finishWithError(error)
+                self.finish(error)
             }
         }
     }

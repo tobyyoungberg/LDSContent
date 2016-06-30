@@ -3,8 +3,4 @@ framework module FTS3HTMLTokenizer {
 
   export *
   module * { export * }
-
-  private header "fts3_hash.h"
-  private header "fts3_tokenizer.h"
-  private header "fts3Int.h"
 }

@@ -21,7 +21,7 @@
 //
 
 import Foundation
-import PSOperations
+import Operations
 
 class Session: NSObject {
     enum DownloadResult {
@@ -65,7 +65,7 @@ class Session: NSObject {
 
     func waitWithCompletion(completion: () -> Void) {
         let operation = Operation()
-        operation.addObserver(BlockObserver(finishHandler: { _, _ in completion() }))
+        operation.addObserver(BlockObserver(didFinish: { _, _ in completion() }))
         operationQueue.addOperation(operation)
     }
 }
