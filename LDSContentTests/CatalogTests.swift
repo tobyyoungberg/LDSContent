@@ -318,7 +318,7 @@ extension CatalogTests {
                 switch result {
                 case let .Success(newCatalog):
                     catalog = newCatalog
-                case let .AlreadyCurrent(newCatalog):
+                case let .PartialSuccess(newCatalog, _):
                     catalog = newCatalog
                 case let .Error(errors):
                     NSLog("Failed with errors %@", "\(errors)")

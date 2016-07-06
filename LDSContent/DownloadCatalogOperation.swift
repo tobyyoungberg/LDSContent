@@ -24,35 +24,49 @@ import Foundation
 import Operations
 import SSZipArchive
 
-class DownloadCatalogOperation: Operation {
+enum DownloadCatalogOperationError: ErrorType {
+    case MissingCatalogVersionError(String)
+}
+
+class DownloadCatalogOperation: Operation, AutomaticInjectionOperationType {
+    var requirement: Int? // Catalog version injected from FetchCatalogVersionOperation
+    var result: DownloadCatalogResult? // When used in group operations it's easier to get individual results after all operations have finished
+    
     let session: Session
-    let catalogVersion: Int
     let progress: (amount: Float) -> Void
     let tempDirectoryURL: NSURL
+    let catalogName: String
+    let baseURL: NSURL
     
-    init(session: Session, catalogVersion: Int, progress: (amount: Float) -> Void, completion: (DownloadCatalogResult) -> Void) {
+    init(session: Session, catalogName: String, baseURL: NSURL, progress: (amount: Float) -> Void, completion: (DownloadCatalogResult) -> Void) {
         self.session = session
-        self.catalogVersion = catalogVersion
+        self.catalogName = catalogName
+        self.baseURL = baseURL
         self.progress = progress
         self.tempDirectoryURL = NSURL(fileURLWithPath: NSTemporaryDirectory()).URLByAppendingPathComponent(NSProcessInfo.processInfo().globallyUniqueString)
         
         super.init()
         
         addObserver(BlockObserver(didFinish: { operation, errors in
-            if errors.isEmpty {
-                completion(.Success(location: self.tempDirectoryURL.URLByAppendingPathComponent("Catalog.sqlite")))
+            if errors.isEmpty, let version = self.requirement {
+                let result = DownloadCatalogResult.Success(version: version, location: self.tempDirectoryURL.URLByAppendingPathComponent("Catalog.sqlite"))
+                self.result = result
+                completion(result)
             } else {
-                completion(.Error(errors: errors))
+                let result = DownloadCatalogResult.Error(errors: errors)
+                self.result = result
+                completion(result)
             }
-            
-            do {
-                try NSFileManager.defaultManager().removeItemAtURL(self.tempDirectoryURL)
-            } catch {}
         }))
     }
     
     override func execute() {
-        downloadCatalog(catalogVersion: catalogVersion, progress: progress) { result in
+        guard let catalogVersion = requirement else {
+            finish(DownloadCatalogOperationError.MissingCatalogVersionError("Catalog version was not injected properly and is nil."))
+            return
+        }
+        
+        downloadCatalog(baseURL: baseURL, catalogVersion: catalogVersion, progress: progress) { result in
             switch result {
             case let .Success(location):
                 self.extractCatalog(location: location) { result in
@@ -74,12 +88,7 @@ class DownloadCatalogOperation: Operation {
         case Error(error: NSError)
     }
     
-    func downloadCatalog(catalogVersion catalogVersion: Int, progress: (amount: Float) -> Void, completion: (DownloadResult) -> Void) {
-        guard let baseURL = NSURL(string: "https://edge.ldscdn.org/mobile/gospelstudy/beta/") else {
-            completion(.Error(error: Error.errorWithCode(.Unknown, failureReason: "Malformed URL")))
-            return
-        }
-        
+    func downloadCatalog(baseURL baseURL: NSURL, catalogVersion: Int, progress: (amount: Float) -> Void, completion: (DownloadResult) -> Void) {
         let compressedCatalogURL = baseURL.URLByAppendingPathComponent("v3/catalogs/\(catalogVersion).zip")
         let request = NSMutableURLRequest(URL: compressedCatalogURL)
         let task = session.urlSession.downloadTaskWithRequest(request)

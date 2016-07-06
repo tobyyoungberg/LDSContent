@@ -22,7 +22,20 @@
 
 import Foundation
 
-public enum DownloadCatalogResult {
-    case Success(version: Int, location: NSURL)
-    case Error(errors: [ErrorType])
+struct CatalogMetadata: Equatable {
+    
+    let name: String
+    let url: String?
+    let version: Int
+    
+    func isDefault() -> Bool {
+        return name == ContentController.defaultCatalogName
+    }
+    
+}
+
+func == (lhs: CatalogMetadata, rhs: CatalogMetadata) -> Bool {
+    return lhs.name == rhs.name &&
+        lhs.url == rhs.url &&
+        lhs.version == rhs.version
 }

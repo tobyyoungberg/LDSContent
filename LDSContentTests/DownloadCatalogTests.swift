@@ -29,43 +29,12 @@ class DownloadCatalogTests: XCTestCase {
         let session = Session()
         
         let expectation = expectationWithDescription("Download latest catalog")
-        session.fetchCatalogVersion { result in
+        session.updateDefaultCatalog { result in
             switch result {
-            case let .Success(availableCatalogVersion):
-                session.downloadCatalog(catalogVersion: availableCatalogVersion, progress: { _ in }, completion: { result in
-                    switch result {
-                    case let .Success(location):
-                        do {
-                            let catalog = try Catalog(path: location.path!)
-                            XCTAssertGreaterThan(catalog.catalogVersion, 0)
-                        } catch {
-                            XCTFail("Failed to connect to catalog: \(error)")
-                        }
-                    case let .Error(errors):
-                        XCTFail("Failed with errors \(errors)")
-                    }
-                    expectation.fulfill()
-                })
-            case let .Error(errors):
-                XCTFail("Failed to fetch version with errors \(errors)")
-            }
-        }
-        
-        waitForExpectationsWithTimeout(30, handler: nil)
-    }
-    
-    func testDownloadSpecificCatalog() {
-        let session = Session()
-        
-        let catalogVersion = 250
-        
-        let expectation = expectationWithDescription("Download latest catalog")
-        session.downloadCatalog(catalogVersion: catalogVersion, progress: { _ in }, completion: { result in
-            switch result {
-            case let .Success(location):
+            case let .Success(_, location):
                 do {
                     let catalog = try Catalog(path: location.path!)
-                    XCTAssertEqual(catalog.catalogVersion, catalogVersion)
+                    XCTAssertGreaterThan(catalog.catalogVersion, 0)
                 } catch {
                     XCTFail("Failed to connect to catalog: \(error)")
                 }
@@ -73,7 +42,8 @@ class DownloadCatalogTests: XCTestCase {
                 XCTFail("Failed with errors \(errors)")
             }
             expectation.fulfill()
-        })
+        }
+        
         waitForExpectationsWithTimeout(30, handler: nil)
     }
     

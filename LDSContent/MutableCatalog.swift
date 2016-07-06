@@ -201,3 +201,22 @@ extension MutableCatalog {
     }
     
 }
+
+extension MutableCatalog {
+    
+    func insertDataFromCatalog(path: String, name: String) throws {
+        let attachName = name.stringByReplacingOccurrencesOfString("-", withString: "_")
+        try db.run("ATTACH DATABASE ? AS ?", path, attachName)
+        
+        // loop through all tables in the database and copy the data into the merged database
+        for row in try db.run("SELECT name FROM sqlite_master WHERE type='table' and name NOT IN ('metadata', 'sqlite_sequence')") {
+            guard let tableName = row[0] as? String else { continue }
+            try db.execute("INSERT OR IGNORE INTO \(tableName) SELECT * FROM \(attachName).\(tableName)")
+        }
+        
+        // Handle the metadata table differently, add the catalogName as a prefix in keys
+        try db.execute("INSERT OR IGNORE INTO metadata (key, value) SELECT '\(name).' || key, value FROM \(attachName).metadata")
+        try db.run("DETACH DATABASE ?", attachName)
+    }
+    
+}

@@ -23,32 +23,21 @@
 import Foundation
 import Operations
 
-class FetchCatalogVersionOperation: Operation {
+class FetchCatalogVersionOperation: Operation, ResultOperationType {
     
     let session: Session
+    let baseURL: NSURL
     
-    var catalogVersion: Int?
+    private(set) var result: Int?
     
-    init(session: Session, completion: (FetchCatalogVersionResult) -> Void) {
+    init(session: Session, baseURL: NSURL) {
         self.session = session
+        self.baseURL = baseURL
         
         super.init()
-        
-        addObserver(BlockObserver(didFinish: { operation, errors in
-            if errors.isEmpty, let catalogVersion = self.catalogVersion {
-                completion(.Success(catalogVersion: catalogVersion))
-            } else {
-                completion(.Error(errors: errors))
-            }
-        }))
     }
     
     override func execute() {
-        guard let baseURL = NSURL(string: "https://edge.ldscdn.org/mobile/gospelstudy/beta/") else {
-            finish(Error.errorWithCode(.Unknown, failureReason: "Malformed URL"))
-            return
-        }
-        
         let indexURL = baseURL.URLByAppendingPathComponent("v3/index.json")
         let request = NSMutableURLRequest(URL: indexURL)
         
@@ -76,7 +65,7 @@ class FetchCatalogVersionOperation: Operation {
                 return
             }
             
-            self.catalogVersion = catalogVersion
+            self.result = catalogVersion
             
             self.finish()
         }

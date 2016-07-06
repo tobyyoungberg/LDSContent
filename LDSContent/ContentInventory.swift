@@ -70,76 +70,22 @@ class ContentInventory {
         if fromVersion < 1 {
             do {
                 try inTransaction {
-                    try self.db.run(MetadataTable.table.create(ifNotExists: true) { builder in
-                        builder.column(MetadataTable.key, primaryKey: true)
-                        builder.column(MetadataTable.stringValue)
-                    })
-                    
                     try self.db.run(InstalledItemTable.table.create(ifNotExists: true) { builder in
                         builder.column(InstalledItemTable.itemID, primaryKey: true)
                         builder.column(InstalledItemTable.schemaVersion)
                         builder.column(InstalledItemTable.itemPackageVersion)
                     })
                     
+                    try self.db.run(InstalledCatalogTable.table.create(ifNotExists: true) { builder in
+                        builder.column(InstalledCatalogTable.name, primaryKey: true)
+                        builder.column(InstalledCatalogTable.url)
+                        builder.column(InstalledCatalogTable.version)
+                    })
+                    
                     self.databaseVersion = 1
                 }
             } catch {}
         }
-    }
-    
-    var catalogVersion: Int? {
-        get {
-            return self.intForMetadataKey("catalogVersion")
-        }
-        set {
-            setInt(newValue, forMetadataKey: "catalogVersion")
-        }
-    }
-    
-}
-
-extension ContentInventory {
-    
-    class MetadataTable {
-        
-        static let table = Table("metadata")
-        static let key = Expression<String>("key")
-        static let integerValue = Expression<Int>("value")
-        static let stringValue = Expression<String>("value")
-        
-    }
-    
-    func intForMetadataKey(key: String) -> Int? {
-        return db.pluck(MetadataTable.table.filter(MetadataTable.key == key).select(MetadataTable.stringValue)).flatMap { row in
-            let string = row[MetadataTable.stringValue]
-            return Int(string)
-        }
-    }
-    
-    func stringForMetadataKey(key: String) -> String? {
-        return db.pluck(MetadataTable.table.filter(MetadataTable.key == key).select(MetadataTable.stringValue)).map { row in
-            return row[MetadataTable.stringValue]
-        }
-    }
-    
-    func setInt(integerValue: Int?, forMetadataKey key: String) {
-        do {
-            if let integerValue = integerValue {
-                try db.run(MetadataTable.table.insert(or: .Replace, MetadataTable.key <- key, MetadataTable.integerValue <- integerValue))
-            } else {
-                try db.run(MetadataTable.table.filter(MetadataTable.key == key).delete())
-            }
-        } catch {}
-    }
-    
-    func setString(stringValue: String?, forMetadataKey key: String) {
-        do {
-            if let stringValue = stringValue {
-                try db.run(MetadataTable.table.insert(or: .Replace, MetadataTable.key <- key, MetadataTable.stringValue <- stringValue))
-            } else {
-                try db.run(MetadataTable.table.filter(MetadataTable.key == key).delete())
-            }
-        } catch {}
     }
     
 }
@@ -185,4 +131,46 @@ extension ContentInventory {
         try db.run(InstalledItemTable.table.filter(InstalledItemTable.itemID == itemID).delete())
     }
 
+}
+
+extension ContentInventory {
+    
+    class InstalledCatalogTable {
+        
+        static let table = Table("installed_catalog")
+        static let name = Expression<String>("name")
+        static let url = Expression<String?>("url")
+        static let version = Expression<Int>("version")
+        
+        static func fromRow(row: Row) -> CatalogMetadata {
+            return CatalogMetadata(name: row[name], url: row[url], version: row[version])
+        }
+        
+    }
+    
+    func addOrUpdateCatalog(name: String, url: String?, version: Int) throws {
+        try db.run(InstalledCatalogTable.table.insert(or: .Replace, InstalledCatalogTable.name <- name, InstalledCatalogTable.url <- url, InstalledCatalogTable.version <- version))
+    }
+    
+    func deleteCatalogsNamed(names: [String]) throws {
+        try db.run(InstalledCatalogTable.table.filter(names.contains(InstalledCatalogTable.name)).delete())
+    }
+    
+    func installedCatalogs() -> [CatalogMetadata] {
+        do {
+            return try db.prepare(InstalledCatalogTable.table).map { InstalledCatalogTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
+    func catalogNamed(name: String) -> CatalogMetadata? {
+        // TODO: Switch back to use `db.pluck` when it doesn't crash
+        do {
+            return try db.prepare(InstalledCatalogTable.table.filter(InstalledCatalogTable.name == name).limit(1)).map { InstalledCatalogTable.fromRow($0) }.first
+        } catch {
+            return nil
+        }
+    }
+    
 }

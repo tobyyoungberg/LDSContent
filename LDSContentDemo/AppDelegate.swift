@@ -78,8 +78,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             switch result {
             case let .Success(catalog):
                 NSLog("Updated catalog to v%li.%li", catalog.schemaVersion, catalog.catalogVersion)
-            case let .AlreadyCurrent(catalog):
-                NSLog("Catalog is already up-to-date (v%li.%li)", catalog.schemaVersion, catalog.catalogVersion)
+            case let .PartialSuccess(catalog, errors):
+                NSLog("Updated catalog to v%li.%li", catalog.schemaVersion, catalog.catalogVersion)
+                for (name, errors) in errors {
+                    NSLog("Failed to update catalog \(name): %@", "\(errors)")
+                }
             case let .Error(errors):
                 NSLog("Failed to update catalog: %@", "\(errors)")
             }
@@ -87,7 +90,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             if showUI {
                 dispatch_async(dispatch_get_main_queue()) {
                     switch result {
-                    case .Success, .AlreadyCurrent:
+                    case .Success, .PartialSuccess:
                         SVProgressHUD.setDefaultMaskType(.None)
                         SVProgressHUD.showSuccessWithStatus("Installed")
                     case .Error:

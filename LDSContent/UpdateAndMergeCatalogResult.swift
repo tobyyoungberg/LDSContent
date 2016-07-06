@@ -20,25 +20,10 @@
 // THE SOFTWARE.
 //
 
-import XCTest
-@testable import LDSContent
+import Foundation
 
-class FetchCatalogVersionTests: XCTestCase {
-    
-    func testFetchCatalogVersion() {
-        let session = Session()
-        
-        let expectation = expectationWithDescription("Fetch catalog version")
-        session.fetchCatalogVersion { result in
-            switch result {
-            case let .Success(catalogVersion):
-                XCTAssertGreaterThan(catalogVersion, 0)
-            case let .Error(errors):
-                XCTFail("Failed with errors \(errors)")
-            }
-            expectation.fulfill()
-        }
-        waitForExpectationsWithTimeout(30, handler: nil)
-    }
-    
+public enum UpdateAndMergeCatalogResult {
+    case Success(catalog: Catalog)
+    case PartialSuccess(catalog: Catalog, secureCatalogFailures: [(name: String, errors: [ErrorType])])
+    case Error(errors: [ErrorType])
 }
