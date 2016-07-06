@@ -96,8 +96,10 @@ public class ContentController {
                     do {
                         let catalog = try self.mergeCatalogs()
                         if secureCatalogFailures.isEmpty {
+                            self.catalogUpdateObservers.notify(catalog)
                             completion(.Success(catalog: catalog))
                         } else {
+                            self.catalogUpdateObservers.notify(catalog)
                             completion(.PartialSuccess(catalog: catalog, secureCatalogFailures: secureCatalogFailures))
                         }
                     } catch {
