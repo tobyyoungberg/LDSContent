@@ -6,7 +6,7 @@ use_frameworks!
 workspace 'LDSContent'
 
 target 'LDSContent' do
-	project 'LDSContent.xcodeproj'
+    project 'LDSContent.xcodeproj'
 
     pod 'Operations'
     pod 'SQLite.swift'
@@ -14,12 +14,12 @@ target 'LDSContent' do
     pod 'Swiftification'
     pod 'SSZipArchive'
     
-	target 'LDSContentTests' do
-	end
-	
-	target 'LDSContentDemo' do
-		project 'LDSContentDemo.xcodeproj'
-	
-		pod 'SVProgressHUD'
-	end
+    target 'LDSContentTests' do
+    end
+    
+    target 'LDSContentDemo' do
+        project 'LDSContentDemo.xcodeproj'
+    
+        pod 'SVProgressHUD'
+    end
 end
