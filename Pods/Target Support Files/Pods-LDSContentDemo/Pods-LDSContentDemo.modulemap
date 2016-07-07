@@ -1,6 +1,0 @@
-framework module Pods_LDSContentDemo {
-  umbrella header "Pods-LDSContentDemo-umbrella.h"
-
-  export *
-  module * { export * }
-}

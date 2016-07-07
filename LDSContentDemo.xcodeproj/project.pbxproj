@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		905ACFEEEFBAAE24A86ED250 /* Pods_LDSContentDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12EE6FFD6D0E9C12BAA15F2C /* Pods_LDSContentDemo.framework */; };
+		8526D9662F1F191B053FC04B /* Pods_LDSContent_LDSContentDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F3BEC3E4DEFEADF440F3B391 /* Pods_LDSContent_LDSContentDemo.framework */; };
 		D942593C1C7B928300F44084 /* ItemNavCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D942593B1C7B928300F44084 /* ItemNavCollectionViewController.swift */; };
 		D99075641CDFE8AB004B046B /* LibraryItemTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D99075631CDFE8AB004B046B /* LibraryItemTableViewCell.swift */; };
 		D9A56A301C6C2B100094621F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9A56A2F1C6C2B100094621F /* AppDelegate.swift */; };
@@ -20,7 +20,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		12EE6FFD6D0E9C12BAA15F2C /* Pods_LDSContentDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LDSContentDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		198DE1802F94BD32DCED0732 /* Pods-LDSContent-LDSContentDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LDSContent-LDSContentDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-LDSContent-LDSContentDemo/Pods-LDSContent-LDSContentDemo.debug.xcconfig"; sourceTree = "<group>"; };
+		C55843A2C13B8EED3E8C8A53 /* Pods-LDSContent-LDSContentDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LDSContent-LDSContentDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-LDSContent-LDSContentDemo/Pods-LDSContent-LDSContentDemo.release.xcconfig"; sourceTree = "<group>"; };
 		D942593B1C7B928300F44084 /* ItemNavCollectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ItemNavCollectionViewController.swift; sourceTree = "<group>"; };
 		D99075631CDFE8AB004B046B /* LibraryItemTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibraryItemTableViewCell.swift; sourceTree = "<group>"; };
 		D9A56A2C1C6C2B100094621F /* LDSContentDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LDSContentDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -32,8 +33,7 @@
 		D9A56A451C6D0C550094621F /* LibraryCollectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibraryCollectionViewController.swift; sourceTree = "<group>"; };
 		D9C012981C74E33D0025D78A /* NSFileManager+URLs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSFileManager+URLs.swift"; sourceTree = "<group>"; };
 		D9E9CBCB1C6D11950077B613 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
-		FB7D538098FF734EFAAD3AC8 /* Pods-LDSContentDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LDSContentDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-LDSContentDemo/Pods-LDSContentDemo.release.xcconfig"; sourceTree = "<group>"; };
-		FE6EACBFC4623FDABA21CDB1 /* Pods-LDSContentDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LDSContentDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-LDSContentDemo/Pods-LDSContentDemo.debug.xcconfig"; sourceTree = "<group>"; };
+		F3BEC3E4DEFEADF440F3B391 /* Pods_LDSContent_LDSContentDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LDSContent_LDSContentDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -42,20 +42,29 @@
 			buildActionMask = 2147483647;
 			files = (
 				D9A56A421C6C31400094621F /* LDSContent.framework in Frameworks */,
-				905ACFEEEFBAAE24A86ED250 /* Pods_LDSContentDemo.framework in Frameworks */,
+				8526D9662F1F191B053FC04B /* Pods_LDSContent_LDSContentDemo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D502F797722FA6CD1620B3B5 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				198DE1802F94BD32DCED0732 /* Pods-LDSContent-LDSContentDemo.debug.xcconfig */,
+				C55843A2C13B8EED3E8C8A53 /* Pods-LDSContent-LDSContentDemo.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 		D9A56A231C6C2B100094621F = {
 			isa = PBXGroup;
 			children = (
 				D9A56A2E1C6C2B100094621F /* LDSContentDemo */,
 				D9A56A2D1C6C2B100094621F /* Products */,
 				E9E1D0175807D354F03A216C /* Frameworks */,
-				DCD54D36920966B447F9EEEC /* Pods */,
+				D502F797722FA6CD1620B3B5 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -99,20 +108,11 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		DCD54D36920966B447F9EEEC /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				FE6EACBFC4623FDABA21CDB1 /* Pods-LDSContentDemo.debug.xcconfig */,
-				FB7D538098FF734EFAAD3AC8 /* Pods-LDSContentDemo.release.xcconfig */,
-			);
-			name = Pods;
-			sourceTree = "<group>";
-		};
 		E9E1D0175807D354F03A216C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				D9A56A411C6C31400094621F /* LDSContent.framework */,
-				12EE6FFD6D0E9C12BAA15F2C /* Pods_LDSContentDemo.framework */,
+				F3BEC3E4DEFEADF440F3B391 /* Pods_LDSContent_LDSContentDemo.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -198,7 +198,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-LDSContentDemo/Pods-LDSContentDemo-resources.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-LDSContent-LDSContentDemo/Pods-LDSContent-LDSContentDemo-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		C98BC42346CCD37F6521D55A /* [CP] Embed Pods Frameworks */ = {
@@ -213,7 +213,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-LDSContentDemo/Pods-LDSContentDemo-frameworks.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-LDSContent-LDSContentDemo/Pods-LDSContent-LDSContentDemo-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		E6999F8AE568F68A476DFE2C /* [CP] Check Pods Manifest.lock */ = {
@@ -335,7 +335,7 @@
 		};
 		D9A56A3F1C6C2B100094621F /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FE6EACBFC4623FDABA21CDB1 /* Pods-LDSContentDemo.debug.xcconfig */;
+			baseConfigurationReference = 198DE1802F94BD32DCED0732 /* Pods-LDSContent-LDSContentDemo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = LDSContentDemo/Info.plist;
@@ -347,7 +347,7 @@
 		};
 		D9A56A401C6C2B100094621F /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FB7D538098FF734EFAAD3AC8 /* Pods-LDSContentDemo.release.xcconfig */;
+			baseConfigurationReference = C55843A2C13B8EED3E8C8A53 /* Pods-LDSContent-LDSContentDemo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = LDSContentDemo/Info.plist;
