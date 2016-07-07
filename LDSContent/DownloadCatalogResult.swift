@@ -23,6 +23,7 @@
 import Foundation
 
 public enum DownloadCatalogResult {
-    case Success(version: Int, location: NSURL)
+    case Success(version: Int)
+    case AlreadyCurrent
     case Error(errors: [ErrorType])
 }

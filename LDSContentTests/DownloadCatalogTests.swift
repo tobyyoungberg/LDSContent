@@ -27,21 +27,41 @@ class DownloadCatalogTests: XCTestCase {
     
     func testDownloadLatestCatalog() {
         let session = Session()
-        
-        let expectation = expectationWithDescription("Download latest catalog")
-        session.updateDefaultCatalog { result in
+        let catalogURL = NSURL(fileURLWithPath: NSTemporaryDirectory()).URLByAppendingPathComponent(NSProcessInfo.processInfo().globallyUniqueString)
+        let downloadExpectation = expectationWithDescription("Download latest catalog")
+        let alreadyCurrentExpectation = self.expectationWithDescription("Already downloaded catalog")
+        session.updateDefaultCatalog(destination: { _ in catalogURL }) { result in
             switch result {
-            case let .Success(_, location):
+            case .Success:
                 do {
-                    let catalog = try Catalog(path: location.path!)
+                    let catalog = try Catalog(path: catalogURL.path!)
                     XCTAssertGreaterThan(catalog.catalogVersion, 0)
                 } catch {
                     XCTFail("Failed to connect to catalog: \(error)")
                 }
+            case .AlreadyCurrent:
+                XCTFail("Shouldn't be already current.")
             case let .Error(errors):
                 XCTFail("Failed with errors \(errors)")
             }
-            expectation.fulfill()
+            downloadExpectation.fulfill()
+            
+            session.updateDefaultCatalog(destination: { _ in catalogURL }) { result in
+                switch result {
+                case .Success:
+                    XCTFail("Should be already current.")
+                case .AlreadyCurrent:
+                    do {
+                        let catalog = try Catalog(path: catalogURL.path!)
+                        XCTAssertGreaterThan(catalog.catalogVersion, 0)
+                    } catch {
+                        XCTFail("Failed to connect to catalog: \(error)")
+                    }
+                case let .Error(errors):
+                    XCTFail("Failed with errors \(errors)")
+                }
+                alreadyCurrentExpectation.fulfill()
+            }
         }
         
         waitForExpectationsWithTimeout(30, handler: nil)

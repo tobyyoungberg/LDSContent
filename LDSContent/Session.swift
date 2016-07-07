@@ -38,23 +38,23 @@ class Session: NSObject {
     private var progressByTaskIdentifier: [Int: (amount: Float) -> Void] = [:]
     private var completionByTaskIdentifier: [Int: (result: DownloadResult) -> Void] = [:]
     
-    private func catalogOperationsForCatalogs(catalogs: [(name: String, baseURL: NSURL)], progress: (amount: Float) -> Void = { _ in }, completion: (DownloadCatalogResult) -> Void) -> [Operation] {
-        return catalogs.flatMap { (name, baseURL) -> [Operation] in
+    private func catalogOperationsForCatalogs(catalogs: [(name: String, baseURL: NSURL, destination: (version: Int) -> NSURL)], progress: (amount: Float) -> Void = { _ in }, completion: (DownloadCatalogResult) -> Void) -> [Operation] {
+        return catalogs.flatMap { (name, baseURL, destination) -> [Operation] in
             let versionOperation = FetchCatalogVersionOperation(session: self, baseURL: baseURL)
-            let downloadOperation = DownloadCatalogOperation(session: self, catalogName: name, baseURL: baseURL, progress: progress, completion: completion)
+            let downloadOperation = DownloadCatalogOperation(session: self, catalogName: name, baseURL: baseURL, destination: destination, progress: progress, completion: completion)
             downloadOperation.injectResultFromDependency(versionOperation)
             return [versionOperation, downloadOperation]
         }
     }
     
-    func updateDefaultCatalog(progress: (amount: Float) -> Void = { _ in }, completion: (DownloadCatalogResult) -> Void) {
+    func updateDefaultCatalog(destination destination: (version: Int) -> NSURL, progress: (amount: Float) -> Void = { _ in }, completion: (DownloadCatalogResult) -> Void) {
         guard let defaultURL = NSURL(string: "https://edge.ldscdn.org/mobile/gospelstudy/beta/") else { return completion(.Error(errors: [Error.errorWithCode(.Unknown, failureReason: "Malformed base URL for default catalog.")])) }
         
-        let operations = catalogOperationsForCatalogs([(ContentController.defaultCatalogName, defaultURL)], progress: progress, completion: completion)
+        let operations = catalogOperationsForCatalogs([(ContentController.defaultCatalogName, defaultURL, destination)], progress: progress, completion: completion)
         operationQueue.addOperations(operations)
     }
     
-    func updateSecureCatalogs(secureCatalogs: [(name: String, baseURL: NSURL)], progress: (amount: Float) -> Void = { _ in }, completion: ([(name: String, baseURL: NSURL, result: DownloadCatalogResult)]) -> Void) {
+    func updateSecureCatalogs(secureCatalogs: [(name: String, baseURL: NSURL, destination: (version: Int) -> NSURL)], progress: (amount: Float) -> Void = { _ in }, completion: ([(name: String, baseURL: NSURL, result: DownloadCatalogResult)]) -> Void) {
         let operations = catalogOperationsForCatalogs(secureCatalogs, progress: progress, completion: { _ in })
         let group = GroupOperation(operations: operations)
         group.addObserver(DidFinishObserver { operation, errors in

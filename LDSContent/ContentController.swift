@@ -74,24 +74,27 @@ public class ContentController {
     /// Checks the server for the latest catalog version and installs it if newer than the currently
     /// installed catalog (or if there is no catalog installed).
     public func updateCatalog(secureCatalogs secureCatalogs: [(name: String, baseURL: NSURL)]? = nil, progress: (amount: Float) -> Void = { _ in }, completion: (UpdateAndMergeCatalogResult) -> Void) {
-        session.updateDefaultCatalog { result in
+        if let secureCatalogs = secureCatalogs {
+            // Delete secure catalogs we no longer have access to
+            let catalogsToDelete = contentInventory.installedCatalogs().filter { installedCatalog in !installedCatalog.isDefault() && !secureCatalogs.contains({ secureCatalog in secureCatalog.name == installedCatalog.name })}.map { $0.name }
+            do {
+                try self.contentInventory.deleteCatalogsNamed(catalogsToDelete)
+            } catch {
+                NSLog("Couldn't delete catalogs \(catalogsToDelete): \(error)")
+            }
+        }
+        
+        session.updateDefaultCatalog(destination: { version in self.locationForCatalog(ContentController.defaultCatalogName, version: version) }) { result in
             switch result {
-            case let .Success(version, location):
-                let defaultCatalogURL = self.locationForCatalog(ContentController.defaultCatalogName, version: version)
-                do {
-                    if let directory = defaultCatalogURL.URLByDeletingLastPathComponent {
-                        try NSFileManager.defaultManager().createDirectoryAtURL(directory, withIntermediateDirectories: true, attributes: nil)
-                    }
-                    try NSFileManager.defaultManager().moveItemAtURL(location, toURL: defaultCatalogURL)
-                } catch {}
-                
+            case let .Success(version):
                 do {
                     try self.contentInventory.addOrUpdateCatalog(ContentController.defaultCatalogName, url: nil, version: version)
                 } catch let error as NSError {
                     completion(.Error(errors: [error]))
                     return
                 }
-                
+                fallthrough
+            case .AlreadyCurrent:
                 func mergeAndComplete(secureCatalogFailures secureCatalogFailures: [(name: String, errors: [ErrorType])]) {
                     do {
                         let catalog = try self.mergeCatalogs()
@@ -109,29 +112,18 @@ public class ContentController {
                 
                 // If default catalog update succeeds, attempt to update secure catalogs (if any)
                 if let secureCatalogs = secureCatalogs {
-                    let catalogsToDelete = self.contentInventory.installedCatalogs().filter { installedCatalog in !installedCatalog.isDefault() && !secureCatalogs.contains({ secureCatalog in secureCatalog.name == installedCatalog.name })}.map { $0.name }
-                    do {
-                        try self.contentInventory.deleteCatalogsNamed(catalogsToDelete)
-                    } catch {
-                        NSLog("Couldn't delete catalogs \(catalogsToDelete): \(error)")
-                    }
-                    self.session.updateSecureCatalogs(secureCatalogs) { results in
+                    self.session.updateSecureCatalogs(secureCatalogs.map { catalog in (catalog.name, catalog.baseURL, { version in self.locationForCatalog(catalog.name, version: version) }) }) { results in
                         var secureCatalogFailures = [(name: String, errors: [ErrorType])]()
                         results.forEach { name, baseURL, result in
                             switch result {
-                            case let .Success(version, location):
-                                let secureCatalogURL = self.locationForCatalog(name, version: version)
-                                do {
-                                    if let directory = secureCatalogURL.URLByDeletingLastPathComponent {
-                                        try NSFileManager.defaultManager().createDirectoryAtURL(directory, withIntermediateDirectories: true, attributes: nil)
-                                    }
-                                    try NSFileManager.defaultManager().moveItemAtURL(location, toURL: secureCatalogURL)
-                                } catch {}
+                            case let .Success(version):
                                 do {
                                     try self.contentInventory.addOrUpdateCatalog(name, url: baseURL.path, version: version)
                                 } catch let error as NSError {
                                     secureCatalogFailures.append((name: name, errors: [error]))
                                 }
+                            case .AlreadyCurrent:
+                                break
                             case let .Error(errors):
                                 secureCatalogFailures.append((name: name, errors: errors))
                             }
@@ -151,6 +143,10 @@ public class ContentController {
     
     private func mergeCatalogs() throws -> Catalog {
         guard let defaultVersion = contentInventory.catalogNamed(ContentController.defaultCatalogName)?.version, mergedPath = mergedCatalogPath else { throw Error.errorWithCode(.Unknown, failureReason: "No default catalog.") }
+        
+        if let existingCatalog = try? Catalog(path: mergedPath) {
+            return existingCatalog
+        }
         
         let tempURL = NSURL(fileURLWithPath: NSTemporaryDirectory()).URLByAppendingPathComponent("Catalog.sqlite")
         let defaultLocation = locationForCatalog(ContentController.defaultCatalogName, version: defaultVersion)

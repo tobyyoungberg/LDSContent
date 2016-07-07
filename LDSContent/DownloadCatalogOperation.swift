@@ -31,17 +31,20 @@ enum DownloadCatalogOperationError: ErrorType {
 class DownloadCatalogOperation: Operation, AutomaticInjectionOperationType {
     var requirement: Int? // Catalog version injected from FetchCatalogVersionOperation
     var result: DownloadCatalogResult? // When used in group operations it's easier to get individual results after all operations have finished
+    var isCurrent = false
     
+    let catalogName: String
     let session: Session
+    let baseURL: NSURL
+    let destination: (version: Int) -> NSURL
     let progress: (amount: Float) -> Void
     let tempDirectoryURL: NSURL
-    let catalogName: String
-    let baseURL: NSURL
     
-    init(session: Session, catalogName: String, baseURL: NSURL, progress: (amount: Float) -> Void, completion: (DownloadCatalogResult) -> Void) {
+    init(session: Session, catalogName: String, baseURL: NSURL, destination: (version: Int) -> NSURL, progress: (amount: Float) -> Void, completion: (DownloadCatalogResult) -> Void) {
         self.session = session
         self.catalogName = catalogName
         self.baseURL = baseURL
+        self.destination = destination
         self.progress = progress
         self.tempDirectoryURL = NSURL(fileURLWithPath: NSTemporaryDirectory()).URLByAppendingPathComponent(NSProcessInfo.processInfo().globallyUniqueString)
         
@@ -49,9 +52,22 @@ class DownloadCatalogOperation: Operation, AutomaticInjectionOperationType {
         
         addObserver(BlockObserver(didFinish: { operation, errors in
             if errors.isEmpty, let version = self.requirement {
-                let result = DownloadCatalogResult.Success(version: version, location: self.tempDirectoryURL.URLByAppendingPathComponent("Catalog.sqlite"))
-                self.result = result
-                completion(result)
+                if self.isCurrent {
+                    let result = DownloadCatalogResult.AlreadyCurrent
+                    self.result = result
+                    completion(result)
+                } else {
+                    let destinationURL = self.destination(version: version)
+                    do {
+                        if let directory = destinationURL.URLByDeletingLastPathComponent {
+                            try NSFileManager.defaultManager().createDirectoryAtURL(directory, withIntermediateDirectories: true, attributes: nil)
+                        }
+                        try NSFileManager.defaultManager().moveItemAtURL(self.tempDirectoryURL.URLByAppendingPathComponent("Catalog.sqlite"), toURL: destinationURL)
+                    } catch {}
+                    let result = DownloadCatalogResult.Success(version: version)
+                    self.result = result
+                    completion(result)
+                }
             } else {
                 let result = DownloadCatalogResult.Error(errors: errors)
                 self.result = result
@@ -64,6 +80,20 @@ class DownloadCatalogOperation: Operation, AutomaticInjectionOperationType {
         guard let catalogVersion = requirement else {
             finish(DownloadCatalogOperationError.MissingCatalogVersionError("Catalog version was not injected properly and is nil."))
             return
+        }
+        
+        let destinationURL = destination(version: catalogVersion)
+        if (try? Catalog(path: destinationURL.path)) != nil {
+            isCurrent = true
+            finish()
+            return
+        } else if let path = destinationURL.path where NSFileManager.defaultManager().fileExistsAtPath(path) {
+            do {
+                try NSFileManager.defaultManager().removeItemAtURL(destinationURL)
+            } catch {
+                finish(error)
+                return
+            }
         }
         
         downloadCatalog(baseURL: baseURL, catalogVersion: catalogVersion, progress: progress) { result in
