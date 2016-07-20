@@ -71,6 +71,19 @@ public class ContentController {
         return location.URLByAppendingPathComponent("MergedCatalogs/\(directoryName)/Catalog.sqlite").path
     }
     
+    /// Directly install catalog located at `path`
+    public func installCatalog(atPath path: String) throws {
+        guard let catalog = try? Catalog(path: path, readonly: true) else { return }
+        
+        let destinationURL = locationForCatalog(ContentController.defaultCatalogName, version: catalog.catalogVersion)
+        if let directory = destinationURL.URLByDeletingLastPathComponent, destinationPath = destinationURL.path {
+            try NSFileManager.defaultManager().createDirectoryAtURL(directory, withIntermediateDirectories: true, attributes: nil)
+            try NSFileManager.defaultManager().copyItemAtPath(path, toPath: destinationPath)
+            try contentInventory.addOrUpdateCatalog(ContentController.defaultCatalogName, url: nil, version: catalog.catalogVersion)
+            try mergeCatalogs()
+        }
+    }
+    
     /// Checks the server for the latest catalog version and installs it if newer than the currently
     /// installed catalog (or if there is no catalog installed).
     public func updateCatalog(secureCatalogs secureCatalogs: [(name: String, baseURL: NSURL)]? = nil, progress: (amount: Float) -> Void = { _ in }, completion: (UpdateAndMergeCatalogResult) -> Void) {
