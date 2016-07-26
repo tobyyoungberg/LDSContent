@@ -23,6 +23,11 @@
 import Foundation
 import Swiftification
 
+public enum InstallPriority {
+    case Default
+    case High
+}
+
 /// Manages, installs, and updates catalogs and item packages.
 public class ContentController {
     static let defaultCatalogName = "default"
@@ -198,7 +203,7 @@ public class ContentController {
     }
     
     /// Downloads and installs a specific version of an item, if not installed already.
-    public func installItemPackageForItem(item: Item, progress: (amount: Float) -> Void, completion: (InstallItemPackageResult) -> Void) {
+    public func installItemPackageForItem(item: Item, progress: (amount: Float) -> Void, priority: InstallPriority = .Default, completion: (InstallItemPackageResult) -> Void) {
         let itemDirectoryURL = location.URLByAppendingPathComponent("Item/\(item.id)")
         let versionDirectoryURL = itemDirectoryURL.URLByAppendingPathComponent("\(Catalog.SchemaVersion).\(item.version)")
         let itemPackageURL = versionDirectoryURL.URLByAppendingPathComponent("package.sqlite")
@@ -211,7 +216,7 @@ public class ContentController {
                 completion(.Error(errors: [error]))
             }
         } else {
-            session.downloadItemPackage(externalID: item.externalID, version: item.version, progress: progress) { result in
+            session.downloadItemPackage(externalID: item.externalID, version: item.version, progress: progress, priority: priority) { result in
                 switch result {
                 case let .Success(location):
                     do {

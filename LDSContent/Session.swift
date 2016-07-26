@@ -69,8 +69,11 @@ class Session: NSObject {
         operationQueue.addOperation(group)
     }
     
-    func downloadItemPackage(externalID externalID: String, version: Int, progress: (amount: Float) -> Void, completion: (DownloadItemPackageResult) -> Void) {
+    func downloadItemPackage(externalID externalID: String, version: Int, progress: (amount: Float) -> Void, priority: InstallPriority = .Default, completion: (DownloadItemPackageResult) -> Void) {
         let operation = DownloadItemPackageOperation(session: self, externalID: externalID, version: version, progress: progress, completion: completion)
+        if case priority = InstallPriority.High {
+            operation.queuePriority = .VeryHigh
+        }
         operationQueue.addOperation(operation)
     }
     
