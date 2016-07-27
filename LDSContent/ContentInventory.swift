@@ -76,6 +76,14 @@ class ContentInventory {
                         builder.column(InstalledItemTable.itemPackageVersion)
                     })
                     
+                    try self.db.run(InstallQueueTable.table.create(ifNotExists: true) { builder in
+                        builder.column(InstallQueueTable.itemID, primaryKey: true)
+                    })
+                    
+                    try self.db.run(ErroredInstallTable.table.create(ifNotExists: true) { builder in
+                        builder.column(ErroredInstallTable.itemID, primaryKey: true)
+                    })
+                    
                     try self.db.run(InstalledCatalogTable.table.create(ifNotExists: true) { builder in
                         builder.column(InstalledCatalogTable.name, primaryKey: true)
                         builder.column(InstalledCatalogTable.url)
@@ -131,6 +139,61 @@ extension ContentInventory {
         try db.run(InstalledItemTable.table.filter(InstalledItemTable.itemID == itemID).delete())
     }
 
+}
+
+extension ContentInventory {
+    
+    class InstallQueueTable {
+        
+        static let table = Table("install_queue")
+        static let itemID = Expression<Int64>("item_id")
+        
+    }
+    
+    func installingItemIDs() -> [Int64] {
+        do {
+            return try db.prepare(InstallQueueTable.table.select(InstallQueueTable.itemID)).map { $0[InstallQueueTable.itemID] }
+        } catch {
+            return []
+        }
+    }
+    
+    func addToInstallQueue(itemID itemID: Int64) throws {
+        try db.run(InstallQueueTable.table.insert(or: .Replace, InstallQueueTable.itemID <- itemID))
+    }
+    
+    func removeFromInstallQueue(itemID itemID: Int64) throws {
+        try db.run(InstallQueueTable.table.filter(InstallQueueTable.itemID == itemID).delete())
+    }
+    
+}
+
+extension ContentInventory {
+    
+    class ErroredInstallTable {
+        
+        static let table = Table("errored_install")
+        static let itemID = Expression<Int64>("item_id")
+        
+    }
+    
+    func erroredItemIDs() -> [Int64] {
+        do {
+            return try db.prepare(ErroredInstallTable.table.select(ErroredInstallTable.itemID)).map { $0[ErroredInstallTable.itemID] }
+        } catch {
+            return []
+        }
+    }
+    
+    func setErrored(errored: Bool, itemID: Int64) throws {
+        if errored {
+            try db.run(ErroredInstallTable.table.insert(or: .Replace, ErroredInstallTable.itemID <- itemID))
+        } else {
+            try db.run(ErroredInstallTable.table.filter(ErroredInstallTable.itemID == itemID).delete())
+        }
+        
+    }
+    
 }
 
 extension ContentInventory {

@@ -211,11 +211,22 @@ public class ContentController {
         if let installedVersion = contentInventory.installedVersionOfItemWithID(item.id) where installedVersion.schemaVersion == Catalog.SchemaVersion && installedVersion.itemPackageVersion == item.version {
             do {
                 let itemPackage = try ItemPackage(url: itemPackageURL)
+                
+                do {
+                    try contentInventory.setErrored(false, itemID: item.id)
+                    try contentInventory.removeFromInstallQueue(itemID: item.id)
+                } catch { }
+                
                 completion(.AlreadyInstalled(itemPackage: itemPackage))
             } catch let error as NSError {
                 completion(.Error(errors: [error]))
             }
         } else {
+            do {
+                try contentInventory.addToInstallQueue(itemID: item.id)
+                try contentInventory.setErrored(false, itemID: item.id)
+            } catch { }
+            
             session.downloadItemPackage(externalID: item.externalID, version: item.version, progress: progress, priority: priority) { result in
                 switch result {
                 case let .Success(location):
@@ -231,13 +242,25 @@ public class ContentController {
                         
                         try self.contentInventory.setSchemaVersion(Catalog.SchemaVersion, itemPackageVersion: item.version, forItemWithID: item.id)
                         
+                        do {
+                            try self.contentInventory.removeFromInstallQueue(itemID: item.id)
+                        } catch { }
+                        
                         self.itemPackageInstallObservers.notify(item)
                         
                         completion(.Success(itemPackage: itemPackage))
                     } catch let error as NSError {
+                        do {
+                            try self.contentInventory.setErrored(true, itemID: item.id)
+                            try self.contentInventory.removeFromInstallQueue(itemID: item.id)
+                        } catch { }
                         completion(.Error(errors: [error]))
                     }
                 case let .Error(errors):
+                    do {
+                        try self.contentInventory.setErrored(true, itemID: item.id)
+                        try self.contentInventory.removeFromInstallQueue(itemID: item.id)
+                    } catch { }
                     completion(.Error(errors: errors))
                 }
             }
@@ -263,6 +286,14 @@ public class ContentController {
     
     public func installedItemIDs() -> [Int64] {
         return contentInventory.installedItemIDs()
+    }
+    
+    public func installingItemIDs() -> [Int64] {
+        return contentInventory.installingItemIDs()
+    }
+    
+    public func erroredItemIDs() -> [Int64] {
+        return contentInventory.erroredItemIDs()
     }
     
     public func installedVersionOfItemWithID(itemID: Int64) -> (schemaVersion: Int, itemPackageVersion: Int)? {
